@@ -62,7 +62,7 @@ void Config_IO(){
 	set_high(SD_POWER);
 	configure_as_output(SD_POWER);
 	
-	set_high(SD_POWER);
+	set_high(SENSE_POWER);
 	configure_as_output(SENSE_POWER);
 	
 	configure_as_input(S1);

@@ -77,10 +77,10 @@
 #define PIO_5					PB0
 #define PIO_5_PORT				PORTB
 
-#define SENSE_SER				PC7
+#define SENSE_SER				PC6
 #define SENSE_SER_PORT			PORTC
 
-#define SENSE_CLR				PC6
+#define SENSE_CLR				PC7
 #define SENSE_CLR_PORT			PORTC
 
 #define DUMMY_LOAD				PD5
