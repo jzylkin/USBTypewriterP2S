@@ -10,10 +10,11 @@
 #define SENSE_KEYS_H_
 
 uint8_t GetModifier();
+uint8_t GetKeySimple();
 
 uint8_t GetKey();
 
-long long ReadSensor();
+unsigned long long ReadSensor();
 
 uint8_t GetKeyCode(uint8_t key, uint8_t modifier);
 

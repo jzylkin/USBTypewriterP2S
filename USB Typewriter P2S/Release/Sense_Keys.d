@@ -124,7 +124,7 @@ Sense_Keys.d Sense_Keys.o: .././Sense_Keys.c .././Keyboard.h \
  ../src/LUFA/LUFA/Platform/Platform.h \
  ../src/LUFA/LUFA/Platform/../Common/Common.h .././IO_Macros.h \
  .././Config_IO.h .././Config_Interrupts.h .././Init_Mode.h \
- .././Sense_Keys.h .././Send.h
+ .././Sense_Keys.h .././Send.h .././KeyCodes.h
 
 .././Keyboard.h:
 
@@ -387,3 +387,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././Sense_Keys.h:
 
 .././Send.h:
+
+.././KeyCodes.h:

@@ -38,10 +38,12 @@
 
 /****REGISTER MANIPULATION MACROS*****/
 #define BIT(x) (0x01 << (x))
+#define LONGLONGBIT(x) ((unsigned long long)0x0000000000000001 << (x))
 #define bit_get(p,m) ((p) & BIT(m)) // get a single bit
-#define bit_set(p,m) ((p) |= BIT(m)) //set a single bit
-#define bit_clr(p,m) ((p) &= ~BIT(m)) //clear a single bit
+#define bit_set(p,m) ((p) |= BIT(m)) //set a single bit (in a generic uint)
+#define longlongbit_set(p,m) ((p) |= LONGLONGBIT(m)) //set a single bit in a long long type
 
+#define bit_clr(p,m) ((p) &= ~BIT(m)) //clear a single bit (generic int)
 
 #define reg_set(p,m) ((p) |= (m)) //register-wide masked set
 #define reg_clr(p,m) ((p) &= ~(m)) //register-wide masked clear

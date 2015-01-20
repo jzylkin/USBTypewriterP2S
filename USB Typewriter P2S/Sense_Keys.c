@@ -6,6 +6,7 @@
  */ 
 #include "Keyboard.h"
 #include "Sense_Keys.h"
+#include "KeyCodes.h"
 
 //extern USB_KeyboardReport_Data_t* KeyBuffer;
 
@@ -24,12 +25,29 @@ uint8_t GetModifier(){
 	return Modifier;
 }
 
+uint8_t GetKeySimple(){
+	unsigned long long ThisSensorReadout; //create 64-bit "long long" binary variable and set it all to 0s.
+	uint8_t Key;
+	
+	Key=0;//by default, there is no key to send, unless one is detected later.
+	ThisSensorReadout = ReadSensor();
+	if(ThisSensorReadout){
+		Key = (uint8_t) __builtin_clzll(ThisSensorReadout);
+	}
+	else{
+		Key = 0;
+	}
+	return  Key;
+	
+}
+	
+	
 uint8_t GetKey(){
 	#define READOUT_FILTER_DEPTH 2 // only 2 entries in filter array of long longs
 	#define RELEASED_KEY_TIME 5 //delay 5 cycles before recognizing that a key has been released.
 	#define NO_BINARY_FILTERING
-	long long ThisSensorReadout; //create 64-bit "long long" binary variable and set it all to 0s.
-	long long SensorReadoutAvg;
+	unsigned long long ThisSensorReadout; //create 64-bit "long long" binary variable and set it all to 0s.
+	unsigned long long SensorReadoutAvg;
 	static uint8_t ReleaseCount; // timer that ticks down when the active key is released.
 	static uint8_t ActiveKey; //the key that has most recently been pressed.
 	uint8_t Key;//the return value
@@ -38,9 +56,9 @@ uint8_t GetKey(){
 	Key=0;//by default, there is no key to send, unless one is detected later.
 
 	#ifdef USE_BINARY_FILTERING
-	static long long *SensorReadouts[READOUT_FILTER_DEPTH];//initialize an array of readouts 
+	static unsigned long long *SensorReadouts[READOUT_FILTER_DEPTH];//initialize an array of readouts 
 	SensorReadoutAvg= ThisSensorReadout & *SensorReadouts[0] & *SensorReadouts[1];// this should be a for loop -- bitwise ANDing the last few readouts will debounce the sensor;
-	memmove(SensorReadouts+1, SensorReadouts, (READOUT_FILTER_DEPTH-1)*sizeof(long long*)); //shift the filter values over 1
+	memmove(SensorReadouts+1, SensorReadouts, (READOUT_FILTER_DEPTH-1)*sizeof(unsigned long long*)); //shift the filter values over 1
 	*SensorReadouts[0] = ThisSensorReadout; //push new sensor readout onto the filter in the spot that just opened up.
 	#else 
 	SensorReadoutAvg= ThisSensorReadout;
@@ -72,25 +90,42 @@ uint8_t GetKey(){
 	
 }
 
-long long ReadSensor(){
-		long long Readout = 0;	
+unsigned long long ReadSensor(){
+		unsigned long long Readout = 0;	
 	
 		set_low(SENSE_CLK);
 		set_high(SENSE_CLR); //stop grounding-out the sensor's power supply
 		set_low(SENSE_POWER); //begin supplying power to sensor;
 		
-		Delay_MS(1);//wait some number of uS for the sensor board to initialize (_PL signal on sensor board goes high about 100uS after powering up)
+		Delay_MS(100);//wait some number of uS for the sensor board to initialize (_PL signal on sensor board goes high about 100uS after powering up)
 		
 		
-		for (int i=1;i<SHIFT_REGISTER_PINS;i++){   //loop through every bit in readout. i=0 is reserved for "No key pressed"
+		for (int i=0;i<SHIFT_REGISTER_PINS;i++){   //loop through every bit in readout. i=0 is the first contact (actually the 8th one on the board)
+			if (is_low(SENSE_SER)) { 
+				longlongbit_set(Readout,i);// if the readout for one of the sensor pins comes back low, that key has been pressed -- store it as a 1 in the readout.
+			}	
 			set_high(SENSE_CLK);
+			DELAY_5US;
+			DELAY_5US;
+			DELAY_5US;
+			DELAY_5US;
+			DELAY_5US;
 			DELAY_5US;
 			set_low(SENSE_CLK);
 			DELAY_5US;
-			if is_low(SENSE_SER) {bit_set(Readout,i);}// if the readout for one of the sensor pins comes back low, that key has been pressed -- store it as a 1 in the readout.
+			DELAY_5US;
+			DELAY_5US;
+			DELAY_5US;
+			DELAY_5US;
+			DELAY_5US;
+
+			
 		}
 		
 		set_high(SENSE_POWER);//turn off sensor power
+		DELAY_5US;
+		DELAY_5US;
+		DELAY_5US;
 		DELAY_5US;
 		set_low(SENSE_CLR);// Sensor's VCC must go back to 0V, because the shift registers' _PL pins are tied to VCC, _PL must be low on each power up.
 		
