@@ -58,10 +58,15 @@ void Calibrate(){
 void GetTeachKey(char teachkey){
 	int keypressed = 0;
 	while(keypressed == 0){ //keep getting a key until there is a key to get.
-		keypressed = GetKey();
+		keypressed = GetKeySimple();
 	}
-
-	if (is_low(S2)){ //if Alt is being held down,
+	if (is_low(S3)){
+		ShiftKeyCodeLookUpTable[keypressed] = teachkey;
+		USBSendString("SHIFT");
+		USBSend(KEY_EQ,UPPER); //send a + sign
+		USBSendNumber(keypressed);
+	}
+	else if (is_low(S2)){ //if Alt is being held down,
 		FnKeyCodeLookUpTable[keypressed] = teachkey;
 		//send "FN+number"
 		USBSendString("FN");
@@ -72,6 +77,8 @@ void GetTeachKey(char teachkey){
 		KeyCodeLookUpTable[keypressed] = teachkey;
 		USBSendNumber(keypressed);
 	}
+	
+	USBSend(KEY_ENTER,0);
 	
 	Delay_MS(500);//implement 500 MS delay
 }
