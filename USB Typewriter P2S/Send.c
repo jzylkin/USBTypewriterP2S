@@ -15,7 +15,8 @@ void USBSend(uint8_t code,uint8_t mod){
 	TMR1_Count = 0;
 	while (KeyBuffer->KeyCode[0] && TMR1_Count < 20) {} //if buffer is full, wait.  If timeout expires, stop waiting.
 	KeyBuffer->KeyCode[0] = code;
-	KeyBuffer->Modifier = mod;
+	KeyBufferMod = mod;
+	Delay_MS(100);
 }
 
 
@@ -25,9 +26,14 @@ void USBSendString(const char *str){
 	int code;
 	length = strlen(str);
 	for (int i=0; i<length; i++){
-		code = toupper(str[i]);//make sure code is uppercase.
-		code = code-ASCII_A+HID_A;  //Convert the character (which is uppercase Ascii)  to an USB HID Keycode.
-		USBSend(code,HID_KEYBOARD_SC_LEFT_SHIFT);
+		if(str[i] == ' '){
+			code = KEY_SPACE;
+		}
+		else{
+			code = toupper(str[i]);//make sure code is uppercase.
+			code = code-ASCII_A+HID_A;  //Convert the character (which is uppercase Ascii)  to an USB HID Keycode.
+		}
+		USBSend(code,HID_KEYBOARD_MODIFIER_LEFTSHIFT);
 	}
 } 
 

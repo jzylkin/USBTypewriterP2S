@@ -29,11 +29,12 @@
 /***** Manipulate Outputs *****/
 #define set_high(bit)                       {bit ## _PORT |= (1 << bit);}
 #define set_low(bit)                        {bit ## _PORT &= ~(1 << bit);}
-#define toggle(bit)                         {bit ## _PORT+2 |= (1 << bit);} //pin register is _port+2
+
 
 /***** Test Inputs *****/
 #define is_high(bit)                        (PIN(bit ## _PORT) & (1 << bit))
 #define is_low(bit)                         (!(PIN(bit ## _PORT) & (1 << bit))) // if the pin is 0, it will and to 0, then flip to 1. if it is 1 it will and to 1, then flip to 0
+
 
 /****REGISTER MANIPULATION MACROS*****/
 #define BIT(x) (0x01 << (x))

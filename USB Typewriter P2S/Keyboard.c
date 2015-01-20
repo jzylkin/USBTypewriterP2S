@@ -36,6 +36,7 @@
 
 #include "Keyboard.h"
 #include "Calibrate.h"
+#include "KeyCodes.h"
 
 volatile int Typewriter_Mode;
 
@@ -46,6 +47,7 @@ uint8_t KeyCodeLookUpTable[KEYCODE_LENGTH];
 uint8_t FnKeyCodeLookUpTable[FN_KEYCODE_LENGTH];
 uint8_t ShiftKeyCodeLookUpTable[SHIFT_KEYCODE_LENGTH];
 uint8_t ReedSwitchLookUpTable[NUM_REED_SWITCHES];
+uint8_t KeyBufferMod;
 
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
@@ -84,9 +86,20 @@ int main(void)
 	SetupHardware();
 	GlobalInterruptEnable();
 	while(1){
+			if(USB_DeviceState == DEVICE_STATE_Configured){
+				set_low(LED1);
+			}
+			else{
+				set_high(LED1);
+			}
 		switch (Typewriter_Mode){
+			case USB_MODE:
+			if(is_low(S1)){
+				USBSend(4,UPPER);
+				Delay_MS(50);
+			}
 			LoadKeyCodeTables();
-			while(1){
+			while(0){
 				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
 					key = GetKey();
 					modifier = GetModifier(); 
@@ -96,18 +109,23 @@ int main(void)
 					}
 				}
 			}
+			break;
 			case TEST_MODE:
-				parity = (uint8_t)is_high(REED_1) + (uint8_t)is_high(REED_2)+ (uint8_t)is_high(REED_3) + (uint8_t)is_high(REED_4);
+				parity = (uint8_t)is_low(REED_1) + (uint8_t)is_low(REED_2)+ (uint8_t)is_low(REED_3) + (uint8_t)is_low(REED_4);
 				if (parity & 1){
-					set_low(LED2);
 					set_high(LED1);
+					set_low(LED2);
 				}
 				else{
 					set_low(LED1);
 					set_high(LED2);
 				}
+			break;
 			case CAL_MODE:
 				Calibrate();
+			break;
+			default:
+				Typewriter_Mode = TEST_MODE;
 			break;
 		};
 			
@@ -116,8 +134,11 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every couple ms)
 	TMR1_Count ++;
+//    if(is_low(S3)){set_low(LED1);}//DEBUG
+//	else{set_high(LED1);}//DEBUG
 	HID_Device_USBTask(&Keyboard_HID_Interface); //These are the VITAL usb functions that must be called every so often (Dean Camera recommends every 30ms, no more that 200ms)
 	USB_USBTask(); //these functions respond to host queries, and they load the usb reports by calling the CALLBACK_HID_Device_CreateHIDReport() function
+
 }
 
 
@@ -137,6 +158,7 @@ void SetupHardware()
 	
 	/* Hardware Initialization */
 	Config_IO();
+	Delay_MS(50); //DELAY 50ms after setting IO.
 	Init_Mode();
 	
 	if(Typewriter_Mode == SD_MODE){
@@ -155,6 +177,7 @@ void SetupHardware()
 /** Event handler for the library USB Connection event. */
 void EVENT_USB_Device_Connect(void)
 {
+
 
 }
 
@@ -218,14 +241,14 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 
 
 	if (KeyboardReport->KeyCode[0]){
-		KeyboardReport->Modifier = KeyBuffer->KeyCode[0];
+		KeyboardReport->Modifier = KeyBufferMod;
 	}
 	else {
-		KeyboardReport->Modifier = GetModifier();
+		KeyboardReport->Modifier = 0;
 	}
 	
 	KeyBuffer->KeyCode[0]= 0;  //remove key to send to clear room for the next key.  This indicates to other routines that the USB buffer is available for sending.
-	KeyBuffer->Modifier = 0;
+	KeyBufferMod= 0;
 
 	*ReportSize = sizeof(USB_KeyboardReport_Data_t);
 	return false;

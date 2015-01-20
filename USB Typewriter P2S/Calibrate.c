@@ -11,15 +11,18 @@
 #include "globals.h"
 
 
+
+
 void Calibrate(){
-	ClearKeyCodeTables();
-	
-	USBSendString("USB TYPEWRITER");
+//	ClearKeyCodeTables();
+	while(USB_DeviceState != DEVICE_STATE_Configured){;}//wait for configuration to complete
+	Delay_MS(1000);//wait 1 second.
+    USBSendString("USB TYPEWRITER");
 	USBSend(KEY_9,UPPER);
 	USBSend(KEY_T,UPPER);
 	USBSend(KEY_M,UPPER);
 	USBSend(KEY_0,UPPER);
-	USBSend(KEY_ENTER,LOWER);
+	USBSend(KEY_ENTER,0);
 	USBSendString("VER");
 	USBSend(KEY_SPACE,UPPER);
 	USBSend(KEY_4,LOWER);
@@ -43,6 +46,13 @@ void Calibrate(){
 		GetTeachKey(learnChar);
 		USBSend(KEY_ENTER,LOWER);
 	}
+	
+	Init_Mode(); //go into regular mode (whatever that is -- usb, bluetooth, etc)
+	
+	//CODE TO SAVE ARRAYS INTO EEPROM MUST GO HERE!!!
+	//
+	//
+	//
 }
 
 void GetTeachKey(char teachkey){

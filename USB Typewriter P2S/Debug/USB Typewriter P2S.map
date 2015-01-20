@@ -4775,13 +4775,13 @@ END GROUP
                 0x00000398       0xa0 Descriptors.o
                 0x00000398                CALLBACK_USB_GetDescriptor
  .text.__vector_17
-                0x00000438       0x60 Keyboard.o
+                0x00000438       0x64 Keyboard.o
                 0x00000438                __vector_17
  .text.SetupHardware
-                0x00000498       0x4a Keyboard.o
-                0x00000498                SetupHardware
- .text.main     0x000004e2       0x30 Keyboard.o
-                0x000004e2                main
+                0x0000049c       0x4a Keyboard.o
+                0x0000049c                SetupHardware
+ .text.main     0x000004e6       0x2c Keyboard.o
+                0x000004e6                main
  .text.EVENT_USB_Device_Connect
                 0x00000512        0x2 Keyboard.o
                 0x00000512                EVENT_USB_Device_Connect
@@ -5183,39 +5183,39 @@ END GROUP
  .debug_frame   0x00000c3c       0x24 src/LUFA/LUFA/Drivers/USB/Core/Events.o
  .debug_frame   0x00000c60       0x2c src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
 
-.debug_str      0x00000000    0x18c39
+.debug_str      0x00000000    0x18c83
  *(.debug_str)
- .debug_str     0x00000000    0x16612 Calibrate.o
-                              0x168a6 (size before relaxing)
- .debug_str     0x00016612       0xb4 Config_Interrupts.o
-                              0x162a2 (size before relaxing)
- .debug_str     0x000166c6       0x1b Config_IO.o
-                               0x84a9 (size before relaxing)
- .debug_str     0x000166e1       0x2b Init_Mode.o
-                               0x8541 (size before relaxing)
- .debug_str     0x0001670c      0x735 Descriptors.o
+ .debug_str     0x00000000    0x165f2 Calibrate.o
+                              0x16886 (size before relaxing)
+ .debug_str     0x000165f2       0xb5 Config_Interrupts.o
+                              0x16283 (size before relaxing)
+ .debug_str     0x000166a7       0x1b Config_IO.o
+                               0x8489 (size before relaxing)
+ .debug_str     0x000166c2       0x2b Init_Mode.o
+                               0x8521 (size before relaxing)
+ .debug_str     0x000166ed      0x79e Descriptors.o
                               0x15554 (size before relaxing)
- .debug_str     0x00016e41      0x4cc Keyboard.o
-                              0x167d7 (size before relaxing)
- .debug_str     0x0001730d       0x39 Send.o
-                              0x16898 (size before relaxing)
- .debug_str     0x00017346       0xdb Sense_Keys.o
-                              0x163d5 (size before relaxing)
- .debug_str     0x00017421      0x399 src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
+ .debug_str     0x00016e8b      0x4cc Keyboard.o
+                              0x167b7 (size before relaxing)
+ .debug_str     0x00017357       0x39 Send.o
+                              0x16878 (size before relaxing)
+ .debug_str     0x00017390       0xdb Sense_Keys.o
+                              0x163b5 (size before relaxing)
+ .debug_str     0x0001746b      0x399 src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
                               0x15337 (size before relaxing)
- .debug_str     0x000177ba      0x9ee src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+ .debug_str     0x00017804      0x9ee src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
                                0xf9fa (size before relaxing)
- .debug_str     0x000181a8      0x270 src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
+ .debug_str     0x000181f2      0x270 src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
                                0xf09c (size before relaxing)
- .debug_str     0x00018418      0x222 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
+ .debug_str     0x00018462      0x222 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
                                0xeffc (size before relaxing)
- .debug_str     0x0001863a       0xe9 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
+ .debug_str     0x00018684       0xe9 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
                                0xefb0 (size before relaxing)
- .debug_str     0x00018723      0x445 src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
+ .debug_str     0x0001876d      0x445 src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
                                0xf46d (size before relaxing)
- .debug_str     0x00018b68       0x53 src/LUFA/LUFA/Drivers/USB/Core/Events.o
+ .debug_str     0x00018bb2       0x53 src/LUFA/LUFA/Drivers/USB/Core/Events.o
                                0xe24a (size before relaxing)
- .debug_str     0x00018bbb       0x7e src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
+ .debug_str     0x00018c05       0x7e src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
                                0xee1b (size before relaxing)
 
 .debug_loc      0x00000000     0x43e9

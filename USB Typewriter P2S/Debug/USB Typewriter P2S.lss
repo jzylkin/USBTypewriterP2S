@@ -21,13 +21,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  00000c8c  00000000  00000000  00015d88  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00018c39  00000000  00000000  00016a14  2**0
+  9 .debug_str    00018c83  00000000  00000000  00016a14  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000043e9  00000000  00000000  0002f64d  2**0
+ 10 .debug_loc    000043e9  00000000  00000000  0002f697  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000e08  00000000  00000000  00033a36  2**0
+ 11 .debug_ranges 00000e08  00000000  00000000  00033a80  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_macro  00009025  00000000  00000000  0003483e  2**0
+ 12 .debug_macro  00009025  00000000  00000000  00034888  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -183,7 +183,7 @@ Disassembly of section .text:
      1c0:	ab 32       	cpi	r26, 0x2B	; 43
      1c2:	b2 07       	cpc	r27, r18
      1c4:	e1 f7       	brne	.-8      	; 0x1be <.do_clear_bss_loop>
-     1c6:	8d d1       	rcall	.+794    	; 0x4e2 <main>
+     1c6:	8f d1       	rcall	.+798    	; 0x4e6 <main>
      1c8:	0c 94 89 0c 	jmp	0x1912	; 0x1912 <_exit>
 
 000001cc <__bad_interrupt>:
@@ -423,10 +423,10 @@ void Config_Interrupts(){
      2d8:	80 93 81 00 	sts	0x0081, r24
 	
 	OCR1AH = TIMER1_COMPARE_HIGH;//high register MUST be written before low register.  Datasheet says so!
-     2dc:	83 e1       	ldi	r24, 0x13	; 19
+     2dc:	83 ec       	ldi	r24, 0xC3	; 195
      2de:	80 93 89 00 	sts	0x0089, r24
 	OCR1AL = UINT8_C(TIMER1_COMPARE_LOW); //we only want the first 8 bits of the "low" variable.
-     2e2:	88 e8       	ldi	r24, 0x88	; 136
+     2e2:	80 e5       	ldi	r24, 0x50	; 80
      2e4:	80 93 88 00 	sts	0x0088, r24
 	
 	bit_set(TIMSK1,OCIE1A); //enable output compare interrupt for timer1
@@ -482,9 +482,9 @@ void Config_IO(){
      310:	26 9a       	sbi	0x04, 6	; 4
 	
 	configure_as_input(SENSE_SER);
-     312:	3f 98       	cbi	0x07, 7	; 7
+     312:	3e 98       	cbi	0x07, 6	; 7
 	pullup_on(SENSE_SER);
-     314:	47 9a       	sbi	0x08, 7	; 8
+     314:	46 9a       	sbi	0x08, 6	; 8
 	
 	configure_as_output(SD_CLK);
      316:	21 9a       	sbi	0x04, 1	; 4
@@ -529,8 +529,8 @@ void Config_IO(){
 	configure_as_output(SD_POWER);
      336:	50 9a       	sbi	0x0a, 0	; 10
 	
-	set_high(SD_POWER);
-     338:	58 9a       	sbi	0x0b, 0	; 11
+	set_high(SENSE_POWER);
+     338:	72 9a       	sbi	0x0e, 2	; 14
 	configure_as_output(SENSE_POWER);
      33a:	6a 9a       	sbi	0x0d, 2	; 13
 	
@@ -850,147 +850,146 @@ ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A regist
      462:	01 96       	adiw	r24, 0x01	; 1
      464:	90 93 99 01 	sts	0x0199, r25
      468:	80 93 98 01 	sts	0x0198, r24
+	set_low(LED1);
+     46c:	89 98       	cbi	0x11, 1	; 17
+	set_high(LED2);
+     46e:	88 9a       	sbi	0x11, 0	; 17
 	HID_Device_USBTask(&Keyboard_HID_Interface); //These are the VITAL usb functions that must be called every so often (Dean Camera recommends every 30ms, no more that 200ms)
-     46c:	80 e0       	ldi	r24, 0x00	; 0
-     46e:	91 e0       	ldi	r25, 0x01	; 1
-     470:	67 d3       	rcall	.+1742   	; 0xb40 <HID_Device_USBTask>
+     470:	80 e0       	ldi	r24, 0x00	; 0
+     472:	91 e0       	ldi	r25, 0x01	; 1
+     474:	65 d3       	rcall	.+1738   	; 0xb40 <HID_Device_USBTask>
 	USB_USBTask(); //these functions respond to host queries, and they load the usb reports by calling the CALLBACK_HID_Device_CreateHIDReport() function
-     472:	0e 94 f5 0b 	call	0x17ea	; 0x17ea <USB_USBTask>
-}
-     476:	ff 91       	pop	r31
-     478:	ef 91       	pop	r30
-     47a:	bf 91       	pop	r27
-     47c:	af 91       	pop	r26
-     47e:	9f 91       	pop	r25
-     480:	8f 91       	pop	r24
-     482:	7f 91       	pop	r23
-     484:	6f 91       	pop	r22
-     486:	5f 91       	pop	r21
-     488:	4f 91       	pop	r20
-     48a:	3f 91       	pop	r19
-     48c:	2f 91       	pop	r18
-     48e:	0f 90       	pop	r0
-     490:	0f be       	out	0x3f, r0	; 63
-     492:	0f 90       	pop	r0
-     494:	1f 90       	pop	r1
-     496:	18 95       	reti
+     476:	0e 94 f5 0b 	call	0x17ea	; 0x17ea <USB_USBTask>
 
-00000498 <SetupHardware>:
+}
+     47a:	ff 91       	pop	r31
+     47c:	ef 91       	pop	r30
+     47e:	bf 91       	pop	r27
+     480:	af 91       	pop	r26
+     482:	9f 91       	pop	r25
+     484:	8f 91       	pop	r24
+     486:	7f 91       	pop	r23
+     488:	6f 91       	pop	r22
+     48a:	5f 91       	pop	r21
+     48c:	4f 91       	pop	r20
+     48e:	3f 91       	pop	r19
+     490:	2f 91       	pop	r18
+     492:	0f 90       	pop	r0
+     494:	0f be       	out	0x3f, r0	; 63
+     496:	0f 90       	pop	r0
+     498:	1f 90       	pop	r1
+     49a:	18 95       	reti
+
+0000049c <SetupHardware>:
 void SetupHardware()
 {
 
 	
 	/* Disable watchdog if enabled by bootloader/fuses */
 	MCUSR &= ~(1 << WDRF);
-     498:	84 b7       	in	r24, 0x34	; 52
-     49a:	87 7f       	andi	r24, 0xF7	; 247
-     49c:	84 bf       	out	0x34, r24	; 52
+     49c:	84 b7       	in	r24, 0x34	; 52
+     49e:	87 7f       	andi	r24, 0xF7	; 247
+     4a0:	84 bf       	out	0x34, r24	; 52
 	wdt_disable();
-     49e:	88 e1       	ldi	r24, 0x18	; 24
-     4a0:	0f b6       	in	r0, 0x3f	; 63
-     4a2:	f8 94       	cli
-     4a4:	80 93 60 00 	sts	0x0060, r24
-     4a8:	10 92 60 00 	sts	0x0060, r1
-     4ac:	0f be       	out	0x3f, r0	; 63
+     4a2:	88 e1       	ldi	r24, 0x18	; 24
+     4a4:	0f b6       	in	r0, 0x3f	; 63
+     4a6:	f8 94       	cli
+     4a8:	80 93 60 00 	sts	0x0060, r24
+     4ac:	10 92 60 00 	sts	0x0060, r1
+     4b0:	0f be       	out	0x3f, r0	; 63
 from 1 to 129. Thus, one does not need to use \c clock_div_t type as argument.
 */
 void clock_prescale_set(clock_div_t __x)
 {
     uint8_t __tmp = _BV(CLKPCE);
     __asm__ __volatile__ (
-     4ae:	90 e0       	ldi	r25, 0x00	; 0
-     4b0:	80 e8       	ldi	r24, 0x80	; 128
-     4b2:	0f b6       	in	r0, 0x3f	; 63
-     4b4:	f8 94       	cli
-     4b6:	80 93 61 00 	sts	0x0061, r24
-     4ba:	90 93 61 00 	sts	0x0061, r25
-     4be:	0f be       	out	0x3f, r0	; 63
+     4b2:	90 e0       	ldi	r25, 0x00	; 0
+     4b4:	80 e8       	ldi	r24, 0x80	; 128
+     4b6:	0f b6       	in	r0, 0x3f	; 63
+     4b8:	f8 94       	cli
+     4ba:	80 93 61 00 	sts	0x0061, r24
+     4be:	90 93 61 00 	sts	0x0061, r25
+     4c2:	0f be       	out	0x3f, r0	; 63
 
 	/* Disable clock division */
 	clock_prescale_set(clock_div_1);
 	Config_Interrupts();
-     4c0:	05 df       	rcall	.-502    	; 0x2cc <Config_Interrupts>
+     4c4:	03 df       	rcall	.-506    	; 0x2cc <Config_Interrupts>
 	
 	/* Hardware Initialization */
 	Config_IO();
-     4c2:	18 df       	rcall	.-464    	; 0x2f4 <Config_IO>
+     4c6:	16 df       	rcall	.-468    	; 0x2f4 <Config_IO>
 	Init_Mode();
-     4c4:	48 df       	rcall	.-368    	; 0x356 <Init_Mode>
+     4c8:	46 df       	rcall	.-372    	; 0x356 <Init_Mode>
 	
 	if(Typewriter_Mode == SD_MODE){
-     4c6:	80 91 dc 01 	lds	r24, 0x01DC
-     4ca:	90 91 dd 01 	lds	r25, 0x01DD
-     4ce:	02 97       	sbiw	r24, 0x02	; 2
-     4d0:	39 f0       	breq	.+14     	; 0x4e0 <SetupHardware+0x48>
+     4ca:	80 91 dc 01 	lds	r24, 0x01DC
+     4ce:	90 91 dd 01 	lds	r25, 0x01DD
+     4d2:	02 97       	sbiw	r24, 0x02	; 2
+     4d4:	39 f0       	breq	.+14     	; 0x4e4 <SetupHardware+0x48>
 		//Initialize SD Card
 	}
 	else if(Typewriter_Mode == BT_MODE){
-     4d2:	80 91 dc 01 	lds	r24, 0x01DC
-     4d6:	90 91 dd 01 	lds	r25, 0x01DD
-     4da:	03 97       	sbiw	r24, 0x03	; 3
-     4dc:	09 f0       	breq	.+2      	; 0x4e0 <SetupHardware+0x48>
+     4d6:	80 91 dc 01 	lds	r24, 0x01DC
+     4da:	90 91 dd 01 	lds	r25, 0x01DD
+     4de:	03 97       	sbiw	r24, 0x03	; 3
+     4e0:	09 f0       	breq	.+2      	; 0x4e4 <SetupHardware+0x48>
 		//Initialize Bluetooth Module
 	}
 	else{
 		//Initialize USB HID mode
 	USB_Init(); //
-     4de:	39 c7       	rjmp	.+3698   	; 0x1352 <USB_Init>
-     4e0:	08 95       	ret
+     4e2:	37 c7       	rjmp	.+3694   	; 0x1352 <USB_Init>
+     4e4:	08 95       	ret
 
-000004e2 <main>:
+000004e6 <main>:
 {	
 	uint8_t key;
 	uint8_t code;
 	uint8_t modifier;
 	uint8_t parity;
 	Typewriter_Mode = INITIALIZING;
-     4e2:	10 92 dd 01 	sts	0x01DD, r1
-     4e6:	10 92 dc 01 	sts	0x01DC, r1
+     4e6:	10 92 dd 01 	sts	0x01DD, r1
+     4ea:	10 92 dc 01 	sts	0x01DC, r1
 	SetupHardware();
-     4ea:	d6 df       	rcall	.-84     	; 0x498 <SetupHardware>
+     4ee:	d6 df       	rcall	.-84     	; 0x49c <SetupHardware>
 			static inline void GlobalInterruptEnable(void)
 			{
 				GCC_MEMORY_BARRIER();
 
 				#if (ARCH == ARCH_AVR8)
 				sei();
-     4ec:	78 94       	sei
+     4f0:	78 94       	sei
 	GlobalInterruptEnable();
 	while(1){
 		switch (Typewriter_Mode){
-     4ee:	80 91 dc 01 	lds	r24, 0x01DC
-     4f2:	90 91 dd 01 	lds	r25, 0x01DD
-     4f6:	84 30       	cpi	r24, 0x04	; 4
-     4f8:	91 05       	cpc	r25, r1
-     4fa:	19 f0       	breq	.+6      	; 0x502 <main+0x20>
-     4fc:	05 97       	sbiw	r24, 0x05	; 5
-     4fe:	39 f0       	breq	.+14     	; 0x50e <main+0x2c>
-     500:	f6 cf       	rjmp	.-20     	; 0x4ee <main+0xc>
+     4f2:	80 91 dc 01 	lds	r24, 0x01DC
+     4f6:	90 91 dd 01 	lds	r25, 0x01DD
+     4fa:	84 30       	cpi	r24, 0x04	; 4
+     4fc:	91 05       	cpc	r25, r1
+     4fe:	19 f0       	breq	.+6      	; 0x506 <main+0x20>
+     500:	05 97       	sbiw	r24, 0x05	; 5
+     502:	29 f0       	breq	.+10     	; 0x50e <main+0x28>
+     504:	f6 cf       	rjmp	.-20     	; 0x4f2 <main+0xc>
 						USBSend(code,modifier);
 					}
 				}
 			}
 			case TEST_MODE:
 				parity = (uint8_t)is_high(REED_1) + (uint8_t)is_high(REED_2)+ (uint8_t)is_high(REED_3) + (uint8_t)is_high(REED_4);
-     502:	89 b1       	in	r24, 0x09	; 9
-     504:	89 b1       	in	r24, 0x09	; 9
-     506:	83 b1       	in	r24, 0x03	; 3
-     508:	83 b1       	in	r24, 0x03	; 3
-				if (parity & 1){
-					set_low(LED2);
-					set_high(LED1);
-				}
+     506:	89 b1       	in	r24, 0x09	; 9
+     508:	89 b1       	in	r24, 0x09	; 9
+     50a:	83 b1       	in	r24, 0x03	; 3
+     50c:	83 b1       	in	r24, 0x03	; 3
 				else{
-					set_low(LED1);
-     50a:	89 98       	cbi	0x11, 1	; 17
-					set_high(LED2);
-     50c:	88 9a       	sbi	0x11, 0	; 17
+					//set_low(LED1);
+					//set_high(LED2);
 				}
 			case CAL_MODE:
 				Calibrate();
      50e:	89 de       	rcall	.-750    	; 0x222 <Calibrate>
 			break;
-     510:	ee cf       	rjmp	.-36     	; 0x4ee <main+0xc>
+     510:	f0 cf       	rjmp	.-32     	; 0x4f2 <main+0xc>
 
 00000512 <EVENT_USB_Device_Connect>:
 	}
@@ -1344,7 +1343,7 @@ void USBSendNumber(uint8_t number){
      69e:	cf 93       	push	r28
      6a0:	df 93       	push	r29
      6a2:	2e 98       	cbi	0x05, 6	; 5
-     6a4:	46 9a       	sbi	0x08, 6	; 8
+     6a4:	47 9a       	sbi	0x08, 7	; 8
      6a6:	72 98       	cbi	0x0e, 2	; 14
      6a8:	8f ec       	ldi	r24, 0xCF	; 207
      6aa:	97 e0       	ldi	r25, 0x07	; 7
@@ -1370,7 +1369,7 @@ void USBSendNumber(uint8_t number){
      6d8:	2e 98       	cbi	0x05, 6	; 5
 	...
      6e2:	00 00       	nop
-     6e4:	37 99       	sbic	0x06, 7	; 6
+     6e4:	36 99       	sbic	0x06, 6	; 6
      6e6:	12 c0       	rjmp	.+36     	; 0x70c <ReadSensor+0x70>
      6e8:	de 01       	movw	r26, r28
      6ea:	0e 2e       	mov	r0, r30
@@ -1397,7 +1396,7 @@ void USBSendNumber(uint8_t number){
      714:	72 9a       	sbi	0x0e, 2	; 14
 	...
      71e:	00 00       	nop
-     720:	46 98       	cbi	0x08, 6	; 8
+     720:	47 98       	cbi	0x08, 7	; 8
      722:	df 91       	pop	r29
      724:	cf 91       	pop	r28
      726:	1f 91       	pop	r17

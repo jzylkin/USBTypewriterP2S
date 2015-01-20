@@ -8,7 +8,8 @@
 #include "Keyboard.h"
 #include "IO_Macros.h"
 
-#define TIMER1_PERIOD_US 5000 //5ms period for TIMER1  
+#define TIMER1_PERIOD_US 10000 //10ms period for TIMER1 -- max is 65535
+
 #define TIMER1_COMPARE TIMER1_PERIOD_US  // each clock tick is 1 us, if prescaler is 8 and system clock is 8MHZ
 #define TIMER1_COMPARE_LOW TIMER1_COMPARE //low byte of comparison register
 #define TIMER1_COMPARE_HIGH TIMER1_COMPARE>>8 //high byte of comparison register
