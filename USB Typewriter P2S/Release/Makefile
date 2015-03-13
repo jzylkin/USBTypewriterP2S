@@ -53,11 +53,13 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../Bluetooth.c \
 ../Calibrate.c \
 ../Config_Interrupts.c \
 ../Config_IO.c \
 ../Init_Mode.c \
 ../Descriptors.c \
+../uart.c \
 ../Keyboard.c \
 ../Send.c \
 ../Sense_Keys.c \
@@ -104,11 +106,13 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+Bluetooth.o \
 Calibrate.o \
 Config_Interrupts.o \
 Config_IO.o \
 Init_Mode.o \
 Descriptors.o \
+uart.o \
 Keyboard.o \
 Send.o \
 Sense_Keys.o \
@@ -148,11 +152,13 @@ src/LUFA/LUFA/Drivers/USB/Core/HostStandardReq.o \
 src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
 
 OBJS_AS_ARGS +=  \
+Bluetooth.o \
 Calibrate.o \
 Config_Interrupts.o \
 Config_IO.o \
 Init_Mode.o \
 Descriptors.o \
+uart.o \
 Keyboard.o \
 Send.o \
 Sense_Keys.o \
@@ -192,11 +198,13 @@ src/LUFA/LUFA/Drivers/USB/Core/HostStandardReq.o \
 src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
 
 C_DEPS +=  \
+Bluetooth.d \
 Calibrate.d \
 Config_Interrupts.d \
 Config_IO.d \
 Init_Mode.d \
 Descriptors.d \
+uart.d \
 Keyboard.d \
 Send.d \
 Sense_Keys.d \
@@ -236,11 +244,13 @@ src/LUFA/LUFA/Drivers/USB/Core/HostStandardReq.d \
 src/LUFA/LUFA/Drivers/USB/Core/USBTask.d
 
 C_DEPS_AS_ARGS +=  \
+Bluetooth.d \
 Calibrate.d \
 Config_Interrupts.d \
 Config_IO.d \
 Init_Mode.d \
 Descriptors.d \
+uart.d \
 Keyboard.d \
 Send.d \
 Sense_Keys.d \
@@ -293,6 +303,13 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+./Bluetooth.o: .././Bluetooth.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
 ./Calibrate.o: .././Calibrate.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
@@ -322,6 +339,13 @@ LINKER_SCRIPT_DEP+=
 	
 
 ./Descriptors.o: .././Descriptors.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+./uart.o: .././uart.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

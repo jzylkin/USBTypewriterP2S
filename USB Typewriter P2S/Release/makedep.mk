@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+Bluetooth.c
+
 Calibrate.c
 
 Config_Interrupts.c
@@ -11,6 +13,8 @@ Config_IO.c
 Init_Mode.c
 
 Descriptors.c
+
+uart.c
 
 Keyboard.c
 

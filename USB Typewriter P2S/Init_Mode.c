@@ -18,6 +18,7 @@ void Init_Mode(){
 		Typewriter_Mode = TEST_MODE;
 	}
 	else{
-		Typewriter_Mode = USB_MODE; //otherwise just go into normal USB mode.
+//		Typewriter_Mode = USB_MODE; //otherwise just go into normal USB mode.
+		Typewriter_Mode = BLUETOOTH_MODE; // default mode is bluetooth for debugging purposes right now.
 	}
 }

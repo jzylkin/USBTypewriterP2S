@@ -1,4 +1,4 @@
-Calibrate.d Calibrate.o: .././Calibrate.c .././Keyboard.h \
+Bluetooth.d Bluetooth.o: .././Bluetooth.c .././Keyboard.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\io.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\sfr_defs.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\inttypes.h \
@@ -124,8 +124,7 @@ Calibrate.d Calibrate.o: .././Calibrate.c .././Keyboard.h \
  ../src/LUFA/LUFA/Platform/Platform.h \
  ../src/LUFA/LUFA/Platform/../Common/Common.h .././IO_Macros.h \
  .././Config_IO.h .././Config_Interrupts.h .././Init_Mode.h \
- .././Sense_Keys.h .././Send.h .././Bluetooth.h .././uart.h \
- .././KeyCodes.h .././Calibrate.h .././globals.h
+ .././Sense_Keys.h .././Send.h .././Bluetooth.h .././uart.h
 
 .././Keyboard.h:
 
@@ -392,9 +391,3 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././Bluetooth.h:
 
 .././uart.h:
-
-.././KeyCodes.h:
-
-.././Calibrate.h:
-
-.././globals.h:

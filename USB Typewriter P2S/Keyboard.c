@@ -85,7 +85,7 @@ int main(void)
 	Typewriter_Mode = INITIALIZING;
 	SetupHardware();
 	GlobalInterruptEnable();
-	Delay_MS(1000);
+	Delay_MS(2000);
 	while(1){
 			if(USB_DeviceState == DEVICE_STATE_Configured){
 				set_low(LED1);
@@ -95,12 +95,8 @@ int main(void)
 			}
 		switch (Typewriter_Mode){
 			case USB_MODE:
-//			if(is_low(S1)){
-//				USBSend(4,UPPER);
-//				Delay_MS(50);
-//			}
 			LoadKeyCodeTables();
-			while(is_high(S2)){}//wait for s2 button press.
+			while(is_high(S2)){};//wait for s2 to be pressed.
 			while(1){
 				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
 					key = GetKeySimple();
@@ -128,6 +124,22 @@ int main(void)
 			break;
 			case CAL_MODE:
 				Calibrate();
+			break;
+			case BLUETOOTH_MODE:
+				uart_init(UART_BAUD_SELECT(38400,F_CPU));//initialize the uart with a baud rate of x bps
+				while(1){
+					if(is_low(S2)){
+						while(is_high(PIO_6)){};
+						while(is_low(PIO_6)){};
+						Bluetooth_Send(KEY_A,LOWER);//send a character
+							
+						Delay_MS(500);
+						while(is_high(PIO_6)){};
+						while(is_low(PIO_6)){};
+						Bluetooth_Send(KEY_Z,LOWER);//send z character
+						Delay_MS(500);
+					}
+				}
 			break;
 			default:
 				Typewriter_Mode = TEST_MODE;

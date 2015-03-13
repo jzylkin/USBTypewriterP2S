@@ -124,7 +124,8 @@ Send.d Send.o: .././Send.c .././Keyboard.h \
  ../src/LUFA/LUFA/Platform/Platform.h \
  ../src/LUFA/LUFA/Platform/../Common/Common.h .././IO_Macros.h \
  .././Config_IO.h .././Config_Interrupts.h .././Init_Mode.h \
- .././Sense_Keys.h .././Send.h .././KeyCodes.h .././globals.h \
+ .././Sense_Keys.h .././Send.h .././Bluetooth.h .././uart.h \
+ .././KeyCodes.h .././globals.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\ctype.h
 
 .././Keyboard.h:
@@ -388,6 +389,10 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././Sense_Keys.h:
 
 .././Send.h:
+
+.././Bluetooth.h:
+
+.././uart.h:
 
 .././KeyCodes.h:
 

@@ -59,9 +59,11 @@
 		#include "Init_Mode.h"
 		#include "Sense_Keys.h"
 		#include "Send.h"
+		#include "Bluetooth.h"
+		#include "uart.h"
 		
 		/**Jack'ss Macros */
-		#define DELAY_1US asm("nop;nop;")
+		#define DELAY_1US asm("nop;nop;nop;nop;nop;nop;nop;nop;")
 		#define DELAY_5US DELAY_1US;DELAY_1US;DELAY_1US;DELAY_1US;DELAY_1US
 		#define DELAY_10US DELAY_5US;DELAY_5US
 		

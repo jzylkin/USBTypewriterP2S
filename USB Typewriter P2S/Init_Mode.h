@@ -20,6 +20,7 @@ void Init_Mode();
 #define QUICK_CAL_MODE 6
 #define FINETUNING_MODE 7
 #define DEEP_SLEEP_MODE 8
+#define BLUETOOTH_MODE 9
 
 
 #endif /* INIT_MODE_H_ */
