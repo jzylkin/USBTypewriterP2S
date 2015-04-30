@@ -85,20 +85,15 @@ int main(void)
 	Typewriter_Mode = INITIALIZING;
 	SetupHardware();
 	GlobalInterruptEnable();
-	Delay_MS(2000);
+	Delay_MS(1000);//delay 1 second for some reason
 	while(1){
-			if(USB_DeviceState == DEVICE_STATE_Configured){
-				set_low(LED1);
-			}
-			else{
-				set_high(LED1);
-			}
 		switch (Typewriter_Mode){
 			case USB_MODE:
 			LoadKeyCodeTables();
-			while(is_high(S2)){};//wait for s2 to be pressed.
+//			while(is_high(S2)){};//wait for s2 to be pressed. DEBUG
+//			USBSend(KEY_A, LOWER);//send an a just to get started -- debug only
 			while(1){
-				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
+//				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
 					key = GetKeySimple();
 				//	modifier = GetModifier(); 
 					modifier = 0;
@@ -106,9 +101,13 @@ int main(void)
 				//	if (code) { //if there is a new key to send, then send it
 				//		USBSend(code,modifier);
 				//	}
-				USBSendString("KEY");
+				if(key){
 				USBSendNumber(key);
+				USBSend(KEY_ENTER,LOWER);
 				}
+
+
+		//			}
 			}
 			break;
 			case TEST_MODE:

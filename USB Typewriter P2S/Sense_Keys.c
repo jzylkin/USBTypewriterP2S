@@ -94,41 +94,33 @@ unsigned long long ReadSensor(){
 		unsigned long long Readout = 0;	
 	
 		set_low(SENSE_CLK);
-		set_high(SENSE_CLR); //stop grounding-out the sensor's power supply
+		
+//		set_high(SENSE_CLR);//To ramp up the power on the external board slowly, we use sense_clr
+//		configure_as_output(SENSE_CLR);
+//		_delay_us(30); //wait for the sensor board to charge up.
+
+		configure_as_input(SENSE_CLR);//stop grounding-out the sensor's power supply -- this output works as an open collector!!! NOT PUSH PULL!
 		set_low(SENSE_POWER); //begin supplying power to sensor;
 		
-		Delay_MS(100);//wait some number of uS for the sensor board to initialize (_PL signal on sensor board goes high about 100uS after powering up)
-		
+		_delay_us(200);//wait some number of uS for the sensor board to initialize (_PL signal on sensor board goes high about 100uS after powering up)
 		
 		for (int i=0;i<SHIFT_REGISTER_PINS;i++){   //loop through every bit in readout. i=0 is the first contact (actually the 8th one on the board)
 			if (is_low(SENSE_SER)) { 
 				longlongbit_set(Readout,i);// if the readout for one of the sensor pins comes back low, that key has been pressed -- store it as a 1 in the readout.
 			}	
 			set_high(SENSE_CLK);
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
+			_delay_us(1);
 			set_low(SENSE_CLK);
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-			DELAY_5US;
-
-			
+			_delay_us(1);
 		}
 		
 		set_high(SENSE_POWER);//turn off sensor power
-		DELAY_5US;
-		DELAY_5US;
-		DELAY_5US;
-		DELAY_5US;
-		set_low(SENSE_CLR);// Sensor's VCC must go back to 0V, because the shift registers' _PL pins are tied to VCC, _PL must be low on each power up.
+		_delay_us(50); //wait for power switch to fully turn off
 		
+		set_low(SENSE_CLR);// Sensor's VCC must go back to 0V, because the shift registers' _PL pins are tied to VCC, _PL must be low on each power up.
+		configure_as_output(SENSE_CLR);
+		Delay_MS(10);  //a delay of some length (not long) is ABSOLUTELY required after each scan.  Otherwise, the sensor does not have time to reset itself.
+
 		return Readout;
 }
 
