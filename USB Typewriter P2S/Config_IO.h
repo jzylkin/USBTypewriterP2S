@@ -12,4 +12,8 @@
 void Config_IO();
 
 
+#define START 0b10100100
+#define STOP 0b10010100
+
+
 #endif /* CONFIG_IO_H_ */

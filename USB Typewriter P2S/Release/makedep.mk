@@ -14,6 +14,14 @@ Init_Mode.c
 
 Descriptors.c
 
+Lib\FatFS\diskio.c
+
+Lib\FatFS\ff.c
+
+Lib\SCSI.c
+
+Lib\SDCardManager.c
+
 uart.c
 
 Keyboard.c

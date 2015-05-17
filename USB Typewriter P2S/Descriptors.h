@@ -8,6 +8,7 @@
 
 /*
   Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  Copyright 2010  Matthias Hullin (lufa [at] matthias [dot] hullin [dot] net)
 
   Permission to use, copy, modify, distribute, and sell this
   software and its documentation for any purpose is hereby granted
@@ -41,6 +42,24 @@
 
 		#include <LUFA/Drivers/USB/USB.h>
 
+		#include "Config/AppConfig.h"
+
+	/* Macros: */
+		/** Endpoint address of the Keyboard HID reporting IN endpoint. */
+		#define KEYBOARD_EPADDR              (ENDPOINT_DIR_IN  | 1)
+
+		/** Size in bytes of the Keyboard HID reporting IN endpoint. */
+		#define KEYBOARD_EPSIZE              8
+
+		/** Endpoint address of the Mass Storage device-to-host data IN endpoint. */
+		#define MASS_STORAGE_IN_EPADDR       (ENDPOINT_DIR_IN  | 3)
+
+		/** Endpoint address of the Mass Storage host-to-device data OUT endpoint. */
+		#define MASS_STORAGE_OUT_EPADDR      (ENDPOINT_DIR_OUT | 4)
+
+		/** Size in bytes of the Mass Storage data endpoints. */
+		#define MASS_STORAGE_IO_EPSIZE       64
+
 	/* Type Defines: */
 		/** Type define for the device configuration descriptor structure. This must be defined in the
 		 *  application code, as the configuration descriptor contains several sub-descriptors which
@@ -50,10 +69,15 @@
 		{
 			USB_Descriptor_Configuration_Header_t Config;
 
-			// Keyboard HID Interface
-			USB_Descriptor_Interface_t            HID_Interface;
+			// Mass Storage Interface
+			USB_Descriptor_Interface_t            MS_Interface;
+			USB_Descriptor_Endpoint_t             MS_DataInEndpoint;
+			USB_Descriptor_Endpoint_t             MS_DataOutEndpoint;
+
+			// Generic HID Interface
+			USB_Descriptor_Interface_t            HID_KeyboardInterface;
 			USB_HID_Descriptor_HID_t              HID_KeyboardHID;
-			USB_Descriptor_Endpoint_t             HID_ReportINEndpoint;
+	        USB_Descriptor_Endpoint_t             HID_ReportINEndpoint;
 		} USB_Descriptor_Configuration_t;
 
 		/** Enum for the device interface descriptor IDs within the device. Each interface descriptor
@@ -62,7 +86,8 @@
 		 */
 		enum InterfaceDescriptors_t
 		{
-			INTERFACE_ID_Keyboard = 0, /**< Keyboard interface descriptor ID */
+			INTERFACE_ID_MassStorage = 0, /**< Mass storage interface descriptor ID */
+			INTERFACE_ID_Keyboard    = 1, /**< Keyboard interface descriptor ID */
 		};
 
 		/** Enum for the device string descriptor IDs within the device. Each string descriptor should
@@ -75,13 +100,6 @@
 			STRING_ID_Manufacturer = 1, /**< Manufacturer string ID */
 			STRING_ID_Product      = 2, /**< Product string ID */
 		};
-
-	/* Macros: */
-		/** Endpoint address of the Keyboard HID reporting IN endpoint. */
-		#define KEYBOARD_EPADDR              (ENDPOINT_DIR_IN | 1)
-
-		/** Size in bytes of the Keyboard HID reporting IN endpoint. */
-		#define KEYBOARD_EPSIZE              8
 
 	/* Function Prototypes: */
 		uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,

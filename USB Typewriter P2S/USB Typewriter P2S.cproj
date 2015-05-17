@@ -290,6 +290,8 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="Lib\" />
+    <Folder Include="Lib\FatFS" />
     <Folder Include="src\" />
     <Folder Include="src\config\" />
     <Folder Include="src\LUFA\" />
@@ -345,6 +347,36 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Descriptors.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\FatFS\diskio.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\FatFS\diskio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\FatFS\ff.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\FatFS\ff.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\FatFS\ffconf.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\FatFS\integer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\SCSI.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\SCSI.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\SDCardManager.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Lib\SDCardManager.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="uart.c">

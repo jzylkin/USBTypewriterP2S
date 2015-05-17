@@ -113,7 +113,8 @@ Descriptors.d Descriptors.o: .././Descriptors.c .././Descriptors.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/RNDISClassDevice.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/RNDISClassCommon.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/CDCClassCommon.h \
- ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h
+ ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h \
+ ../src/Config/AppConfig.h
 
 .././Descriptors.h:
 
@@ -346,3 +347,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/CDCClassCommon.h:
 
 ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h:
+
+../src/Config/AppConfig.h:

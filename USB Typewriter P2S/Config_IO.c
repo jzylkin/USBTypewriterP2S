@@ -6,6 +6,7 @@
  */ 
 
 #include "IO_Macros.h"
+#include "Config_IO.h"
 #include <avr/io.h>
 
 void Config_IO(){
@@ -58,13 +59,12 @@ void Config_IO(){
 	configure_as_input(RX);
 	pullup_on(RX);
 	
-	set_high(SD_CHIP_SELECT);
-	configure_as_output(SD_CHIP_SELECT);
-	
-	set_high(SD_POWER);
-	configure_as_output(SD_POWER);
+	configure_as_input(TWI_DAT);
+	pullup_on(TWI_DAT);
+		
+	configure_as_input(TWI_CLK);
+	pullup_on(TWI_CLK);
 
-	
 	set_high(SENSE_POWER);
 	configure_as_output(SENSE_POWER);
 	
@@ -87,3 +87,7 @@ void Config_IO(){
 	configure_as_output(LED2);
 	
 }
+
+
+
+

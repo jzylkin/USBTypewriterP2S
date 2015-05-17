@@ -53,6 +53,16 @@
 		#include <LUFA/Drivers/USB/USB.h>
 		#include <LUFA/Platform/Platform.h>
 		
+		
+		#include "Lib/SCSI.h"
+
+		#include "Lib/SDCardManager.h"
+		
+				#include "Lib/FATFs/ff.h"
+				#include "Config/AppConfig.h"
+				
+
+		
 		/***Jack's additional includes****/
 		#include "IO_Macros.h"
 		#include "Config_IO.h"
@@ -80,6 +90,9 @@
 		#define SHIFT_KEYCODE_ADDR (FN_KEYCODE_ADDR + FN_KEYCODE_LENGTH) //table for all contacts when shift is held down (if implemented)
 		#define REED_SWITCH_ADDR (SHIFT_KEYCODE_ADDR + SHIFT_KEYCODE_LENGTH)  //table for all reed switch functions.
 		
+		/** Indicates if the disk is write protected or not. */
+		#define DISK_READ_ONLY           false
+		
 		#define ASCII_A 65
 		#define HID_A 4
 	/* Function Prototypes: */
@@ -101,6 +114,13 @@
 		                                          const uint8_t ReportType,
 		                                          const void* ReportData,
 		                                          const uint16_t ReportSize);
+												  
+
+		bool CALLBACK_MS_Device_SCSICommandReceived(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo);
+												 
+		uint32_t get_num_of_sectors();
+		FRESULT OpenLogFile(void);
+		void CloseLogFile(void);
 
 #endif
 

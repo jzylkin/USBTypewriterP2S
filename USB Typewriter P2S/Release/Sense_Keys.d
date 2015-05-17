@@ -117,15 +117,18 @@ Sense_Keys.d Sense_Keys.o: .././Sense_Keys.c .././Keyboard.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/RNDISClassCommon.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/CDCClassCommon.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h \
- ../src/LUFA/LUFA/Drivers/Board/Joystick.h \
+ ../src/Config/AppConfig.h ../src/LUFA/LUFA/Drivers/Board/Joystick.h \
  ../src/LUFA/LUFA/Drivers/Board/../../Common/Common.h \
  ../src/LUFA/LUFA/Drivers/Board/LEDs.h \
  ../src/LUFA/LUFA/Drivers/Board/Buttons.h \
  ../src/LUFA/LUFA/Platform/Platform.h \
- ../src/LUFA/LUFA/Platform/../Common/Common.h .././IO_Macros.h \
- .././Config_IO.h .././Config_Interrupts.h .././Init_Mode.h \
- .././Sense_Keys.h .././Send.h .././Bluetooth.h .././uart.h \
- .././KeyCodes.h
+ ../src/LUFA/LUFA/Platform/../Common/Common.h .././Lib/SCSI.h \
+ .././Lib/../Keyboard.h .././Lib/../Descriptors.h \
+ .././Lib/SDCardManager.h ../src/LUFA/LUFA/Common/Common.h \
+ .././Lib/SDCardManager.h .././Lib/FATFs/ff.h .././Lib/FATFs/integer.h \
+ .././Lib/FATFs/ffconf.h .././IO_Macros.h .././Config_IO.h \
+ .././Config_Interrupts.h .././Init_Mode.h .././Sense_Keys.h .././Send.h \
+ .././Bluetooth.h .././uart.h .././KeyCodes.h
 
 .././Keyboard.h:
 
@@ -365,6 +368,8 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h:
 
+../src/Config/AppConfig.h:
+
 ../src/LUFA/LUFA/Drivers/Board/Joystick.h:
 
 ../src/LUFA/LUFA/Drivers/Board/../../Common/Common.h:
@@ -376,6 +381,24 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 ../src/LUFA/LUFA/Platform/Platform.h:
 
 ../src/LUFA/LUFA/Platform/../Common/Common.h:
+
+.././Lib/SCSI.h:
+
+.././Lib/../Keyboard.h:
+
+.././Lib/../Descriptors.h:
+
+.././Lib/SDCardManager.h:
+
+../src/LUFA/LUFA/Common/Common.h:
+
+.././Lib/SDCardManager.h:
+
+.././Lib/FATFs/ff.h:
+
+.././Lib/FATFs/integer.h:
+
+.././Lib/FATFs/ffconf.h:
 
 .././IO_Macros.h:
 

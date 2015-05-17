@@ -33,6 +33,8 @@ LINKER_SCRIPT_DEP:=
 
 # Every subdirectory with source files must be described here
 SUBDIRS :=  \
+../Lib/ \
+../Lib/FatFS \
 ../src/ \
 ../src/config/ \
 ../src/LUFA/ \
@@ -59,6 +61,10 @@ C_SRCS +=  \
 ../Config_IO.c \
 ../Init_Mode.c \
 ../Descriptors.c \
+../Lib/FatFS/diskio.c \
+../Lib/FatFS/ff.c \
+../Lib/SCSI.c \
+../Lib/SDCardManager.c \
 ../uart.c \
 ../Keyboard.c \
 ../Send.c \
@@ -112,6 +118,10 @@ Config_Interrupts.o \
 Config_IO.o \
 Init_Mode.o \
 Descriptors.o \
+Lib/FatFS/diskio.o \
+Lib/FatFS/ff.o \
+Lib/SCSI.o \
+Lib/SDCardManager.o \
 uart.o \
 Keyboard.o \
 Send.o \
@@ -158,6 +168,10 @@ Config_Interrupts.o \
 Config_IO.o \
 Init_Mode.o \
 Descriptors.o \
+Lib/FatFS/diskio.o \
+Lib/FatFS/ff.o \
+Lib/SCSI.o \
+Lib/SDCardManager.o \
 uart.o \
 Keyboard.o \
 Send.o \
@@ -204,6 +218,10 @@ Config_Interrupts.d \
 Config_IO.d \
 Init_Mode.d \
 Descriptors.d \
+Lib/FatFS/diskio.d \
+Lib/FatFS/ff.d \
+Lib/SCSI.d \
+Lib/SDCardManager.d \
 uart.d \
 Keyboard.d \
 Send.d \
@@ -250,6 +268,10 @@ Config_Interrupts.d \
 Config_IO.d \
 Init_Mode.d \
 Descriptors.d \
+Lib/FatFS/diskio.d \
+Lib/FatFS/ff.d \
+Lib/SCSI.d \
+Lib/SDCardManager.d \
 uart.d \
 Keyboard.d \
 Send.d \
@@ -339,6 +361,34 @@ LINKER_SCRIPT_DEP+=
 	
 
 ./Descriptors.o: .././Descriptors.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Lib/FatFS/diskio.o: ../Lib/FatFS/diskio.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Lib/FatFS/ff.o: ../Lib/FatFS/ff.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Lib/SCSI.o: ../Lib/SCSI.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Lib/SDCardManager.o: ../Lib/SDCardManager.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
@@ -613,6 +663,20 @@ src/LUFA/LUFA/Drivers/USB/Core/USBTask.o: ../src/LUFA/LUFA/Drivers/USB/Core/USBT
 
 
 ./%.o: .././%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Lib/FatFS/%.o: ../Lib/FatFS/%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Lib/%.o: ../Lib/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DNDEBUG -DARCH=ARCH_AVR8 -DBOARD=BOARD_NONE -DF_CPU=8000000UL -DUSE_LUFA_CONFIG_HEADER -DF_USB=8000000UL  -I"../src" -I"../src/LUFA" -I"../src/config"  -Os -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -Wall -mmcu=atmega32u4 -c -mrelax -std=gnu99 -fno-strict-aliasing -fno-jump-tables -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

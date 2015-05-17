@@ -25,10 +25,9 @@
 #define enable_pin_change_interrupt(pin)    {pin ## _PCMSK |= (1 << pin ## _PCINT);}
 #define disable_pin_change_interrupt(pin)   {pin ## _PCMSK &= ~(1<< pin ## _PCINT);}
 
-
 /***** Manipulate Outputs *****/
-#define set_high(bit)                       {bit ## _PORT |= (1 << bit);}
-#define set_low(bit)                        {bit ## _PORT &= ~(1 << bit);}
+#define set_high(bit)                       bit ## _PORT |= (1 << bit)
+#define set_low(bit)                        bit ## _PORT &= ~(1 << bit)
 
 
 /***** Test Inputs *****/
@@ -101,8 +100,11 @@
 #define SD_CHIP_SELECT				PD1
 #define SD_CHIP_SELECT_PORT			PORTD
 
-#define SD_POWER				PD0
-#define SD_POWER_PORT			PORTD
+#define TWI_DAT				PD1
+#define TWI_DAT_PORT				PORTD
+
+#define TWI_CLK				PD0
+#define TWI_CLK_PORT			PORTD
 
 #define PIO_6					PE6
 #define PIO_6_PORT				PORTE

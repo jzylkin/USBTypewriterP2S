@@ -51,3 +51,8 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 	uart_putc(0x00);
 	
 }
+
+void Bluetooth_Init(){
+	
+	
+}

@@ -38,6 +38,15 @@
 #include "Calibrate.h"
 #include "KeyCodes.h"
 
+/** FAT Fs structure to hold the internal state of the FAT driver for the Dataflash contents. */
+static FATFS DiskFATState;
+
+/** FAT Fs structure to hold a FAT file handle for the log data write destination. */
+static FIL TempLogFile;
+
+static bool FileIsOpen;
+
+
 volatile int Typewriter_Mode;
 
 volatile USB_KeyboardReport_Data_t* KeyBuffer; //GLOBAL A single-key buffer holding the next key to send. Cleared each time a key is sent.
@@ -51,6 +60,32 @@ uint8_t KeyBufferMod;
 
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
+
+/** LUFA Mass Storage Class driver interface configuration and state information. This structure is
+ *  passed to all Mass Storage Class driver functions, so that multiple instances of the same class
+ *  within a device can be differentiated from one another.
+ */
+USB_ClassInfo_MS_Device_t Disk_MS_Interface =
+	{
+		.Config =
+			{
+				.InterfaceNumber           = INTERFACE_ID_MassStorage,
+				.DataINEndpoint            =
+					{
+						.Address           = MASS_STORAGE_IN_EPADDR,
+						.Size              = MASS_STORAGE_IO_EPSIZE,
+						.Banks             = 1,
+					},
+				.DataOUTEndpoint            =
+					{
+						.Address           = MASS_STORAGE_OUT_EPADDR,
+						.Size              = MASS_STORAGE_IO_EPSIZE,
+						.Banks             = 1,
+					},
+				.TotalLUNs                 = 1,
+			},
+	};
+
 
 /** LUFA HID Class driver interface configuration and state information. This structure is
  *  passed to all HID Class driver functions, so that multiple instances of the same class
@@ -84,30 +119,26 @@ int main(void)
 	uint8_t parity;
 	Typewriter_Mode = INITIALIZING;
 	SetupHardware();
+	SDCardManager_Init(); 
 	GlobalInterruptEnable();
+	
+
 	Delay_MS(1000);//delay 1 second for some reason
 	while(1){
 		switch (Typewriter_Mode){
 			case USB_MODE:
 			LoadKeyCodeTables();
-//			while(is_high(S2)){};//wait for s2 to be pressed. DEBUG
-//			USBSend(KEY_A, LOWER);//send an a just to get started -- debug only
 			while(1){
-//				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
+				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
 					key = GetKeySimple();
 				//	modifier = GetModifier(); 
 					modifier = 0;
 				//	code = GetKeyCode(key, modifier);
-				//	if (code) { //if there is a new key to send, then send it
-				//		USBSend(code,modifier);
-				//	}
-				if(key){
-				USBSendNumber(key);
-				USBSend(KEY_ENTER,LOWER);
+					if(key){
+						USBSendNumber(key);
+						USBSend(KEY_ENTER,LOWER);
+					}
 				}
-
-
-		//			}
 			}
 			break;
 			case TEST_MODE:
@@ -121,22 +152,23 @@ int main(void)
 					set_high(LED2);
 				}
 			break;
+			
+			case SD_MODE:
+				OpenLogFile();
+				CloseLogFile();
+			break;
+			
 			case CAL_MODE:
 				Calibrate();
 			break;
+			
 			case BLUETOOTH_MODE:
-				uart_init(UART_BAUD_SELECT(38400,F_CPU));//initialize the uart with a baud rate of x bps
+				uart_init(UART_BAUD_SELECT(9800,F_CPU));//initialize the uart with a baud rate of x bps
 				while(1){
 					if(is_low(S2)){
-						while(is_high(PIO_6)){};
-						while(is_low(PIO_6)){};
-						Bluetooth_Send(KEY_A,LOWER);//send a character
-							
+						Bluetooth_Send(KEY_A,LOWER);//send a character							
 						Delay_MS(500);
-						while(is_high(PIO_6)){};
-						while(is_low(PIO_6)){};
 						Bluetooth_Send(KEY_Z,LOWER);//send z character
-						Delay_MS(500);
 					}
 				}
 			break;
@@ -150,8 +182,7 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every couple ms)
 	TMR1_Count ++;
-//    if(is_low(S3)){set_low(LED1);}//DEBUG
-//	else{set_high(LED1);}//DEBUG
+	MS_Device_USBTask(&Disk_MS_Interface);
 	HID_Device_USBTask(&Keyboard_HID_Interface); //These are the VITAL usb functions that must be called every so often (Dean Camera recommends every 30ms, no more that 200ms)
 	USB_USBTask(); //these functions respond to host queries, and they load the usb reports by calling the CALLBACK_HID_Device_CreateHIDReport() function
 
@@ -218,7 +249,8 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 	bool ConfigSuccess = true;
 
 	ConfigSuccess &= HID_Device_ConfigureEndpoints(&Keyboard_HID_Interface);
-
+	ConfigSuccess &= MS_Device_ConfigureEndpoints(&Disk_MS_Interface);
+	
 	USB_Device_EnableSOFEvents();
 
 }
@@ -226,6 +258,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 /** Event handler for the library USB Control Request reception event. */
 void EVENT_USB_Device_ControlRequest(void)
 {
+	MS_Device_ProcessControlRequest(&Disk_MS_Interface);
 	HID_Device_ProcessControlRequest(&Keyboard_HID_Interface);
 }
 
@@ -233,6 +266,19 @@ void EVENT_USB_Device_ControlRequest(void)
 void EVENT_USB_Device_StartOfFrame(void)
 {
 	HID_Device_MillisecondElapsed(&Keyboard_HID_Interface);
+}
+
+/** Mass Storage class driver callback function the reception of SCSI commands from the host, which must be processed.
+ *
+ *  \param[in] MSInterfaceInfo  Pointer to the Mass Storage class interface configuration structure being referenced
+ */
+bool CALLBACK_MS_Device_SCSICommandReceived(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
+{
+	bool CommandSuccess;
+
+	CommandSuccess = SCSI_DecodeSCSICommand(MSInterfaceInfo);
+
+	return CommandSuccess;
 }
 
 /** HID class driver callback function for the creation of HID reports to the host.
@@ -297,5 +343,36 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
 	  LEDMask |= LEDS_LED4;
 
 	LEDs_SetAllLEDs(LEDMask);
+}
+
+uint32_t get_num_of_sectors(){
+	uint32_t tot_sect = (DiskFATState.n_fatent - 2) * DiskFATState.csize;
+	
+	return 	tot_sect;
+}
+
+/** Opens the log file on the Dataflash's FAT formatted partition according to the current date */
+FRESULT OpenLogFile(void)
+{
+	FRESULT diskstatus;
+
+	diskstatus = f_mount(&DiskFATState,"",1);
+	
+	if (diskstatus == FR_OK){
+		diskstatus = f_open(&TempLogFile, "MYLOGFILE.txt", FA_OPEN_ALWAYS | FA_WRITE);
+		f_lseek(&TempLogFile, TempLogFile.fsize);
+		FileIsOpen = true;
+	}
+	
+	return diskstatus;
+}
+
+/** Closes the open data log file on the Dataflash's FAT formatted partition */
+void CloseLogFile(void)
+{
+	/* Sync any data waiting to be written, unmount the storage device */
+	f_sync(&TempLogFile);
+	f_close(&TempLogFile);
+	FileIsOpen = false;
 }
 
