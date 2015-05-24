@@ -48,9 +48,9 @@ void Calibrate(){
 		
 		TeachHIDKey(HIDKey, KeyPressed, LOWER); //all alphanumeric keys programmed as a/A pairs -- no special shift keys allowed.
 	
-		ASCIIKey = HIDkey-KEY_A+ASCII_A;
-		TeachASCIIKey(ASCIIKey, KeyPressed, UPPER);
-		TeachASCIIKey(ASCIIKey+0x20, KeyPressed, LOWER);
+		ASCIIKey = HIDkey-KEY_A+ASCII_A; //calculated corresponding sd card Ascii key
+		TeachASCIIKey(ASCIIKey, KeyPressed, UPPER);  //program this key into memory as an upper case key
+		TeachASCIIKey(ASCIIKey+0x20, KeyPressed, LOWER); // and as a lower case key
 		
 		USBSend(KEY_ENTER,LOWER);
 	}
