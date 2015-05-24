@@ -19,15 +19,14 @@ void Calibrate(){
 	Delay_MS(1000);//wait 1 second.
     USBSendString("USB TYPEWRITER");
 	USBSend(KEY_9,UPPER);
-	USBSend(KEY_T,UPPER);
-	USBSend(KEY_M,UPPER);
+    USBSendString("TM");
 	USBSend(KEY_0,UPPER);
 	USBSend(KEY_ENTER,0);
-	USBSendString("VER");
+	USBSendString("FIRMWARE VER");
 	USBSend(KEY_SPACE,UPPER);
-	USBSend(KEY_4,LOWER);
+	USBSend(KEY_5,LOWER);
 	USBSend(KEY_PERIOD,LOWER);
-	USBSend(KEY_2,LOWER);
+	USBSend(KEY_0,LOWER);
 	USBSend(KEY_ENTER,LOWER);
 	USBSendString("CALIBRATING");
 	USBSend(KEY_PERIOD,LOWER);
@@ -40,33 +39,55 @@ void Calibrate(){
 	USBSend(KEY_PERIOD,LOWER);
 	USBSend(KEY_ENTER,LOWER);
 	
-	for (char learnChar = KEY_A; learnChar <= KEY_Z; learnChar ++){
-		USBSend(learnChar, UPPER);
+	for (char HIDkey = KEY_A; HIDkey <= KEY_Z; HIDkey ++){
+		
+		USBSend(HIDkey, UPPER);
 		USBSend(KEY_SPACE,LOWER);// used to be a colon
-		GetTeachKey(learnChar);
+		KeyPressed = WaitForKeystroke();
+		Modifier = GetModifier();
+		
+		TeachHIDKey(HIDKey, KeyPressed, LOWER); //all alphanumeric keys programmed as a/A pairs -- no special shift keys allowed.
+	
+		ASCIIKey = HIDkey-KEY_A+ASCII_A;
+		TeachASCIIKey(ASCIIKey, KeyPressed, UPPER);
+		TeachASCIIKey(ASCIIKey+0x20, KeyPressed, LOWER);
+		
 		USBSend(KEY_ENTER,LOWER);
 	}
-	
+		
+   //Save calibration to eeprom:
+	 eeprom_write_block (KeyCodeLookUpTable, (void *) KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
+	 eeprom_write_block (FnKeyCodeLookUpTable, (void *) FN_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
+	 eeprom_write_block (ShiftKeyCodeLookUpTable, (void *) SHIFT_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
+	 eeprom_write_block (ASCIILookUpTable,(void *) ASCII_ADDR, KEYCODE_ARRAY_LENGTH);
+	 eeprom_write_block (ASCIIShiftLookUpTable,(void *) ASCII_SHIFT_ADDR, KEYCODE_ARRAY_LENGTH);
+	 eeprom_write_block (ReedSwitchLookUpTable, (void *) REED_SWITCH_ADDR, NUM_REED_SWITCHES);
+	 
+	 
 	Init_Mode(); //go into regular mode (whatever that is -- usb, bluetooth, etc)
-	
-	//CODE TO SAVE ARRAYS INTO EEPROM MUST GO HERE!!!
-	//
-	//
-	//
+
 }
 
-void GetTeachKey(char teachkey){
-	int keypressed = 0;
-	while(keypressed == 0){ //keep getting a key until there is a key to get.
-		keypressed = GetKeySimple();
+int WaitForKeypress(){
+	int KeyPressed = 0;
+	
+	Delay_MS(500);//implement 500 MS delay before detecting a key.  (prevents rapid re-detection of keys over and over.
+	
+	while(KeyPressed == 0){ //keep getting a key until there is a key to get.
+		KeyPressed = GetKeySimple();
 	}
-	if (is_low(S3)){
+	return KeyPressed;
+}
+	
+	
+void TeachHIDKey(char teachkey, int keypressed, char Modifier){
+	if (Modifier == UPPER){
 		ShiftKeyCodeLookUpTable[keypressed] = teachkey;
 		USBSendString("SHIFT");
 		USBSend(KEY_EQ,UPPER); //send a + sign
 		USBSendNumber(keypressed);
 	}
-	else if (is_low(S2)){ //if Alt is being held down,
+	else if (Modifier == HID_KEYBOARD_MODIFIER_LEFTALT){ //if FN is being held down,
 		FnKeyCodeLookUpTable[keypressed] = teachkey;
 		//send "FN+number"
 		USBSendString("FN");
@@ -77,10 +98,15 @@ void GetTeachKey(char teachkey){
 		KeyCodeLookUpTable[keypressed] = teachkey;
 		USBSendNumber(keypressed);
 	}
-	
-	USBSend(KEY_ENTER,0);
-	
-	Delay_MS(500);//implement 500 MS delay
+}
+
+void TeachASCIIKey(char teachkey, int keypressed, char Modifier){
+	if (Modifier == UPPER){
+		ASCIIShiftLookUpTable[keypressed] = teachkey;
+	}
+	else{
+		ASCIILookUpTable[keypressed] = teachkey;
+	}
 }
 
 

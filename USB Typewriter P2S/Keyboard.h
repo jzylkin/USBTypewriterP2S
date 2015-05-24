@@ -80,21 +80,40 @@
 		
 		#define SHIFT_REGISTER_PINS 8*6  //There are 6 shift registers, each with 8 inputs.
 		
-		#define KEYCODE_LENGTH 64
-		#define FN_KEYCODE_LENGTH 64
-		#define SHIFT_KEYCODE_LENGTH 64
+		
+		#define KEYCODE_ARRAY_LENGTH 64 // must be less than or equal to 64 (0x40)
+		
 		#define NUM_REED_SWITCHES 4
 		
+		
+		#define EEP_BANK0 0 //bank 0 starts at 0
 		#define KEYCODE_ADDR 0 //starting address of the table that stores the keycodes for each of 64 contacts
-		#define FN_KEYCODE_ADDR (KEYCODE_ADDR + KEYCODE_LENGTH) //table starting  address for all contacts when fn key is held down
-		#define SHIFT_KEYCODE_ADDR (FN_KEYCODE_ADDR + FN_KEYCODE_LENGTH) //table for all contacts when shift is held down (if implemented)
-		#define REED_SWITCH_ADDR (SHIFT_KEYCODE_ADDR + SHIFT_KEYCODE_LENGTH)  //table for all reed switch functions.
+		#define FN_KEYCODE_ADDR 0x40 //table starting  address for all contacts when fn key is held down
+		#define SHIFT_KEYCODE_ADDR 0x80 //table for all contacts when shift is held down (if implemented)
+		#define ASCII_ADDR 0xC0 //table to store ascii characters for saving to SD card
+		#define ASCII_SHIFT_ADDR 0x100 // table for shifted ascii characters for saving to SD card
+		#define REED_SWITCH_ADDR 0x140  //table for reed switch functions.
+		#define EEP_BANK0_END 0x150 // eeprom BANK0 ends at this address
+		
+		#define EEPROM_BANK2 0x200
+		#define DOUBLE_TAP_ADDR 0x200
+		#define HOLD_TIME_ADDR 0x201
+		#define RELEASE_TIME_ADDR 0x202
+		
+		#define EEP_CHECKSUM_ADDR 0x3FF;
+		#define EEP_CHECKSUM 71; //if eeprom doesn't have this code in the checksum address, it has not been initialized.
+		
+		#define DEFAULT_DOUBLE_TAP_TIME 10;
+		#define DEFAULT_HOLD_TIME 10;
+		#define DEFAULT_RELEASE_TIME 10;
+
 		
 		/** Indicates if the disk is write protected or not. */
 		#define DISK_READ_ONLY           false
 		
-		#define ASCII_A 65
-		#define HID_A 4
+		#define ASCII_A 0x61 // upper case A in ascii
+		#define ASCII_a 0x41 //lower case A in ascii
+		
 	/* Function Prototypes: */
 		void SetupHardware(void);
 
@@ -121,6 +140,8 @@
 		uint32_t get_num_of_sectors();
 		FRESULT OpenLogFile(void);
 		void CloseLogFile(void);
+		
+		
 
 #endif
 

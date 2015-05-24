@@ -128,6 +128,18 @@
 #define LED2					PF0
 #define LED2_PORT				PORTF
 
+#define CTRL_KEY				S1
+#define CTRL_KEY_PORT			S1_PORT
+
+#define ALT_KEY					S2
+#define ALT_KEY_PORT			S2_PORT
+
+#define CMD_KEY					S3
+#define CMD_KEY_PORT			S3_PORT
+
+#define FN_KEY					ALT_KEY
+#define FN_KEY_PORT				ALT_KEY_PORT
+
 							
 
 
