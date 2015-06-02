@@ -82,7 +82,8 @@ void dly_us (UINT n)	/* Delay n microseconds (avr-gcc -Os) */
 {
 	do {
 		PINB;
-		PINB; //PINB is a throwaway command that wastes one op cycle.  2 PINB commands is recommended for 8MHZ clock.  We can lengthen this or randomize this for EMC reasons.
+		PINB;
+		 //PINB is a throwaway command that wastes one op cycle.  1 PINB commands is recommended for 8MHZ clock.  We can lengthen this or randomize this for EMC reasons.
 	} while (--n);
 }
 

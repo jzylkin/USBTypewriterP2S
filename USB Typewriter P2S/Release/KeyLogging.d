@@ -1,4 +1,4 @@
-Lib/SCSI.d Lib/SCSI.o: ../Lib/SCSI.c ../Lib/SCSI.h \
+KeyLogging.d KeyLogging.o: .././KeyLogging.c .././Keyboard.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\io.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\sfr_defs.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\inttypes.h \
@@ -10,25 +10,28 @@ Lib/SCSI.d Lib/SCSI.o: ../Lib/SCSI.c ../Lib/SCSI.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\version.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\fuse.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\lock.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\pgmspace.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stddef.h \
- ../src/LUFA/LUFA/Drivers/USB/USB.h \
- ../src/LUFA/LUFA/Drivers/USB/../../Common/Common.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\wdt.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\power.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stdbool.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\string.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stddef.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\math.h \
+ .././Descriptors.h \
+ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\pgmspace.h \
+ ../src/LUFA/LUFA/Drivers/USB/USB.h \
+ ../src/LUFA/LUFA/Drivers/USB/../../Common/Common.h \
  ../src/LUFA/LUFA/Drivers/USB/../../Common/Architectures.h \
  ../src/LUFA/LUFA/Drivers/USB/../../Common/BoardTypes.h \
  ../src/LUFA/LUFA/Drivers/USB/../../Common/ArchitectureSpecific.h \
  ../src/LUFA/LUFA/Drivers/USB/../../Common/CompilerSpecific.h \
  ../src/LUFA/LUFA/Drivers/USB/../../Common/Attributes.h \
  ../src/config/LUFAConfig.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\eeprom.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\boot.h \
  c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include-fixed\limits.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\math.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay_basic.h \
  ../src/LUFA/LUFA/Drivers/USB/../../Common/Endianness.h \
  ../src/LUFA/LUFA/Drivers/USB/Core/USBMode.h \
  ../src/LUFA/LUFA/Drivers/USB/Core/../../../Common/Common.h \
@@ -114,25 +117,20 @@ Lib/SCSI.d Lib/SCSI.o: ../Lib/SCSI.c ../Lib/SCSI.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/RNDISClassCommon.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/Device/../Common/CDCClassCommon.h \
  ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h \
- ../Lib/../Keyboard.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\wdt.h \
- c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\power.h \
- ../Lib/../Descriptors.h ../src/Config/AppConfig.h \
- ../src/LUFA/LUFA/Drivers/Board/Joystick.h \
+ ../src/Config/AppConfig.h ../src/LUFA/LUFA/Drivers/Board/Joystick.h \
  ../src/LUFA/LUFA/Drivers/Board/../../Common/Common.h \
  ../src/LUFA/LUFA/Drivers/Board/LEDs.h \
  ../src/LUFA/LUFA/Drivers/Board/Buttons.h \
  ../src/LUFA/LUFA/Platform/Platform.h \
- ../src/LUFA/LUFA/Platform/../Common/Common.h ../Lib/../Lib/SCSI.h \
- ../Lib/../Lib/SDCardManager.h ../Lib/../Lib/../Keyboard.h \
- ../Lib/../Lib/../Descriptors.h ../src/LUFA/LUFA/Common/Common.h \
- ../Lib/../Lib/FATFs/ff.h ../Lib/../Lib/FATFs/integer.h \
- ../Lib/../Lib/FATFs/ffconf.h ../Lib/../IO_Macros.h ../Lib/../Config_IO.h \
- ../Lib/../Config_Interrupts.h ../Lib/../Sense_Keys.h ../Lib/../Send.h \
- ../Lib/../Bluetooth.h ../Lib/../uart.h ../Lib/../KeyLogging.h \
- ../Lib/../Descriptors.h ../Lib/SDCardManager.h
+ ../src/LUFA/LUFA/Platform/../Common/Common.h .././Lib/SCSI.h \
+ .././Lib/../Keyboard.h .././Lib/../Descriptors.h \
+ .././Lib/SDCardManager.h ../src/LUFA/LUFA/Common/Common.h \
+ .././Lib/SDCardManager.h .././Lib/FATFs/ff.h .././Lib/FATFs/integer.h \
+ .././Lib/FATFs/ffconf.h .././IO_Macros.h .././Config_IO.h \
+ .././Config_Interrupts.h .././Sense_Keys.h .././Send.h .././Bluetooth.h \
+ .././uart.h .././KeyLogging.h .././KeyCodes.h .././globals.h
 
-../Lib/SCSI.h:
+.././Keyboard.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -156,17 +154,31 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\lock.h:
 
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\pgmspace.h:
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\wdt.h:
 
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stddef.h:
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\power.h:
 
-../src/LUFA/LUFA/Drivers/USB/USB.h:
-
-../src/LUFA/LUFA/Drivers/USB/../../Common/Common.h:
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stdbool.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\string.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include\stddef.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay_basic.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\math.h:
+
+.././Descriptors.h:
+
+c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\pgmspace.h:
+
+../src/LUFA/LUFA/Drivers/USB/USB.h:
+
+../src/LUFA/LUFA/Drivers/USB/../../Common/Common.h:
 
 ../src/LUFA/LUFA/Drivers/USB/../../Common/Architectures.h:
 
@@ -180,19 +192,11 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 ../src/config/LUFAConfig.h:
 
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
-
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\eeprom.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\boot.h:
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\lib\gcc\avr\4.8.1\include-fixed\limits.h:
-
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\math.h:
-
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay.h:
-
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\util\delay_basic.h:
 
 ../src/LUFA/LUFA/Drivers/USB/../../Common/Endianness.h:
 
@@ -364,14 +368,6 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 ../src/LUFA/LUFA/Drivers/USB/Class/StillImageClass.h:
 
-../Lib/../Keyboard.h:
-
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\wdt.h:
-
-c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\power.h:
-
-../Lib/../Descriptors.h:
-
 ../src/Config/AppConfig.h:
 
 ../src/LUFA/LUFA/Drivers/Board/Joystick.h:
@@ -386,38 +382,40 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 ../src/LUFA/LUFA/Platform/../Common/Common.h:
 
-../Lib/../Lib/SCSI.h:
+.././Lib/SCSI.h:
 
-../Lib/../Lib/SDCardManager.h:
+.././Lib/../Keyboard.h:
 
-../Lib/../Lib/../Keyboard.h:
+.././Lib/../Descriptors.h:
 
-../Lib/../Lib/../Descriptors.h:
+.././Lib/SDCardManager.h:
 
 ../src/LUFA/LUFA/Common/Common.h:
 
-../Lib/../Lib/FATFs/ff.h:
+.././Lib/SDCardManager.h:
 
-../Lib/../Lib/FATFs/integer.h:
+.././Lib/FATFs/ff.h:
 
-../Lib/../Lib/FATFs/ffconf.h:
+.././Lib/FATFs/integer.h:
 
-../Lib/../IO_Macros.h:
+.././Lib/FATFs/ffconf.h:
 
-../Lib/../Config_IO.h:
+.././IO_Macros.h:
 
-../Lib/../Config_Interrupts.h:
+.././Config_IO.h:
 
-../Lib/../Sense_Keys.h:
+.././Config_Interrupts.h:
 
-../Lib/../Send.h:
+.././Sense_Keys.h:
 
-../Lib/../Bluetooth.h:
+.././Send.h:
 
-../Lib/../uart.h:
+.././Bluetooth.h:
 
-../Lib/../KeyLogging.h:
+.././uart.h:
 
-../Lib/../Descriptors.h:
+.././KeyLogging.h:
 
-../Lib/SDCardManager.h:
+.././KeyCodes.h:
+
+.././globals.h:

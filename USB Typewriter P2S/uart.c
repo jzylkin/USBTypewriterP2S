@@ -328,7 +328,6 @@ Purpose:  called when the UART is ready to transmit the next byte
 **************************************************************************/
 {
     unsigned char tmptail;
-
     
     if ( UART_TxHead != UART_TxTail) {
         /* calculate and store new buffer index */
@@ -465,6 +464,12 @@ unsigned int uart_getc(void)
 
 }/* uart_getc */
 
+void uart_clear_rx_buffer(){
+//the head and tail define the buffer index of the first and last byte of the received data.  
+//If they are equal to each other, no data has been received (buffer empty)
+	UART_RxHead = 0;
+	UART_RxTail = 0; 
+}
 
 /*************************************************************************
 Function: uart_putc()
@@ -475,7 +480,6 @@ Returns:  none
 void uart_putc(unsigned char data)
 {
     unsigned char tmphead;
-
     
     tmphead  = (UART_TxHead + 1) & UART_TX_BUFFER_MASK;
     
@@ -490,6 +494,8 @@ void uart_putc(unsigned char data)
     UART0_CONTROL    |= _BV(UART0_UDRIE);
 
 }/* uart_putc */
+
+
 
 
 /*************************************************************************

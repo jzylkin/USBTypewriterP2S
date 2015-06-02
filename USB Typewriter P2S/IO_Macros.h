@@ -50,21 +50,19 @@
 
 /****IO DEFINITIONS******/
 
-#define SD_DETECT				PB7
+#define SD_DETECT				PB0
 #define SD_DETECT_PORT			PORTB
-#define SD_DETECT_DDR			DDRB
-#define SD_DETECT_PIN			PINB
 
-#define SENSE_CLK				PB6
-#define SENSE_CLK_PORT			PORTB
+#define SENSE_CLK				PE2
+#define SENSE_CLK_PORT			PORTE
 
-#define REED_4					PB5
+#define REED_4					PB4
 #define REED_4_PORT				PORTB
-#define REED_3					PB4
-#define REED_3_PORT				PORTB
-#define REED_2					PD7
+#define REED_3					PD7
+#define REED_3_PORT				PORTD
+#define REED_2					PD6
 #define REED_2_PORT				PORTD
-#define REED_1					PD6
+#define REED_1					PD4
 #define REED_1_PORT				PORTD
 
 #define SD_MISO					PB3
@@ -76,20 +74,11 @@
 #define SD_CLK					PB1
 #define SD_CLK_PORT			PORTB
 
-#define PIO_5					PB0
-#define PIO_5_PORT				PORTB
-
-#define SENSE_SER				PC6
-#define SENSE_SER_PORT			PORTC
-
-#define SENSE_CLR				PC7
-#define SENSE_CLR_PORT			PORTC
+#define SENSE_SER				PB5
+#define SENSE_SER_PORT			PORTB
 
 #define DUMMY_LOAD				PD5
 #define DUMMY_LOAD_PORT			PORTD
-
-#define POK						PD4
-#define POK_PORT				PORTD
 
 #define TX						PD3
 #define TX_PORT					PORTD
@@ -100,33 +89,33 @@
 #define SD_CHIP_SELECT				PD1
 #define SD_CHIP_SELECT_PORT			PORTD
 
-#define TWI_DAT				PD1
-#define TWI_DAT_PORT				PORTD
-
-#define TWI_CLK				PD0
-#define TWI_CLK_PORT			PORTD
-
-#define PIO_6					PE6
-#define PIO_6_PORT				PORTE
-
-#define SENSE_POWER				PE2
-#define SENSE_POWER_PORT		PORTE
-
-#define S3						PF7
+#define S3						PF6
 #define S3_PORT					PORTF
-#define S2						PF6
+#define S2						PF5
 #define S2_PORT					PORTF
-#define S1						PF5
+#define S1						PF4
 #define S1_PORT					PORTF
 
-#define BT_RESET				PF4
+#define BT_RESET				PF7
 #define BT_RESET_PORT			PORTF
 
-#define LED1					PF1
-#define LED1_PORT				PORTF
+#define BT_BAUD					PC7
+#define BT_BAUD_PORT			PORTC
 
-#define LED2					PF0
-#define LED2_PORT				PORTF
+#define BT_CONNECTED			PF1
+#define BT_CONNECTED_PORT		PORTF
+
+#define BT_CTS					PE6
+#define BT_CTS_PORT				PORTE
+
+#define BT_RTS					PF0
+#define BT_RTS_PORT				PORTF
+
+#define LED1					PC6
+#define LED1_PORT				PORTC
+
+#define LED2					PB6
+#define LED2_PORT				PORTB
 
 #define CTRL_KEY				S1
 #define CTRL_KEY_PORT			S1_PORT
@@ -139,6 +128,7 @@
 
 #define FN_KEY					ALT_KEY
 #define FN_KEY_PORT				ALT_KEY_PORT
+#define FN_MODIFIER				HID_KEYBOARD_MODIFIER_LEFTALT  //the alt key is used as the fn key.
 
 							
 

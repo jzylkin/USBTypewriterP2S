@@ -127,8 +127,8 @@ Sense_Keys.d Sense_Keys.o: .././Sense_Keys.c .././Keyboard.h \
  .././Lib/SDCardManager.h ../src/LUFA/LUFA/Common/Common.h \
  .././Lib/SDCardManager.h .././Lib/FATFs/ff.h .././Lib/FATFs/integer.h \
  .././Lib/FATFs/ffconf.h .././IO_Macros.h .././Config_IO.h \
- .././Config_Interrupts.h .././Init_Mode.h .././Sense_Keys.h .././Send.h \
- .././Bluetooth.h .././uart.h .././KeyCodes.h
+ .././Config_Interrupts.h .././Sense_Keys.h .././Send.h .././Bluetooth.h \
+ .././uart.h .././KeyLogging.h .././KeyCodes.h .././globals.h
 
 .././Keyboard.h:
 
@@ -406,8 +406,6 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 .././Config_Interrupts.h:
 
-.././Init_Mode.h:
-
 .././Sense_Keys.h:
 
 .././Send.h:
@@ -416,4 +414,8 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 .././uart.h:
 
+.././KeyLogging.h:
+
 .././KeyCodes.h:
+
+.././globals.h:

@@ -20,20 +20,37 @@ void USBSend(uint8_t code,uint8_t mod){
 }
 
 
-
 void USBSendString(const char *str){
 	int length;
 	int code;
+	int modifier = LOWER;
 	length = strlen(str);
 	for (int i=0; i<length; i++){
 		if(str[i] == ' '){
 			code = KEY_SPACE;
 		}
+		if(str[i] == '\r'){
+			code = KEY_ENTER;
+		}
+		else if(str[i] == '.'){
+			code = KEY_PERIOD;
+		}
+		else if(str[i] == '!'){
+			code = KEY_1;
+			modifier = UPPER;
+		}
+		else if(str[i] == '0'){
+			code = KEY_0;
+		}
+		else if((str[i] >= ASCII_1 )&&(str[i] <= ASCII_9)){
+			code = str[i] - ASCII_1 + KEY_1; //translate ascii to hid number code 
+		}
 		else{
 			code = toupper(str[i]);//make sure code is uppercase.
-			code = code-ASCII_A+HID_A;  //Convert the character (which is uppercase Ascii)  to an USB HID Keycode.
+			code = code-ASCII_A+KEY_A;  //Convert the character (which is uppercase Ascii)  to an USB HID Keycode.
+			modifier = UPPER;
 		}
-		USBSend(code,HID_KEYBOARD_MODIFIER_LEFTSHIFT);
+		USBSend(code,modifier);
 	}
 } 
 

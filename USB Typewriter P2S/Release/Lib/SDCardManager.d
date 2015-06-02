@@ -129,11 +129,11 @@ Lib/SDCardManager.d Lib/SDCardManager.o: ../Lib/SDCardManager.c \
  ../Lib/../Lib/SDCardManager.h ../Lib/../Lib/SDCardManager.h \
  ../Lib/../Lib/FATFs/ff.h ../Lib/../Lib/FATFs/integer.h \
  ../Lib/../Lib/FATFs/ffconf.h ../Lib/../IO_Macros.h ../Lib/../Config_IO.h \
- ../Lib/../Config_Interrupts.h ../Lib/../Init_Mode.h \
- ../Lib/../Sense_Keys.h ../Lib/../Send.h ../Lib/../Bluetooth.h \
- ../Lib/../uart.h ../Lib/../Descriptors.h \
- ../src/LUFA/LUFA/Common/Common.h ../Lib/../Lib/FatFS/diskio.h \
- ../Lib/../Lib/FatFS/integer.h ../Lib/../IO_Macros.h
+ ../Lib/../Config_Interrupts.h ../Lib/../Sense_Keys.h ../Lib/../Send.h \
+ ../Lib/../Bluetooth.h ../Lib/../uart.h ../Lib/../KeyLogging.h \
+ ../Lib/../Descriptors.h ../src/LUFA/LUFA/Common/Common.h \
+ ../Lib/../Lib/FatFS/diskio.h ../Lib/../Lib/FatFS/integer.h \
+ ../Lib/../IO_Macros.h ../Lib/../globals.h
 
 ../Lib/SDCardManager.h:
 
@@ -411,8 +411,6 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 ../Lib/../Config_Interrupts.h:
 
-../Lib/../Init_Mode.h:
-
 ../Lib/../Sense_Keys.h:
 
 ../Lib/../Send.h:
@@ -420,6 +418,8 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 ../Lib/../Bluetooth.h:
 
 ../Lib/../uart.h:
+
+../Lib/../KeyLogging.h:
 
 ../Lib/../Descriptors.h:
 
@@ -430,3 +430,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 ../Lib/../Lib/FatFS/integer.h:
 
 ../Lib/../IO_Macros.h:
+
+../Lib/../globals.h:

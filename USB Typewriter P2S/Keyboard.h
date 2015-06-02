@@ -67,11 +67,11 @@
 		#include "IO_Macros.h"
 		#include "Config_IO.h"
 		#include "Config_Interrupts.h"
-		#include "Init_Mode.h"
 		#include "Sense_Keys.h"
 		#include "Send.h"
 		#include "Bluetooth.h"
 		#include "uart.h"
+		#include "KeyLogging.h"
 		
 		/**Jack'ss Macros */
 		#define DELAY_1US asm("nop;nop;nop;nop;nop;nop;nop;nop;")
@@ -92,27 +92,63 @@
 		#define SHIFT_KEYCODE_ADDR 0x80 //table for all contacts when shift is held down (if implemented)
 		#define ASCII_ADDR 0xC0 //table to store ascii characters for saving to SD card
 		#define ASCII_SHIFT_ADDR 0x100 // table for shifted ascii characters for saving to SD card
-		#define REED_SWITCH_ADDR 0x140  //table for reed switch functions.
 		#define EEP_BANK0_END 0x150 // eeprom BANK0 ends at this address
 		
-		#define EEPROM_BANK2 0x200
+		#define EEP_BANK2 0x200
 		#define DOUBLE_TAP_ADDR 0x200
 		#define HOLD_TIME_ADDR 0x201
 		#define RELEASE_TIME_ADDR 0x202
+		#define USE_HALL_SENSOR_ADDR 0x203
+		#define HALL_SENSOR_POLARITY_ADDR 0x204
+		#define SHIFT_REED_ADDR 0x205
+		#define REED_1_POLARITY_ADDR 0x206
+		#define REED_2_POLARITY_ADDR 0x207
+		#define REED_3_POLARITY_ADDR 0x208
+		#define REED_4_POLARITY_ADDR 0x209
+		#define FILENUM_ADDR 0x20A
+		#define FILENUM_ADDR_2 0x20B
+		#define EEP_BANK2_END 0x20F
 		
-		#define EEP_CHECKSUM_ADDR 0x3FF;
-		#define EEP_CHECKSUM 71; //if eeprom doesn't have this code in the checksum address, it has not been initialized.
+		#define EEP_CHECKSUM_ADDR 0x3FF
+		#define EEP_CHECKSUM 71 //if eeprom doesn't have this code in the checksum address, it has not been initialized yet.
 		
-		#define DEFAULT_DOUBLE_TAP_TIME 10;
-		#define DEFAULT_HOLD_TIME 10;
-		#define DEFAULT_RELEASE_TIME 10;
+		#define DEFAULT_DOUBLE_TAP_TIME 10
+		#define DEFAULT_HOLD_TIME 10
+		#define DEFAULT_RELEASE_TIME 10
+		
+		
+		//TIMING FOR SENSOR READOUT ROUTINES
+		#define CLK_POS_PULSE 10
+		#define CLK_NEG_PULSE 40
+
+		//DEFINING THE 64-bit SENSOR BITFIELD
+		#define KEY_SENSOR_MASK 0x0000FFFFFFFFFFFF  //This mask represents the lowest 48 bits of the bitfield  -- these are the bits used for detecting keys on the sensor.
+		#define REED_1_BIT 63
+		#define REED_2_BIT 62
+		#define REED_3_BIT 61
+		#define REED_4_BIT 60
+		#define HALL_SENSOR_BIT 44
+		
+		#define INITIALIZING 0
+		#define USB_MODE 1
+		#define SD_MODE 2
+		#define BT_MODE 3
+		#define TEST_MODE 4
+		#define CAL_MODE 5
+		#define QUICK_CAL_MODE 6
+		#define FINETUNING_MODE 7
+		#define DEEP_SLEEP_MODE 8
+		#define BLUETOOTH_MODE 9
+		#define PANIC_MODE 10
+		
+		#define SD_BUFFER_LENGTH 512
 
 		
 		/** Indicates if the disk is write protected or not. */
 		#define DISK_READ_ONLY           false
 		
-		#define ASCII_A 0x61 // upper case A in ascii
-		#define ASCII_a 0x41 //lower case A in ascii
+		#define ASCII_A 0x41 // upper case A in ascii
+		#define ASCII_a 0x61 //lower case A in ascii
 		
 	/* Function Prototypes: */
 		void SetupHardware(void);
@@ -137,9 +173,9 @@
 
 		bool CALLBACK_MS_Device_SCSICommandReceived(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo);
 												 
-		uint32_t get_num_of_sectors();
-		FRESULT OpenLogFile(void);
-		void CloseLogFile(void);
+
+		
+		void Init_Mode(void);
 		
 		
 

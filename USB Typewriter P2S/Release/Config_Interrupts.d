@@ -128,8 +128,8 @@ Config_Interrupts.d Config_Interrupts.o: .././Config_Interrupts.c \
  .././Lib/SDCardManager.h ../src/LUFA/LUFA/Common/Common.h \
  .././Lib/SDCardManager.h .././Lib/FATFs/ff.h .././Lib/FATFs/integer.h \
  .././Lib/FATFs/ffconf.h .././IO_Macros.h .././Config_IO.h \
- .././Config_Interrupts.h .././Init_Mode.h .././Sense_Keys.h .././Send.h \
- .././Bluetooth.h .././uart.h
+ .././Config_Interrupts.h .././Sense_Keys.h .././Send.h .././Bluetooth.h \
+ .././uart.h .././KeyLogging.h
 
 c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
 
@@ -407,8 +407,6 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 
 .././Config_Interrupts.h:
 
-.././Init_Mode.h:
-
 .././Sense_Keys.h:
 
 .././Send.h:
@@ -416,3 +414,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././Bluetooth.h:
 
 .././uart.h:
+
+.././KeyLogging.h:

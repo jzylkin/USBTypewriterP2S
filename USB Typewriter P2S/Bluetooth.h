@@ -10,6 +10,11 @@
 #define BLUETOOTH_H_
 void Bluetooth_Send(uint8_t key, uint8_t modifier);
 void Bluetooth_Init();
-
-
+void Bluetooth_Send_CMD(char* command);
+bool Bluetooth_Enter_CMD_Mode();
+void Bluetooth_Reset();
+bool Bluetooth_Disconnect();
+bool Bluetooth_Connect();
+#define BLUETOOTH_RESPONSE_DELAY 100 //delay for a little bit to make sure bluetooth has time to respond after each command --100ms recommended by makeymakey.
+	
 #endif /* BLUETOOTH_H_ */

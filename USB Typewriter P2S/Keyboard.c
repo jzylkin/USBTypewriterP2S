@@ -38,28 +38,41 @@
 #include "Calibrate.h"
 #include "KeyCodes.h"
 
-/** FAT Fs structure to hold the internal state of the FAT driver for the Dataflash contents. */
-static FATFS DiskFATState;
-
-/** FAT Fs structure to hold a FAT file handle for the log data write destination. */
-static FIL TempLogFile;
-
-static bool FileIsOpen;
 
 
-volatile int Typewriter_Mode;
+
+volatile int8_t Typewriter_Mode;
 
 volatile USB_KeyboardReport_Data_t* KeyBuffer; //GLOBAL A single-key buffer holding the next key to send. Cleared each time a key is sent.
 volatile int TMR1_Count;
 
-uint8_t KeyCodeLookUpTable[KEYCODE_LENGTH];
-uint8_t FnKeyCodeLookUpTable[FN_KEYCODE_LENGTH];
-uint8_t ShiftKeyCodeLookUpTable[SHIFT_KEYCODE_LENGTH];
-uint8_t ReedSwitchLookUpTable[NUM_REED_SWITCHES];
+uint8_t KeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
+uint8_t FnKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
+uint8_t ShiftKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
+uint8_t ASCIILookUpTable[KEYCODE_ARRAY_LENGTH];
+uint8_t ASCIIShiftLookUpTable[KEYCODE_ARRAY_LENGTH];
+
+uint8_t Shift_Reed;
+uint8_t UseHallSensor; 
+uint8_t HallSensorPolarity;
+
+uint8_t DoubleTapTime;
+uint8_t KeyReleaseTime;
+uint8_t KeyHoldTime;
 uint8_t KeyBufferMod;
+
+bool Reed1Polarity; //reed switches are active low by default
+bool Reed2Polarity; //reed switches are active low by default
+bool Reed3Polarity; //reed switches are active low by default
+bool Reed4Polarity; //reed switches are active low by default
+
 
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
+
+//general purpose buffer to hold information to read/write to sd card
+volatile uint8_t SD_Buffer[SD_BUFFER_LENGTH]; //global buffer for general purpose use by multiple functions.
+
 
 /** LUFA Mass Storage Class driver interface configuration and state information. This structure is
  *  passed to all Mass Storage Class driver functions, so that multiple instances of the same class
@@ -117,32 +130,40 @@ int main(void)
 	uint8_t code;
 	uint8_t modifier;
 	uint8_t parity;
+	
 	Typewriter_Mode = INITIALIZING;
 	SetupHardware();
+	InitializeEeprom();//sets all EEPROM entries to zero if the checksum is incorrect
 	SDCardManager_Init(); 
+	Init_Mode();
 	GlobalInterruptEnable();
 	
-
-	Delay_MS(1000);//delay 1 second for some reason
+//	Delay_MS(1000);//delay 1 second for some reason
 	while(1){
 		switch (Typewriter_Mode){
 			case USB_MODE:
-			LoadKeyCodeTables();
+			MountFilesystem();//mount the filesystem so that we can access it as an MSD
+		//	LoadKeyCodeTables();
+			set_low(LED1);
 			while(1){
 				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
 					key = GetKeySimple();
-				//	modifier = GetModifier(); 
-					modifier = 0;
-				//	code = GetKeyCode(key, modifier);
-					if(key){
+					modifier = GetModifier(); 
+				//	code = GetHIDKeyCode(key, modifier);
+					if(key){	
 						USBSendNumber(key);
+						USBSend(code,modifier);
 						USBSend(KEY_ENTER,LOWER);
 					}
 				}
+				MS_Device_USBTask(&Disk_MS_Interface);
+				HID_Device_USBTask(&Keyboard_HID_Interface); //These are the VITAL usb functions that must be called every so often (Dean Camera recommends every 30ms, no more that 200ms)
 			}
 			break;
 			case TEST_MODE:
+				getHallState();
 				parity = (uint8_t)is_low(REED_1) + (uint8_t)is_low(REED_2)+ (uint8_t)is_low(REED_3) + (uint8_t)is_low(REED_4);
+				
 				if (parity & 1){
 					set_high(LED1);
 					set_low(LED2);
@@ -154,8 +175,8 @@ int main(void)
 			break;
 			
 			case SD_MODE:
-				OpenLogFile();
-				CloseLogFile();
+				USB_Detach(); //make sure no host is connected before accessing SD card.
+				LogKeystrokes();
 			break;
 			
 			case CAL_MODE:
@@ -163,7 +184,9 @@ int main(void)
 			break;
 			
 			case BLUETOOTH_MODE:
-				uart_init(UART_BAUD_SELECT(9800,F_CPU));//initialize the uart with a baud rate of x bps
+				USB_Detach(); //make sure no host is connected before sending over bluetooth.
+				uart_init(UART_BAUD_SELECT(9600,F_CPU));//initialize the uart with a baud rate of x bps
+				Bluetooth_Init();
 				while(1){
 					if(is_low(S2)){
 						Bluetooth_Send(KEY_A,LOWER);//send a character							
@@ -172,8 +195,18 @@ int main(void)
 					}
 				}
 			break;
+			case PANIC_MODE:
+				while(1){
+					set_high(LED2);
+					set_low(LED1);
+					Delay_MS(200);
+					set_high(LED1);
+					set_low(LED2);
+					Delay_MS(200);
+				}
+				
 			default:
-				Typewriter_Mode = TEST_MODE;
+				Typewriter_Mode = PANIC_MODE;
 			break;
 		};
 			
@@ -182,9 +215,6 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every couple ms)
 	TMR1_Count ++;
-	MS_Device_USBTask(&Disk_MS_Interface);
-	HID_Device_USBTask(&Keyboard_HID_Interface); //These are the VITAL usb functions that must be called every so often (Dean Camera recommends every 30ms, no more that 200ms)
-	USB_USBTask(); //these functions respond to host queries, and they load the usb reports by calling the CALLBACK_HID_Device_CreateHIDReport() function
 
 }
 
@@ -194,10 +224,16 @@ ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A regist
 void SetupHardware()
 {
 
-	
 	/* Disable watchdog if enabled by bootloader/fuses */
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
+	
+	/* Disable JTAG on PortF -- enables Port F pins to function normally.  Datasheet requires this pin to be written repeatedly in order for it to work. 
+	("The application software must write this bit to the desired value twice within four cycles to change its value."*/
+	MCUCR |= (1 << JTD); 
+	MCUCR |= (1 << JTD); 
+	MCUCR |= (1 << JTD); 
+	MCUCR |= (1 << JTD); 
 
 	/* Disable clock division */
 	clock_prescale_set(clock_div_1);
@@ -206,6 +242,12 @@ void SetupHardware()
 	/* Hardware Initialization */
 	Config_IO();
 	Delay_MS(50); //DELAY 50ms after setting IO.
+	
+	Reed1Polarity = eeprom_read_byte((uint8_t *)REED_1_POLARITY_ADDR);
+	Reed2Polarity= eeprom_read_byte((uint8_t *)REED_2_POLARITY_ADDR);
+	Reed3Polarity = eeprom_read_byte((uint8_t *)REED_3_POLARITY_ADDR);
+	Reed4Polarity = eeprom_read_byte((uint8_t *)REED_4_POLARITY_ADDR);
+	
 	Init_Mode();
 	
 	if(Typewriter_Mode == SD_MODE){
@@ -345,34 +387,23 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
 	LEDs_SetAllLEDs(LEDMask);
 }
 
-uint32_t get_num_of_sectors(){
-	uint32_t tot_sect = (DiskFATState.n_fatent - 2) * DiskFATState.csize;
-	
-	return 	tot_sect;
-}
 
-/** Opens the log file on the Dataflash's FAT formatted partition according to the current date */
-FRESULT OpenLogFile(void)
-{
-	FRESULT diskstatus;
 
-	diskstatus = f_mount(&DiskFATState,"",1);
-	
-	if (diskstatus == FR_OK){
-		diskstatus = f_open(&TempLogFile, "MYLOGFILE.txt", FA_OPEN_ALWAYS | FA_WRITE);
-		f_lseek(&TempLogFile, TempLogFile.fsize);
-		FileIsOpen = true;
+
+
+
+
+void Init_Mode(){
+	if (is_low(S1)){ //hold down S1 during initialization to calibrate
+		set_low(LED2);
+		Typewriter_Mode = CAL_MODE;
 	}
-	
-	return diskstatus;
-}
-
-/** Closes the open data log file on the Dataflash's FAT formatted partition */
-void CloseLogFile(void)
-{
-	/* Sync any data waiting to be written, unmount the storage device */
-	f_sync(&TempLogFile);
-	f_close(&TempLogFile);
-	FileIsOpen = false;
+	else if (is_low(S3)){ //hold down S3 to enter LED indication mode to test reed switches.
+		Typewriter_Mode = TEST_MODE;
+	}
+	else{
+		Typewriter_Mode = USB_MODE; //otherwise just go into normal USB mode.
+		set_high(BT_RESET);//and turn off the bluetooth module.
+	}
 }
 

@@ -7,7 +7,7 @@
 
 
 #ifndef CONFIG_IO_H_
-#define OONFIG_IO_H_
+#define CONFIG_IO_H_
 
 void Config_IO();
 

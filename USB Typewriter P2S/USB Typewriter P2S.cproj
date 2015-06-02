@@ -337,16 +337,16 @@
     <Compile Include="globals.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Init_Mode.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Init_Mode.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="IO_Macros.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Descriptors.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="KeyLogging.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="KeyLogging.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Lib\FatFS\diskio.c">

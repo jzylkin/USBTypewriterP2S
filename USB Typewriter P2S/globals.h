@@ -14,7 +14,6 @@ volatile extern USB_KeyboardReport_Data_t* KeyBuffer;
 extern uint8_t KeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t FnKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t ShiftKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
-extern uint8_t ReedSwitchLookUpTable[NUM_REED_SWITCHES];
 extern uint8_t ASCIILookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t ASCIIShiftLookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t KeyBufferMod;
@@ -22,6 +21,20 @@ extern uint8_t KeyBufferMod;
 extern uint8_t DoubleTapTime;
 extern uint8_t KeyReleaseTime;
 extern uint8_t KeyHoldTime;
+
+extern uint8_t Shift_Reed;
+extern uint8_t UseHallSensor; 
+extern uint8_t HallSensorPolarity;
+
+extern bool Reed1Polarity;
+extern bool Reed2Polarity;
+extern bool Reed3Polarity;
+extern bool Reed4Polarity;
+
+extern volatile uint8_t Typewriter_Mode;
+extern volatile uint8_t SD_Buffer[SD_BUFFER_LENGTH];
+
+
 
 
 

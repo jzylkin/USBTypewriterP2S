@@ -40,8 +40,8 @@
 #include "SDCardManager.h"
 #include "../Lib/FatFS/diskio.h"
 #include "../IO_Macros.h"
+#include "../globals.h"
 
-static uint8_t Buffer[512];
 static bool SDCard_Present= false;
 
 void SDCardManager_Init(void)
@@ -112,12 +112,12 @@ void SDCardManager_WriteBlocks(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo,
 		BytesWritten = 0;
 		
 		while((BytesWritten<512)){
-			BytesWritten += SDCardManager_WriteBlockHandler(Buffer, BytesWritten);
+			BytesWritten += SDCardManager_WriteBlockHandler((uint8_t*)SD_Buffer, BytesWritten);
 			if (USB_DeviceState != DEVICE_STATE_Configured){return;}//if the device is not configured, exit out of this
 			if (MSInterfaceInfo->State.IsMassStoreReset){return;}
 		}
 		
-		disk_write (0, Buffer, BlockAddress, 1);//write to disk 0, from Buffer array, into BlockAddress, Write only 1 sector (block);
+		disk_write (0, (uint8_t*)SD_Buffer, BlockAddress, 1);//write to disk 0, from Buffer array, into BlockAddress, Write only 1 sector (block);
 	
 		/* Decrement the blocks remaining counter and reset the sub block counter */
 		BlockAddress++;
@@ -151,12 +151,12 @@ void SDCardManager_ReadBlocks(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo, 
 		BytesRead = 0;
 		
 		/* Read a data block from the SD card */		
-		disk_read (0, Buffer, BlockAddress, 1);//  read disk 0,  into Buffer,  starting at block address,  read only 1 sector (block=sector)
+		disk_read (0, (uint8_t *) SD_Buffer, BlockAddress, 1);//  read disk 0,  into Buffer,  starting at block address,  read only 1 sector (block=sector)
 		
 		while(BytesRead<512){  //send the results to the usb endpoint buffer, 16 bytes at a time.
-			BytesRead += SDCardManager_ReadBlockHandler(Buffer, BytesRead); // BytesRead increases 16 every time handler is called, if all goes well.
+			BytesRead += SDCardManager_ReadBlockHandler((uint8_t*)SD_Buffer, BytesRead); // BytesRead increases 16 every time handler is called, if all goes well.
 			if (MSInterfaceInfo->State.IsMassStoreReset){return;}
-			if (USB_DeviceState != DEVICE_STATE_Configured){return;}
+			if (USB_DeviceState != DEVICE_STATE_Configured){Typewriter_Mode = PANIC_MODE; return;}
 		}
 		
 		/* Decrement the blocks remaining counter */

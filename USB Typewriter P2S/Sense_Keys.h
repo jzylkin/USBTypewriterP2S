@@ -16,11 +16,16 @@ uint8_t GetKey();
 
 unsigned long long ReadSensor();
 
-uint8_t GetKeyCode(uint8_t key, uint8_t modifier);
-
 void LoadKeyCodeTables();
 
 void ClearKeyCodeTables();
 
+uint8_t GetASCIIKeyCode(uint8_t key, uint8_t modifier);
+
+uint8_t GetHIDKeyCode(uint8_t key, uint8_t modifier);
+
+bool getHallState();
+
+void InitializeEeprom();
 
 #endif /* SENSE_KEYS_H_ */

@@ -10,10 +10,9 @@
 #define CALIBRATE_H_
 
 void Calibrate();
-void TeachHIDKey(char hidkey, int keypressed);
+void TeachHIDKey(char teachkey, int keypressed, char Modifier);
 int WaitForKeypress();
-void TeachASCIIKey(char asciikey, int keypressed);
-void TeachASCIIShiftKey(char asciishiftkey, int keypressed);
+void TeachASCIIKey(char teachkey, int keypressed, char Modifier);
 
 
 
