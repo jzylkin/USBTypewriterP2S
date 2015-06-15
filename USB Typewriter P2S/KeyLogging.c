@@ -112,6 +112,30 @@ bool WriteToLogFile(){
 	
 }
 
+void TestSDHardware(){
+		FRESULT diskstatus;
+		FRESULT filestatus;
+		FILINFO fileinfo;
+		int filenum;
+		
+		diskstatus = MountFilesystem();
+		
+		if (diskstatus != FR_OK){
+			Typewriter_Mode = PANIC_MODE;
+			return;
+		}
+		
+		strcpy(FileName, "SDHWTest2.csv");
+		while(1){
+		OpenLogFile();
+		strcpy((CHAR*)SD_Buffer,"testphrase\n");
+		WriteToLogFile();
+		CloseLogFile();
+		Delay_MS(500);
+		}
+		
+}
+
 void AddCharToWriteSD_Buffer(char character){
 	UINT index;
 	static char prevcharacter;

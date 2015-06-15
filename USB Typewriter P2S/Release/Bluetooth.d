@@ -128,7 +128,7 @@ Bluetooth.d Bluetooth.o: .././Bluetooth.c .././Keyboard.h \
  .././Lib/SDCardManager.h .././Lib/FATFs/ff.h .././Lib/FATFs/integer.h \
  .././Lib/FATFs/ffconf.h .././IO_Macros.h .././Config_IO.h \
  .././Config_Interrupts.h .././Sense_Keys.h .././Send.h .././Bluetooth.h \
- .././uart.h .././KeyLogging.h .././globals.h
+ .././uart.h .././KeyLogging.h .././globals.h .././KeyCodes.h
 
 .././Keyboard.h:
 
@@ -417,3 +417,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 .././KeyLogging.h:
 
 .././globals.h:
+
+.././KeyCodes.h:

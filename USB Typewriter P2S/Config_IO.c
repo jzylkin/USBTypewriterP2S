@@ -25,10 +25,13 @@ void Config_IO(){
 	
 	configure_as_input(REED_4);
 	pullup_on(REED_4);	
-
+	
+	
+	set_high(SD_MISO);
 	configure_as_input(SD_MISO);
 	pullup_on(SD_MISO);
 	
+	set_high(SD_MOSI);
 	configure_as_input(SD_MOSI);
 	pullup_on(SD_MOSI);
 	
@@ -37,6 +40,7 @@ void Config_IO(){
 	configure_as_input(SENSE_SER);
 	pullup_on(SENSE_SER);
 
+	set_high(SD_CLK);
 	configure_as_input(SD_CLK);
 	pullup_on(SD_CLK);
 	
@@ -69,6 +73,9 @@ void Config_IO(){
 	
 	configure_as_input(BT_CONNECTED);
 	pullup_on(BT_CONNECTED);
+	
+	set_high(BT_CTS);
+	configure_as_output(BT_CTS);
 	
 	set_high(LED1);
 	configure_as_output(LED1);

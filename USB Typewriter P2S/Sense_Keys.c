@@ -89,8 +89,10 @@ uint8_t GetKey(){
 		
 		
 		SensorReadout = SensorReadout & KEY_SENSOR_MASK;
-		
-		if(ActiveKey){
+		if (SensorReadout == KEY_SENSOR_MASK){
+			SensorReadout = 0;// if masked sensor readout is all ones, sensor is probably not plugged in -- discard.
+		}
+		else if(ActiveKey){
 			SensorReadout = (SensorReadout & LONGLONGBIT(ActiveKey)); //if a key was detected last time, mask all others -- only look at that key this time -- prevents confusion from multiple keys.
 		}
 		else if(PreviousKey){
@@ -104,8 +106,13 @@ uint8_t GetKey(){
 			}
 		}
 		
-		DetectedKey = (uint8_t) __builtin_clzll(SensorReadout); //get the position of the first "one" in the sparse key detection array 
-			
+		if(SensorReadout){ //if sensor readout is not all zeros
+			DetectedKey = (uint8_t) __builtin_clzll(SensorReadout); //get the position of the first "one" in the sparse key detection array 
+		}
+		else{
+			DetectedKey = 0;
+		}
+		
 		if(DetectedKey){//if there is a detected key this time,
 			 KeyHoldCounter++;  
 			 KeyReleaseCounter=0;		 
