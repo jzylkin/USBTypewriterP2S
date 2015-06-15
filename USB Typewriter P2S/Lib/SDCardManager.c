@@ -49,6 +49,7 @@ void SDCardManager_Init(void)
 
 	if(disk_initialize(0)==FR_OK){ //if the disk initializes correctly
 		SDCard_Present = true;
+		set_low(RED_LED);
 	}
 	else{
 		SDCard_Present = false; //tell other functions that the SD Card is missing/malfunctioned

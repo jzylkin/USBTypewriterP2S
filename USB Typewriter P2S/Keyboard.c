@@ -132,35 +132,45 @@ int main(void)
 	uint8_t parity;
 	
 	Typewriter_Mode = INITIALIZING;
+
 	SetupHardware();
 	InitializeEeprom();//sets all EEPROM entries to zero if the checksum is incorrect
 	SDCardManager_Init(); 
 	Init_Mode();
+	USB_Init();
 	GlobalInterruptEnable();
 	
 //	Delay_MS(1000);//delay 1 second for some reason
 	while(1){
 		switch (Typewriter_Mode){
 			case USB_MODE:
-			MountFilesystem();//mount the filesystem so that we can access it as an MSD
+			MountFilesystem();//mount the filesystem so that we have info on it
 		//	LoadKeyCodeTables();
 			set_low(LED1);
 			while(1){
-				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
+//				if(KeyBuffer->KeyCode[0] == 0){ // If there the key buffer is not full,  get a new key.
 					key = GetKeySimple();
 					modifier = GetModifier(); 
 				//	code = GetHIDKeyCode(key, modifier);
-					if(key){	
-						USBSendNumber(key);
-						USBSend(code,modifier);
-						USBSend(KEY_ENTER,LOWER);
+					code = 0;
+					if(is_low(S3)){
+						code = KEY_A;
+						modifier = UPPER;
+						Delay_MS(100);
 					}
-				}
+					if(code){	
+					//	USBSendNumber(key);
+						USBSend(code,modifier);
+						Delay_MS(100);
+						//USBSend(KEY_ENTER,LOWER);
+					}
+				HID_Device_USBTask(&Keyboard_HID_Interface);
 				MS_Device_USBTask(&Disk_MS_Interface);
-				HID_Device_USBTask(&Keyboard_HID_Interface); //These are the VITAL usb functions that must be called every so often (Dean Camera recommends every 30ms, no more that 200ms)
+//				}
 			}
 			break;
 			case TEST_MODE:
+				USB_Detach(); //USB not needed for testing
 				getHallState();
 				parity = (uint8_t)is_low(REED_1) + (uint8_t)is_low(REED_2)+ (uint8_t)is_low(REED_3) + (uint8_t)is_low(REED_4);
 				
@@ -173,27 +183,40 @@ int main(void)
 					set_high(LED2);
 				}
 			break;
-			
+			case HARDWARE_TEST:				
+				USB_Detach(); //make sure no host is connected before accessing SD card.
+				//LogKeystrokes();
+				TestSDHardware();
 			case SD_MODE:
 				USB_Detach(); //make sure no host is connected before accessing SD card.
 				LogKeystrokes();
+
+
 			break;
 			
 			case CAL_MODE:
 				Calibrate();
 			break;
-			
-			case BLUETOOTH_MODE:
-				USB_Detach(); //make sure no host is connected before sending over bluetooth.
+			case BLUETOOTH_INIT_MODE:
 				uart_init(UART_BAUD_SELECT(9600,F_CPU));//initialize the uart with a baud rate of x bps
-				Bluetooth_Init();
+				Bluetooth_Init();		
+				Typewriter_Mode = BLUETOOTH_MODE;
+			break;
+			case BLUETOOTH_MODE:
 				while(1){
+					while(is_low(BT_CONNECTED)){;}//wait for connection to happen
+					set_low(RED_LED);
+					//Bluetooth_Save_Address();
 					if(is_low(S2)){
-						Bluetooth_Send(KEY_A,LOWER);//send a character							
-						Delay_MS(500);
-						Bluetooth_Send(KEY_Z,LOWER);//send z character
+					set_low(GREEN_LED);
+					Bluetooth_Send(KEY_A,LOWER);//send a character							
+					Delay_MS(500);
+					set_high(GREEN_LED);
+					Bluetooth_Send(KEY_Z,LOWER);//send z character
+					Delay_MS(500);
 					}
 				}
+	
 			break;
 			case PANIC_MODE:
 				while(1){
@@ -215,9 +238,16 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every couple ms)
 	TMR1_Count ++;
-
+	if (Typewriter_Mode != USB_MODE){ //dont ask 
+		MS_Device_USBTask(&Disk_MS_Interface);
+		HID_Device_USBTask(&Keyboard_HID_Interface);
+	}
+		USB_USBTask();
 }
 
+void Do_HID_Task(){
+	HID_Device_USBTask(&Keyboard_HID_Interface);
+}
 
 
 /** Configures the board hardware and chip peripherals for the demo's functionality. */
@@ -248,19 +278,6 @@ void SetupHardware()
 	Reed3Polarity = eeprom_read_byte((uint8_t *)REED_3_POLARITY_ADDR);
 	Reed4Polarity = eeprom_read_byte((uint8_t *)REED_4_POLARITY_ADDR);
 	
-	Init_Mode();
-	
-	if(Typewriter_Mode == SD_MODE){
-		//Initialize SD Card
-	}
-	else if(Typewriter_Mode == BT_MODE){
-		//Initialize Bluetooth Module
-	}
-	else{
-		//Initialize USB HID mode
-	USB_Init(); //
-	
-	}
 }
 
 /** Event handler for the library USB Connection event. */
@@ -398,12 +415,14 @@ void Init_Mode(){
 		set_low(LED2);
 		Typewriter_Mode = CAL_MODE;
 	}
+	else if(is_low(S2)){
+		Typewriter_Mode = BLUETOOTH_INIT_MODE;
+	}
 	else if (is_low(S3)){ //hold down S3 to enter LED indication mode to test reed switches.
-		Typewriter_Mode = TEST_MODE;
+		Typewriter_Mode = HARDWARE_TEST;
 	}
 	else{
 		Typewriter_Mode = USB_MODE; //otherwise just go into normal USB mode.
-		set_high(BT_RESET);//and turn off the bluetooth module.
 	}
 }
 

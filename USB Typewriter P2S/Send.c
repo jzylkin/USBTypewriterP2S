@@ -12,24 +12,32 @@
 #include <ctype.h> // allows toupper()
 
 void USBSend(uint8_t code,uint8_t mod){	
+	
 	TMR1_Count = 0;
-	while (KeyBuffer->KeyCode[0] && TMR1_Count < 20) {} //if buffer is full, wait.  If timeout expires, stop waiting.
+	while (KeyBuffer->KeyCode[0] && TMR1_Count < 20) {Do_HID_Task();} //if buffer is full, wait.  If timeout expires, stop waiting.
 	KeyBuffer->KeyCode[0] = code;
 	KeyBufferMod = mod;
+	Do_HID_Task();
 	Delay_MS(100);
+	Do_HID_Task();
 }
 
 
-void USBSendString(const char *str){
+void USBSendString(char *str){
 	int length;
-	int code;
-	int modifier = LOWER;
+	uint8_t code;
+	uint8_t modifier;
 	length = strlen(str);
 	for (int i=0; i<length; i++){
+		modifier = LOWER;
 		if(str[i] == ' '){
 			code = KEY_SPACE;
 		}
-		if(str[i] == '\r'){
+		else if(str[i] == '?'){
+			code = KEY_SLASH;
+			modifier = UPPER;
+		}
+		else if((str[i] == '\r')||(str[i] == '\n')){
 			code = KEY_ENTER;
 		}
 		else if(str[i] == '.'){

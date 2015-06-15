@@ -132,7 +132,7 @@
 		#define INITIALIZING 0
 		#define USB_MODE 1
 		#define SD_MODE 2
-		#define BT_MODE 3
+		#define BLUETOOTH_INIT_MODE 3
 		#define TEST_MODE 4
 		#define CAL_MODE 5
 		#define QUICK_CAL_MODE 6
@@ -140,6 +140,7 @@
 		#define DEEP_SLEEP_MODE 8
 		#define BLUETOOTH_MODE 9
 		#define PANIC_MODE 10
+		#define HARDWARE_TEST 11
 		
 		#define SD_BUFFER_LENGTH 512
 
@@ -176,6 +177,7 @@
 
 		
 		void Init_Mode(void);
+void Do_HID_Task();
 		
 		
 

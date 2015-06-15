@@ -214,9 +214,8 @@ void Calibrate(){
 	 eeprom_update_byte ((uint8_t *)REED_2_POLARITY_ADDR,Reed2Polarity);
 	 eeprom_update_byte ((uint8_t *)REED_3_POLARITY_ADDR,Reed3Polarity);
 	 eeprom_update_byte ((uint8_t *)REED_4_POLARITY_ADDR,Reed4Polarity);
-	 
-	Init_Mode(); //go into regular mode (whatever that is -- usb, bluetooth, etc)
-
+	
+	Typewriter_Mode = USB_MODE;
 }
 
 int WaitForKeypress(){
