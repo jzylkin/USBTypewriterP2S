@@ -99,7 +99,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 
 			.ConfigAttributes       = USB_CONFIG_ATTR_RESERVED,
 
-			.MaxPowerConsumption    = USB_CONFIG_POWER_MA(15)
+			.MaxPowerConsumption    = USB_CONFIG_POWER_MA(100)
 		},
 
 	.MS_Interface =

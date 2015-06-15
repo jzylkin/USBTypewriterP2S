@@ -114,12 +114,6 @@
 #define LED1					PC6
 #define LED1_PORT				PORTC
 
-#define RED_LED					LED2
-#define RED_LED_PORT			LED2_PORT
-
-#define GREEN_LED				LED1
-#define GREEN_LED_PORT			LED1_PORT
-
 #define LED2					PB6
 #define LED2_PORT				PORTB
 
