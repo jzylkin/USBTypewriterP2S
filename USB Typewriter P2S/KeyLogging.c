@@ -10,7 +10,7 @@
 #include "KeyCodes.h"
 #include "globals.h"
 
-char FileName[] = "PAGE 0001";
+char FileName[] = "PAGE 0001.TXT";
 
 /** FAT Fs structure to hold the internal state of the FAT driver for the Dataflash contents. */
 static FATFS DiskFATState;
@@ -37,7 +37,7 @@ void LogKeystrokes(){
 	
 	do{ //increment filenum until a file name is found that does not already exist 
 		filenum++; //increment file number
-		sprintf(FileName,"PAGE %04d",filenum);
+		sprintf(FileName,"PAGE %04d.TXT",filenum);
 		filestatus = f_stat(FileName, &fileinfo);
 	}while(filestatus == FR_OK);
 	
@@ -125,13 +125,13 @@ void TestSDHardware(){
 			return;
 		}
 		
-		strcpy(FileName, "SDHWTest2.csv");
+		strcpy(FileName, "SDHW.TXT");
 		while(1){
 		OpenLogFile();
 		strcpy((CHAR*)SD_Buffer,"testphrase\n");
 		WriteToLogFile();
 		CloseLogFile();
-		Delay_MS(500);
+		Delay_MS(100);
 		}
 		
 }
