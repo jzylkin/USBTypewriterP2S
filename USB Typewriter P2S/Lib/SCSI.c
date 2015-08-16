@@ -37,6 +37,7 @@
 
 #define  INCLUDE_FROM_SCSI_C
 #include "SCSI.h"
+#include "../globals.h"
 
 /** Structure to hold the SCSI response data to a SCSI INQUIRY command. This gives information about the device's
  *  features and capabilities.
@@ -65,8 +66,8 @@ static const SCSI_Inquiry_Response_t InquiryData =
 		.WideBus32Bit        = false,
 		.RelAddr             = false,
 
-		.VendorID            = "LUFA",
-		.ProductID           = "Dataflash Disk",
+		.VendorID            = "USB TYPE",
+		.ProductID           = "SD Card",
 		.RevisionID          = {'0','.','0','0'},
 	};
 
@@ -104,7 +105,7 @@ bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
 			CommandSuccess = SCSI_Command_Request_Sense(MSInterfaceInfo);
 			break;
 		case SCSI_CMD_READ_CAPACITY_10:
-			if (!SDCardManager_CheckSDCardOperation()){ //if SD Card is missing or malfunctioned
+			if (!SDCardManager_CheckSDCardOperation() || (Typewriter_Mode != USB_COMBO_MODE)){ //if SD Card is missing or malfunctioned
 				SCSI_SET_SENSE(	SCSI_SENSE_KEY_NOT_READY,SCSI_ASENSE_MEDIUM_NOT_PRESENT,SCSI_ASENSEQ_NO_QUALIFIER);//explain why unit is not ready.
 				return false; //return with an error flag -- send a failure response to host.
 			}
@@ -114,14 +115,15 @@ bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
 			CommandSuccess = SCSI_Command_Send_Diagnostic(MSInterfaceInfo);
 			break;
 		case SCSI_CMD_WRITE_10:
-			if (!SDCardManager_CheckSDCardOperation()){ //if SD Card is missing or malfunctioned
+			if (!SDCardManager_CheckSDCardOperation() || (Typewriter_Mode != USB_COMBO_MODE)){ //if SD Card is missing or malfunctioned
 				SCSI_SET_SENSE(	SCSI_SENSE_KEY_NOT_READY,SCSI_ASENSE_MEDIUM_NOT_PRESENT,SCSI_ASENSEQ_NO_QUALIFIER);//explain why unit is not ready.
 				return false; //return with an error flag -- send a failure response to host.
 			}
+			
 				CommandSuccess = SCSI_Command_ReadWrite_10(MSInterfaceInfo, DATA_WRITE);
 			break;
 		case SCSI_CMD_READ_10:
-			if (!SDCardManager_CheckSDCardOperation()){ //if SD Card is missing or malfunctioned
+			if (!SDCardManager_CheckSDCardOperation() || (Typewriter_Mode != USB_COMBO_MODE)){ //if SD Card is missing or malfunctioned
 				SCSI_SET_SENSE(	SCSI_SENSE_KEY_NOT_READY,SCSI_ASENSE_MEDIUM_NOT_PRESENT,SCSI_ASENSEQ_NO_QUALIFIER);//explain why unit is not ready.
 				return false; //return with an error flag -- send a failure response to host.
 			}
@@ -138,7 +140,7 @@ bool SCSI_DecodeSCSICommand(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo)
 			MSInterfaceInfo->State.CommandBlock.DataTransferLength = 0;
 			break;
 		case SCSI_CMD_TEST_UNIT_READY:
-			if (!SDCardManager_CheckSDCardOperation()){ //if SD Card is missing or malfunctioned
+			if (!SDCardManager_CheckSDCardOperation() || (Typewriter_Mode != USB_COMBO_MODE)){ //if SD Card is missing or malfunctioned
 				SCSI_SET_SENSE(	SCSI_SENSE_KEY_NOT_READY,SCSI_ASENSE_MEDIUM_NOT_PRESENT,SCSI_ASENSEQ_NO_QUALIFIER);//explain why unit is not ready.
 				return false; //return with an error flag -- send a failure response to host.
 			}

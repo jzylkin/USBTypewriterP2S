@@ -27,5 +27,6 @@ uint8_t GetHIDKeyCode(uint8_t key, uint8_t modifier);
 bool getHallState();
 
 void InitializeEeprom();
-
+void LoadEepromParameters();
+void RestoreFactoryDefaults();
 #endif /* SENSE_KEYS_H_ */

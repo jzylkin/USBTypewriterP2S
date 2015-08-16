@@ -29,6 +29,8 @@
 #define set_high(bit)                       bit ## _PORT |= (1 << bit)
 #define set_low(bit)                        bit ## _PORT &= ~(1 << bit)
 
+#define toggle(bit)							PIN(bit ## _PORT) |= (1 << bit)
+
 
 /***** Test Inputs *****/
 #define is_high(bit)                        (PIN(bit ## _PORT) & (1 << bit))
@@ -42,11 +44,16 @@
 #define bit_set(p,m) ((p) |= BIT(m)) //set a single bit (in a generic uint)
 #define longlongbit_set(p,m) ((p) |= LONGLONGBIT(m)) //set a single bit in a long long type
 
+#define KEYMASK(x) LONGLONGBIT(63-x) //set a specific bit in the key sensor array.
+
 #define bit_clr(p,m) ((p) &= ~BIT(m)) //clear a single bit (generic int)
 
 #define reg_set(p,m) ((p) |= (m)) //register-wide masked set
 #define reg_clr(p,m) ((p) &= ~(m)) //register-wide masked clear
 #define reg_write(p,m) ((p) = (m))
+
+#define increment(x) if(x+1) x++ //meaning, if the value x does not overflow to zero, it is safe to increment
+#define decrement(x) if(x) x-- //if x is not zero, it is ok to decrement it.
 
 /****IO DEFINITIONS******/
 

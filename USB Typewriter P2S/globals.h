@@ -21,6 +21,7 @@ extern uint8_t KeyBufferMod;
 extern uint8_t DoubleTapTime;
 extern uint8_t KeyReleaseTime;
 extern uint8_t KeyHoldTime;
+extern uint8_t ReedHoldTime;
 
 extern uint8_t Shift_Reed;
 extern uint8_t UseHallSensor; 
@@ -34,8 +35,11 @@ extern bool Reed4Polarity;
 extern volatile uint8_t Typewriter_Mode;
 extern volatile uint8_t SD_Buffer[SD_BUFFER_LENGTH];
 
+extern char StringBuffer[60];
 
+extern uint8_t Reeds_Are_Independent;
 
+extern uint8_t Ignore_Flag;
 
 
 

@@ -13,7 +13,7 @@ void Calibrate();
 void TeachHIDKey(char teachkey, int keypressed, char Modifier);
 int WaitForKeypress();
 void TeachASCIIKey(char teachkey, int keypressed, char Modifier);
-
-
+bool DetectHallSensor();
+void Adjust_Sensitivity();
 
 #endif /* CALIBRATE_H_ */

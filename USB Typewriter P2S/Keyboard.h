@@ -80,7 +80,6 @@
 		
 		#define SHIFT_REGISTER_PINS 8*6  //There are 6 shift registers, each with 8 inputs.
 		
-		
 		#define KEYCODE_ARRAY_LENGTH 64 // must be less than or equal to 64 (0x40)
 		
 		#define NUM_REED_SWITCHES 4
@@ -107,15 +106,19 @@
 		#define REED_4_POLARITY_ADDR 0x209
 		#define FILENUM_ADDR 0x20A
 		#define FILENUM_ADDR_2 0x20B
+		#define REED_HOLD_TIME_ADDR 0x20C
+		#define DEFAULT_MODE_ADDR 0x20D
+		#define REEDS_INDEPENDENT_ADDR 0x20E
 		#define EEP_BANK2_END 0x20F
 		
 		#define EEP_CHECKSUM_ADDR 0x3FF
-		#define EEP_CHECKSUM 71 //if eeprom doesn't have this code in the checksum address, it has not been initialized yet.
+		#define EEP_CHECKSUM 71 //if eeprom doesn't have this random code in the checksum address, it has not been initialized yet. 
 		
-		#define DEFAULT_DOUBLE_TAP_TIME 10
-		#define DEFAULT_HOLD_TIME 10
-		#define DEFAULT_RELEASE_TIME 10
-		
+		#define DEFAULT_DOUBLE_TAP_TIME 7
+		#define DEFAULT_HOLD_TIME 7
+		#define DEFAULT_RELEASE_TIME 7
+		#define DEFAULT_REED_HOLD_TIME 3
+		#define REEDS_ARE_INDEPENDENT_BY_DEFAULT 0
 		
 		//TIMING FOR SENSOR READOUT ROUTINES
 		#define CLK_POS_PULSE 10
@@ -129,10 +132,10 @@
 		#define REED_4_BIT 60
 		#define HALL_SENSOR_BIT 44
 		
-		#define INITIALIZING 0
-		#define USB_MODE 1
+		#define NO_MODE 0
+		#define USB_COMBO_MODE 1
 		#define SD_MODE 2
-		#define BLUETOOTH_INIT_MODE 3
+		#define SENSITIVITY_MODE 3
 		#define TEST_MODE 4
 		#define CAL_MODE 5
 		#define QUICK_CAL_MODE 6
@@ -141,9 +144,20 @@
 		#define BLUETOOTH_MODE 9
 		#define PANIC_MODE 10
 		#define HARDWARE_TEST 11
+		#define INITIALIZING 12
+		#define USB_LIGHT_MODE 13
 		
 		#define SD_BUFFER_LENGTH 512
-
+		
+		#define USB_SEND_TIMEOUT 100 //wait 50ms if usb send buffer is full before discarding a character.
+		#define USB_SEND_DELAY 30// wait 30ms after sending each key to usb.
+		#define CALIBRATION_DELAY 500// wait 500ms between programming keys.
+		
+		#define SENSE_DELAY 2// wait X ms between reading the sensor.
+		
+		#define INIT_DELAY 500// wait X ms after initializing.
+		
+		#define ENUMERATION_TIMEOUT 5000 //how long to wait for enumeration to happen.  this parameter might not be used.
 		
 		/** Indicates if the disk is write protected or not. */
 		#define DISK_READ_ONLY           false
@@ -176,9 +190,17 @@
 												 
 
 		
-		void Init_Mode(void);
-void Do_HID_Task();
-		
+	void Init_Mode(void);
+	void Task_Manager(void);
+		#define NOTASK 0
+		#define MSHIDTASK 1
+		#define MSTASK 2
+		#define HIDTASK 3
+
+	#define FORCE_UPPER 0x80 //a flag that forces a keycode to be upper case.
+
+bool WaitForEnumeration();
+
 		
 
 #endif

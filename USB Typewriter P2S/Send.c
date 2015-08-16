@@ -11,18 +11,27 @@
 #include "globals.h"
 #include <ctype.h> // allows toupper()
 
+extern USB_ClassInfo_HID_Device_t Keyboard_HID_Interface; //import the keyboard interface object from main routine so we can call usbtask on it.
+
+/*Send a character over usb with a given modifier (shift, ctrl, etc)*/
 void USBSend(uint8_t code,uint8_t mod){	
 	
 	TMR1_Count = 0;
-	while (KeyBuffer->KeyCode[0] && TMR1_Count < 20) {Do_HID_Task();} //if buffer is full, wait.  If timeout expires, stop waiting.
-	KeyBuffer->KeyCode[0] = code;
+	while (KeyBuffer->KeyCode[0] && TMR1_Count < USB_SEND_TIMEOUT) {HID_Device_USBTask(&Keyboard_HID_Interface);} //if buffer is full, wait.  If timeout expires, stop waiting.
+	
+	if (code&FORCE_UPPER){ //in this program, we use the MSB of code to indicate that this key MUST be sent as upper case.
+		reg_clr(code,FORCE_UPPER); //clear the MSB,  
+		mod = UPPER; //and set the modifier to upper case.
+	}
+	
+	KeyBuffer->KeyCode[0] = code; //cue up keycode to be sent during next LUFA HID callback function.
 	KeyBufferMod = mod;
-	Do_HID_Task();
-	Delay_MS(100);
-	Do_HID_Task();
+	HID_Device_USBTask(&Keyboard_HID_Interface); //Dean Camera says to call this function regularly -- right after sending a character seems like an appropriate time.
+	Delay_MS(USB_SEND_DELAY);// wait X ms after sending each character.
+	HID_Device_USBTask(&Keyboard_HID_Interface); //do LUFA hid usb tasks
 }
 
-
+/*Send a string over USB. Only supports some characters.*/
 void USBSendString(char *str){
 	int length;
 	uint8_t code;
@@ -33,8 +42,23 @@ void USBSendString(char *str){
 		if(str[i] == ' '){
 			code = KEY_SPACE;
 		}
+		else if(str[i] == '('){
+			code = KEY_9;
+			modifier = UPPER;
+		}
+		else if(str[i] == ')'){
+			code = KEY_0;
+			modifier = UPPER;
+		}
+		else if(str[i] == '/'){
+			code = KEY_SLASH;
+		}
 		else if(str[i] == '?'){
 			code = KEY_SLASH;
+			modifier = UPPER;
+		}
+		else if(str[i] == ':'){
+			code = HID_KEYBOARD_SC_SEMICOLON_AND_COLON;
 			modifier = UPPER;
 		}
 		else if((str[i] == '\r')||(str[i] == '\n')){
@@ -42,6 +66,10 @@ void USBSendString(char *str){
 		}
 		else if(str[i] == '.'){
 			code = KEY_PERIOD;
+		}
+		else if(str[i] == ':'){
+			code = HID_KEYBOARD_SC_SEMICOLON_AND_COLON;
+			modifier = UPPER;
 		}
 		else if(str[i] == '!'){
 			code = KEY_1;
@@ -62,12 +90,26 @@ void USBSendString(char *str){
 	}
 } 
 
+/*Send a string literal over USB, using a string stored in program memory instead of data memory (this saves on data RAM)*/
+void USBSendPROGString(const char*  ProgStr){
+	strcpy_P(StringBuffer, (char*) ProgStr);
+	USBSendString(StringBuffer);
+}
+
+/*Send a number between 0 and 255 over usb)*/
 void USBSendNumber(uint8_t number){
 	uint8_t ones ;
 	uint8_t tens;
 	
 	ones = number%10;
 	tens = ((number - ones)%100)/10;
+	
+	if (number >= 200){
+		USBSend(KEY_2,LOWER);
+	}
+	else if (number >= 100){
+		USBSend(KEY_1,LOWER);
+	}
 	
 	if (tens != 0){
 		USBSend(29+tens,LOWER);
@@ -86,5 +128,6 @@ void USBSendNumber(uint8_t number){
 	}
 	
 	Delay_MS(100);
+
 }
 

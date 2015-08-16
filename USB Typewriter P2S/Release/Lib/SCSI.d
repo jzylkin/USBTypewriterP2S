@@ -130,7 +130,7 @@ Lib/SCSI.d Lib/SCSI.o: ../Lib/SCSI.c ../Lib/SCSI.h \
  ../Lib/../Lib/FATFs/ffconf.h ../Lib/../IO_Macros.h ../Lib/../Config_IO.h \
  ../Lib/../Config_Interrupts.h ../Lib/../Sense_Keys.h ../Lib/../Send.h \
  ../Lib/../Bluetooth.h ../Lib/../uart.h ../Lib/../KeyLogging.h \
- ../Lib/../Descriptors.h ../Lib/SDCardManager.h
+ ../Lib/../Descriptors.h ../Lib/SDCardManager.h ../Lib/../globals.h
 
 ../Lib/SCSI.h:
 
@@ -421,3 +421,5 @@ c:\program\ files\ (x86)\atmel\atmel\ toolchain\avr8\ gcc\native\3.4.1061\avr8-g
 ../Lib/../Descriptors.h:
 
 ../Lib/SDCardManager.h:
+
+../Lib/../globals.h:

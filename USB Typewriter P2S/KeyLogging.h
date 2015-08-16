@@ -16,4 +16,5 @@ void LogKeystrokes();
 bool WriteToLogFile();
 bool MountFilesystem();
 void TestSDHardware();
+void AddToSDBuffer(char character);
 #endif /* KEYLOGGING_H_ */

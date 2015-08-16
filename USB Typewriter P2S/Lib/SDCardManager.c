@@ -49,7 +49,6 @@ void SDCardManager_Init(void)
 
 	if(disk_initialize(0)==FR_OK){ //if the disk initializes correctly
 		SDCard_Present = true;
-		set_low(RED_LED);
 	}
 	else{
 		SDCard_Present = false; //tell other functions that the SD Card is missing/malfunctioned
@@ -109,6 +108,8 @@ void SDCardManager_WriteBlocks(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo,
 	
 	while (TotalBlocks)
 	{
+		set_low(RED_LED); //red LED indicates busy status
+		
 		//Reset BytesWritten every time you finish writing a block, Dummy!
 		BytesWritten = 0;
 		
@@ -129,6 +130,8 @@ void SDCardManager_WriteBlocks(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo,
 	/* If the endpoint is empty, clear it ready for the next packet from the host */
 	if (!(Endpoint_IsReadWriteAllowed()))
 	  Endpoint_ClearOUT();
+	  
+	  set_high(RED_LED);
 }
 
 /** Reads blocks (OS blocks, not Dataflash pages) from the storage medium, the board dataflash IC(s), into
@@ -148,29 +151,28 @@ void SDCardManager_ReadBlocks(USB_ClassInfo_MS_Device_t* const MSInterfaceInfo, 
 	
 	while (TotalBlocks)
 	{		
+		set_low(RED_LED); //red LED indicates busy status
 		//Reset tally of BytesRead every time a new block is accessed.  
 		BytesRead = 0;
 		
 		/* Read a data block from the SD card */		
 		disk_read (0, (uint8_t *) SD_Buffer, BlockAddress, 1);//  read disk 0,  into Buffer,  starting at block address,  read only 1 sector (block=sector)
-		
+
 		while(BytesRead<512){  //send the results to the usb endpoint buffer, 16 bytes at a time.
 			BytesRead += SDCardManager_ReadBlockHandler((uint8_t*)SD_Buffer, BytesRead); // BytesRead increases 16 every time handler is called, if all goes well.
 			if (MSInterfaceInfo->State.IsMassStoreReset){return;}
 			if (USB_DeviceState != DEVICE_STATE_Configured){Typewriter_Mode = PANIC_MODE; return;}
 		}
-		
 		/* Decrement the blocks remaining counter */
 		BlockAddress++;
 		TotalBlocks--;
-		
-
-		
 	}
 	
 	/* If the endpoint is full, send its contents to the host */
 	if (!(Endpoint_IsReadWriteAllowed()))
 	  Endpoint_ClearIN();
+	 
+	 set_high(RED_LED);
 }
 
 /*Forwarding buffered data to the endpoint (and therefore on to the host) in 16 byte chunks. This function is called by ReadBlocks.  
@@ -218,6 +220,6 @@ uint8_t SDCardManager_ReadBlockHandler(uint8_t* buffer, uint16_t offset)
  */
 bool SDCardManager_CheckSDCardOperation(void)
 {	
-	return SDCard_Present;
+	return SDCard_Present; //return whether or not sd card is present and working.
 }
 

@@ -8,6 +8,11 @@
 #include "IO_Macros.h"
 #include "Config_IO.h"
 #include <avr/io.h>
+#include <avr/interrupt.h>
+
+volatile uint8_t GlowDirection; //global variable that sets direction of led glow (fade up or down)
+	#define BRIGHTEN 0
+	#define DIM 1
 
 void Config_IO(){
 	
@@ -84,6 +89,67 @@ void Config_IO(){
 	configure_as_output(LED2);
 	
 }
+
+void GlowGreenLED(uint8_t speed){
+
+	//green led is also called the ~OC4A pin
+	cli();//disable interrupts;
+	OCR4C = 0xFF; //clear tmr4 when reaching this value
+	TC4H = 0x00; //clearing this register sets timer4 to 8-bit mode
+	OCR4A = 0x08; //when counter reaches this value, it triggers LED.
+	bit_set(TCCR4E,OC4OE0);//enable the ~oc4a output
+	bit_set(TCCR4A,COM4A0); //set the bit for ~OC4A pin to be active in fast pwm mode
+	bit_set(TCCR4A,PWM4A);//activate fast pwm mode
+	bit_set(TIMSK4,TOIE4);//enable timer overflow interrupts.
+	switch(speed){
+		case 0:
+			TCCR4B = BIT(CS43)|BIT(CS40);
+		case 1:
+			bit_set(TCCR4B,CS43);//enable 1:128 prescaler (should make each tick worth about 10khZ).
+		break;
+		case 2:
+			TCCR4B = BIT(CS42)|BIT(CS41)|BIT(CS40);
+		break;
+		case 3:
+			TCCR4B = BIT(CS42)|BIT(CS41);
+		break;
+		default:
+			bit_set(TCCR4B,CS43);
+		break;
+	}
+		
+		
+	GlowDirection = BRIGHTEN;
+	TCNT4 = 0;//clear the timer to 0;
+	sei();//enable interrupts again.
+}
+
+ISR(TIMER4_OVF_vect){ //called each time timer1 counts up to the OCR1A register (every couple ms)
+
+	uint8_t temp;
+	temp = OCR4A;
+	if (GlowDirection == BRIGHTEN){
+		if(temp==0xFF){
+			GlowDirection = DIM;
+		}
+		else{
+			temp++;
+		}
+	}
+	else if (GlowDirection == DIM){
+		if(temp == 0x00){
+			bit_clr(TCCR4A,COM4A0); //disconnect green led output pin
+			TCCR4B = 0;//clear the timer4 register (disable the timer);
+			GlowDirection = BRIGHTEN;
+		}
+		else{
+			temp--;
+		}
+	}
+	OCR4A = temp;
+}
+	
+
 
 
 

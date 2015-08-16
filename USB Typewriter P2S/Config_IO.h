@@ -10,7 +10,7 @@
 #define CONFIG_IO_H_
 
 void Config_IO();
-
+void GlowGreenLED(uint8_t speed);
 
 #define START 0b10100100
 #define STOP 0b10010100

@@ -10,7 +10,7 @@
 #include "KeyCodes.h"
 #include "globals.h"
 
-char FileName[] = "PAGE 0001.TXT";
+char FileName[] = "PAGE0001.TXT";
 
 /** FAT Fs structure to hold the internal state of the FAT driver for the Dataflash contents. */
 static FATFS DiskFATState;
@@ -18,13 +18,14 @@ static FATFS DiskFATState;
 /** FAT Fs structure to hold a FAT file handle for the log data write destination. */
 static FIL LogFile;
 
-static bool FileIsOpen;
-
 void LogKeystrokes(){
 	FRESULT diskstatus;
 	FRESULT filestatus;
 	FILINFO fileinfo;
-	int filenum;
+	uint16_t filenum;
+	uint8_t code;
+	uint8_t modifier;
+	uint8_t key;
 	
 	diskstatus = MountFilesystem();
 	
@@ -35,24 +36,48 @@ void LogKeystrokes(){
 	
 	filenum = eeprom_read_word((uint16_t *)FILENUM_ADDR); //filenum is the last used filenum, plus 1;
 	
+	if (filenum>9999){
+		filenum = 0;
+	} //filenum can only be 4 digits long.
+
 	do{ //increment filenum until a file name is found that does not already exist 
 		filenum++; //increment file number
-		sprintf(FileName,"PAGE %04d.TXT",filenum);
+		sprintf(FileName,"PAGE%04d.TXT",filenum); //filename can only be 8 characters long (not including .TXT).
 		filestatus = f_stat(FileName, &fileinfo);
 	}while(filestatus == FR_OK);
 	
 	if (filestatus == FR_NO_FILE){
 		eeprom_write_word((uint16_t *)FILENUM_ADDR,filenum); // save the new filenumber for next time
-		OpenLogFile();
+		sprintf(FileName,"PAGE%04d.TXT",filenum);
+		if (OpenLogFile()!=FR_OK){
+			Typewriter_Mode = PANIC_MODE; // go into panic mode
+			return;
+		}
+		else{
+			GlowGreenLED(0);
+		}
 	}
 	else{ //an error occurred
-		FileIsOpen = false;
 		Typewriter_Mode = PANIC_MODE; // go into panic mode 
 		return;
 	}
 	
-
-	
+	while(1){
+			key = GetKey();
+			modifier = GetModifier();
+			
+			code = GetASCIIKeyCode(key, modifier);
+			
+			if(code){
+				if ((code == 's') && Ignore_Flag) code = 0; //if user is holding down S on startup, don't add this to file.
+				Ignore_Flag = 0;
+				AddToSDBuffer(code); //this adds the character to the sd write buffer.
+			}
+			if(code == '\r'){
+				WriteToLogFile(); //save your work every time enter key is pressed.
+			}
+			Delay_MS(SENSE_DELAY);
+	}
 }
 
 /** Opens the log file on the Dataflash's FAT formatted partition according to the current date */
@@ -60,16 +85,18 @@ FRESULT OpenLogFile(void)
 {
 	FRESULT diskstatus;
 	
-	if (USB_DeviceState == DEVICE_STATE_Configured){
-		return FR_LOCKED; //the disk is locked if the USB is engaged.  This prevents collision with filesystem read/writes
-	}
+//	if (USB_DeviceState == DEVICE_STATE_Configured){
+//		return FR_LOCKED; //the disk is locked if the USB is engaged.  This prevents collision with filesystem read/writes
+//	}
 	
 		SD_Buffer[0] = '\0'; // A simple way to erase the SD_Buffer string -- first character is now the end of the string;
 
 		diskstatus = f_open(&LogFile, FileName, FA_OPEN_ALWAYS | FA_WRITE);
+		f_sync(&LogFile);
+		f_close(&LogFile);
+		diskstatus = f_open(&LogFile, FileName, FA_OPEN_ALWAYS | FA_WRITE);
+		
 		f_lseek(&LogFile, LogFile.fsize);
-		FileIsOpen = true;
-	
 	
 	return diskstatus;
 }
@@ -80,7 +107,6 @@ void CloseLogFile(void)
 	/* Sync any data waiting to be written, unmount the storage device */
 	f_sync(&LogFile);
 	f_close(&LogFile);
-	FileIsOpen = false;
 }
 
 bool MountFilesystem(){
@@ -90,23 +116,25 @@ bool MountFilesystem(){
 }
 
 uint32_t get_num_of_sectors(){
-	uint32_t tot_sect = (DiskFATState.n_fatent - 2) * DiskFATState.csize;
+	static uint32_t tot_sect;
+	if(!tot_sect){ //if we have not yet read a valid value into totsect
+		tot_sect = (DiskFATState.n_fatent - 2) * DiskFATState.csize;
+	}
 	return 	tot_sect;
 }
 
 bool WriteToLogFile(){
 	UINT BytesWritten;
-
 	uint8_t result;
 	
+	GlowGreenLED(2);//glow a green led to indicate write in progress.
+	
 	BytesWritten = strlen((char*)SD_Buffer);
-//	BytesWritten = sprintf(SD_Buffer, "TESTINGTESTING/r/n");//debug message
-
+//	BytesWritten = sprintf(SD_Buffer, "TESTINGTESTING/r/n");//debug 
 	f_lseek(&LogFile, LogFile.fsize);
-	result = f_write(&LogFile, (uint8_t *) SD_Buffer, BytesWritten, &BytesWritten);
+	result = f_write(&LogFile, (void *) SD_Buffer, BytesWritten, &BytesWritten);
+	SD_Buffer[0] = '\0'; //a simple way to clear the buffer (equivalent to saving an empty string into the buffer)
 	f_sync(&LogFile);
-	
-	
 	
 	return result;
 	
@@ -114,9 +142,6 @@ bool WriteToLogFile(){
 
 void TestSDHardware(){
 		FRESULT diskstatus;
-		FRESULT filestatus;
-		FILINFO fileinfo;
-		int filenum;
 		
 		diskstatus = MountFilesystem();
 		
@@ -136,7 +161,7 @@ void TestSDHardware(){
 		
 }
 
-void AddCharToWriteSD_Buffer(char character){
+void AddToSDBuffer(char character){
 	UINT index;
 	static char prevcharacter;
 	
@@ -145,11 +170,10 @@ void AddCharToWriteSD_Buffer(char character){
 		return; //take no action if SD_Buffer is nearly full.  this could over-write other variables and cause a mess.
 	}
 	
-	if (character == '\r'){//if the character is the return character, insert a space instead, and save to file.
-		if(prevcharacter != '\r'){
+	if (character == '\r'){ //special treatment for return character
+		if(prevcharacter != '\r'){ //if this is first time \r is pressed, insert a space instead, and save to file.
 			SD_Buffer[index] = ' ';
 			SD_Buffer[index+1] = '\0';
-			WriteToLogFile(); //save your work every time enter key is pressed.
 		}
 		else if (SD_Buffer[index-1] == ' '){//if a space was inserted last time in place of \r\n, user has pressed return twice.
 			SD_Buffer[index-1] = '\r'; //so put the missing \r\n in now
@@ -158,18 +182,20 @@ void AddCharToWriteSD_Buffer(char character){
 			SD_Buffer[index+2] = '\n';
 			SD_Buffer[index+3] = '\0';
 		}
-		else { //but if the last character entered was not a space, then call a spade a spade.
+		else { //but if the last character entered was not recorded as a space (\r has already been pressed several times), then call a spade a spade.
 			SD_Buffer[index] = '\r';
 			SD_Buffer[index+1] = '\n';
 			SD_Buffer[index+2] = '\0';
 		}
 	}
-	else if (character == '\b'){
+	else if (character == '\b'){ //for a backspace character,
 		SD_Buffer[index-1] = '\0'; //turn the previous character into an "end of string" character 
 	}
-	else{
+	else{ //the most common scenario -- put a character at the end of the buffer, then follow with a \0;
 		SD_Buffer[index] = character;
 		SD_Buffer[index+1] = '\0';
 	}
+	
+	prevcharacter = character; // save the character just pressed.
 }
 
