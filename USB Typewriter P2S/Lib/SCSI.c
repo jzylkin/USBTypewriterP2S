@@ -66,7 +66,7 @@ static const SCSI_Inquiry_Response_t InquiryData =
 		.WideBus32Bit        = false,
 		.RelAddr             = false,
 
-		.VendorID            = "USB TYPE",
+		.VendorID            = "USBTYPE",
 		.ProductID           = "SD Card",
 		.RevisionID          = {'0','.','0','0'},
 	};

@@ -1,37 +1,23 @@
 /*
+	  USB TYPEWRITER CODE, 
+	  Copyright (C) Jack Zylkin, 2015
+	  www.usbtypewriter.com
+	  jack [at] usbtypewriter.com
+
+
+Utilizes the LUFA library written by Dean Camera.
              LUFA Library
      Copyright (C) Dean Camera, 2014.
 
-  dean [at] fourwalledcubicle [dot] com
-           www.lufa-lib.org
-*/
 
-/*
-  Copyright 2014  Dean Camera (dean [at] fourwalledcubicle [dot] com)
-
-  Permission to use, copy, modify, distribute, and sell this
-  software and its documentation for any purpose is hereby granted
-  without fee, provided that the above copyright notice appear in
-  all copies and that both that the copyright notice and this
-  permission notice and warranty disclaimer appear in supporting
-  documentation, and that the name of the author not be used in
-  advertising or publicity pertaining to distribution of the
-  software without specific, written prior permission.
-
-  The author disclaims all warranties with regard to this
-  software, including all implied warranties of merchantability
-  and fitness.  In no event shall the author be liable for any
-  special, indirect or consequential damages or any damages
-  whatsoever resulting from loss of use, data or profits, whether
-  in an action of contract, negligence or other tortious action,
-  arising out of or in connection with the use or performance of
-  this software.
-*/
+Permission to use this software is granted under the terms of the Creative Commons Non-Commercial
+Attribution Share-Alike license.  You may use this code or its derivatives in your own product, provided that you
+do not use it for commercial purposes, and you attribute its origins to Jack Zylkin and USB Typewriter */
 
 /** \file
  *
- *  Main source file for the Keyboard demo. This file contains the main tasks of
- *  the demo and is responsible for the initial application hardware configuration.
+ *  Main source file for the USB Tyewriter. This file contains the main tasks of
+ *  the keyboard and is responsible for the initial application hardware configuration.
  */
 
 #include "Keyboard.h"
@@ -71,6 +57,8 @@ bool Reed4Polarity; //reed switches are active low by default
 uint8_t Reeds_Are_Independent;
 
 uint8_t Ignore_Flag; //flag to tell processor to ignore the next character typed by user.
+
+uint8_t UseDummyLoad; //dummy load is a 100 ohm resistor (or so) that makes the device draw more current from supply -- useful for power supplies with load minimum requirements.
 
 
 char StringBuffer[60];//global buffer to store strings that are being forwarded from program memory to regular data memory
@@ -191,6 +179,7 @@ int main(void)
 				USB_Disable(); //make sure no host is connected before accessing SD card.
 				TestSDHardware();
 			case SD_MODE:
+				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
 				USB_Disable(); //make sure no host is connected before accessing SD card.
 				LogKeystrokes();
 			break;
@@ -198,7 +187,12 @@ int main(void)
 				Calibrate();
 				Typewriter_Mode = USB_LIGHT_MODE; //after calibrating, go to usb light mode.
 			break;
+			case QUICK_CAL_MODE:
+				QuickCalibrate();
+				Typewriter_Mode = USB_LIGHT_MODE;//after calibrating, go to usb light mode.
+			break;
 			case BLUETOOTH_MODE:
+				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
 				uart_init(UART_BAUD_SELECT(9600,F_CPU));//initialize the uart with a baud rate of x bps
 				Bluetooth_Init();
 				while(1){
@@ -441,11 +435,6 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
 }
 
 
-
-
-
-
-
 void Init_Mode(){
 	uint8_t key;
 	uint8_t code;
@@ -460,6 +449,15 @@ void Init_Mode(){
 			Typewriter_Mode = USB_COMBO_MODE;
 			Default_Mode = USB_COMBO_MODE;
 			RestoreFactoryDefaults();			
+	}
+	else if(is_low(S2)&&is_low(S3)){ //debug bluetooth and sd mode
+			Typewriter_Mode = BLUETOOTH_MODE;
+	}
+	else if(is_low(S1)&&is_low(S2)){
+			Typewriter_Mode = SD_MODE;
+	}
+	else if(is_low(S1)&&is_low(S3)){//quick calibration mode
+			Typewriter_Mode = QUICK_CAL_MODE;
 	}
 	else if (is_low(S1)){ //hold down S1 during initialization to calibrate
 			Typewriter_Mode = CAL_MODE;

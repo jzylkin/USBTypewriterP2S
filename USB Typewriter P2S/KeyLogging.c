@@ -54,7 +54,7 @@ void LogKeystrokes(){
 			return;
 		}
 		else{
-			GlowGreenLED(0);
+			GlowGreenLED(VERY_SLOW,SOLID);
 		}
 	}
 	else{ //an error occurred
@@ -127,7 +127,7 @@ bool WriteToLogFile(){
 	UINT BytesWritten;
 	uint8_t result;
 	
-	GlowGreenLED(2);//glow a green led to indicate write in progress.
+	GlowGreenLED(MEDIUM, GLOWING);//glow a green led to indicate write in progress.
 	
 	BytesWritten = strlen((char*)SD_Buffer);
 //	BytesWritten = sprintf(SD_Buffer, "TESTINGTESTING/r/n");//debug 

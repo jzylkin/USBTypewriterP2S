@@ -269,6 +269,7 @@ void LoadEepromParameters(){
 	 HallSensorPolarity = eeprom_read_byte((uint8_t *)HALL_SENSOR_POLARITY_ADDR);
 	 Shift_Reed = eeprom_read_byte((uint8_t *)SHIFT_REED_ADDR);
 	 Reeds_Are_Independent = eeprom_read_byte((uint8_t *)REEDS_INDEPENDENT_ADDR);
+	 UseDummyLoad = eeprom_read_byte((uint8_t*)DUMMY_LOAD_ADDR);
 }
 
 void ClearKeyCodeTables(){
@@ -307,6 +308,7 @@ void RestoreFactoryDefaults(){
 			eeprom_update_byte((uint8_t*)REED_HOLD_TIME_ADDR, DEFAULT_REED_HOLD_TIME);
 			eeprom_update_byte((uint8_t*)REEDS_INDEPENDENT_ADDR,REEDS_ARE_INDEPENDENT_BY_DEFAULT);
 			eeprom_update_byte((uint8_t*)DEFAULT_MODE_ADDR,USB_COMBO_MODE);
+			eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR,0); //do not use dummy load unless told to.
 			eeprom_write_word((uint16_t *)FILENUM_ADDR,0);//reset sd card file number to zero.
 			
 			LoadEepromParameters(); //load new defaults into RAM

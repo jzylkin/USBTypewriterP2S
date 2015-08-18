@@ -13,10 +13,11 @@
 const uint8_t HIDNumbers[] = {KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8,KEY_9,KEY_0}; //usb codes for 0-9
 const uint8_t ASCIINumbers[] = {'1','2','3','4','5','6','7','8','9','0'}; // the ascii codes for 0-9
 const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};// ascii codes for weird characters above 0-9 on  typewriters.
+	
 
 //messages to user are stored in program memory space, to conserve data memory (there is much more program memory than data memory)
 	const char Str_USB_Typewriter[]		PROGMEM = "USB TYPEWRITER (TM)\r";
-	const char Str_Firmware_Ver[]		PROGMEM = "FIRMWARE VER 5.0\r";
+	const char Str_Firmware_Ver[]		PROGMEM = "FIRMWARE VER 5.0.1\r";
 	const char Str_Typewriter_Mode[]	PROGMEM = "DEFAULT SETTING: ";
 	const char Str_BT_Mode[]			PROGMEM = "BLUETOOTH KEYBOARD MODE\r";
 	const char Str_Light_Mode[]			PROGMEM = "LIGHT MODE (SD CARD READER DISABLED)\r";
@@ -25,15 +26,18 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_SD_Detected[]		PROGMEM = "SD CARD DETECTED\r";
 	const char Str_SD_Not_Detected[]	PROGMEM = "SD CARD NOT DETECTED\r";
 	const char Str_Calibrating[]		PROGMEM = "CALIBRATING...\r";
-	const char Str_Type_The_Following[] PROGMEM = "TYPE THE FOLLOWING KEYS...\r";
+	const char Str_Type_The_Following[] PROGMEM = "TYPE THE FOLLOWING KEYS (PRESS SPACE TO SKIP)...\r";
 	const char Str_Shift_Error[]		PROGMEM = "ERROR...SHIFT MUST BE A REED SWITCH.\r";
-	const char Str_SD_Only[]			PROGMEM = " (FOR SD MODE) ";
-	const char Str_USB_Only[]			PROGMEM = " (FOR USB MODE) ";
+	const char Str_SD_Only[]			PROGMEM = " (SD MODE)";
+	const char Str_USB_Only[]			PROGMEM = " (USB MODE)";
+	const char Str_Dummy_Load[]			PROGMEM = "DUMMY LOAD ACTIVATED\r";
+	const char Str_No_Dummy_Load[]		PROGMEM = "DUMMY LOAD DEACTIVATED\r";
+	const char Str_Quick_Calibrate[]	PROGMEM = "QUICK CALIBRATION MODE...\r";
 	const char Str_Spacebar[]			PROGMEM = "SPACEBAR";
 	const char Str_Enter[]				PROGMEM = "ENTER";
 	const char Str_Backspace[]			PROGMEM = "BACKSPACE";
-	const char Str_Calibrate_Hall[]		PROGMEM = "FIRMLY PRESS ANY KEY TO CALIBRATE HALL EFFECT SENSOR...\r";
-	const char Str_No_Hall[]			PROGMEM = "NO HALL EFFECT SENSOR DETECTED.\r";
+	const char Str_Calibrate_Hall[]		PROGMEM = "HOLD DOWN ANY KEY TO CALIBRATE HALL EFFECT SENSOR...\r";
+	const char Str_No_Hall[]			PROGMEM = "NO HALL EFFECT SENSOR DETECTED. (NOT A PROBLEM)\r";
 	const char Str_Adj_Sensitivity[]	PROGMEM = "ADJUSTING KEY SENSITIVITY.\r";
 	const char Str_Press_CMD[]			PROGMEM = "PRESS CMD KEY TO CONTINUE...\r";
 	const char Str_Set_Reaction_Time[]	PROGMEM = "PRESS CTRL AND ALT TO SET KEY REACTION TIME...\r";
@@ -41,7 +45,7 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Set_Double_Time[]	PROGMEM = "\rNOW SET DELAY BETWEEN DOUBLE KEY PRESSES...\r";
 	const char Str_Set_Reed_Time[]		PROGMEM = "\rNOW SET REED REACTION TIME...\r";
 	const char Str_Spacebar_Blocks_Enter[] PROGMEM = "\rIGNORE ENTER KEY WHEN SPACEBAR IS HELD?\r";
-	const char Str_Settings_Saved[]		PROGMEM = "\rSETTINGS SAVED!\r";
+	const char Str_Settings_Saved[]		PROGMEM = "SETTINGS SAVED!\r";
 	
 
 void Calibrate(){
@@ -93,6 +97,18 @@ void Calibrate(){
 		DetectHallSensor();
 	}
 	
+	if (is_low(S2)){//hold down to activate the dummy load
+		if (UseDummyLoad) {
+			UseDummyLoad = 0; 
+			USBSendPROGString(Str_No_Dummy_Load);
+		}
+		else {
+		UseDummyLoad = 1; 
+		USBSendPROGString(Str_Dummy_Load);
+		}
+		eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR, UseDummyLoad);
+	}
+	
 	USBSendPROGString(Str_Type_The_Following);
 	
 //--------TEACH LETTER KEYS----------
@@ -129,10 +145,32 @@ void Calibrate(){
 			if ( !(Modifier & FN_MODIFIER)) { //if the fn key is not being pressed (sd card doesn't use fn key)
 				TeachASCIIKey(ASCIINumbers[i], KeyPressed, LOWER); // and the ascii array about this key
 				TeachASCIIKey(ASCIINumSymbols[i],KeyPressed, UPPER); // and the symbols above the numbers on most typewriters, for asii (sd card) use only.
-			}
+				FnKeyCodeLookUpTable[KeyPressed] = (KEY_F1+i);			}
 			
 			USBSend(KEY_ENTER,LOWER);
 	}
+	
+//----TEACH F1, F11, F12
+	USBSendString("F1");
+	USBSend(KEY_SPACE,LOWER);
+	KeyPressed = WaitForKeypress();
+	Modifier = GetModifier();
+	TeachHIDKey(KEY_F1, KeyPressed, Modifier); 
+	USBSend(KEY_ENTER,LOWER);
+	
+	USBSendString("F11");
+	USBSend(KEY_SPACE,LOWER);
+	KeyPressed = WaitForKeypress();
+	Modifier = GetModifier();
+	TeachHIDKey(KEY_F11, KeyPressed, Modifier);
+	USBSend(KEY_ENTER,LOWER);
+	
+	USBSendString("F12");
+	USBSend(KEY_SPACE,LOWER);
+	KeyPressed = WaitForKeypress();
+	Modifier = GetModifier();
+	TeachHIDKey(KEY_F12, KeyPressed, Modifier);
+	USBSend(KEY_ENTER,LOWER);	
 	
 //--------TEACH SHIFT KEY-----------
 	USBSendString("SHIFT");
@@ -174,9 +212,10 @@ void Calibrate(){
 	}
 	
 //-------TEACH VARIOUS UPPER CASE SYMBOLS ---------
-	//@
+	//@ for sd
 	USBSend(KEY_2,UPPER);
-	USBSendPROGString(Str_SD_Only);
+//	USBSendPROGString(Str_SD_Only);
+	USBSend(KEY_SPACE,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
@@ -184,31 +223,34 @@ void Calibrate(){
 	USBSendNumber(KeyPressed);
 	USBSend(KEY_ENTER,LOWER);
 	
-	//@
+/*	//@ for usb
 	USBSend(KEY_2,UPPER);
 	USBSendPROGString(Str_USB_Only);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
 	TeachHIDKey(KEY_2|FORCE_UPPER,KeyPressed,Modifier);
-	USBSend(KEY_ENTER,LOWER);
+	USBSend(KEY_ENTER,LOWER);*/
 	
 	//?
 	USBSend(KEY_SLASH,UPPER);
-	USBSendPROGString(Str_SD_Only);
+//	USBSendPROGString(Str_SD_Only);
+	USBSend(KEY_SPACE,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachASCIIKey('?',KeyPressed,Modifier);
 	USBSendNumber(KeyPressed);
 	USBSend(KEY_ENTER,LOWER);
 	
+//for USB
+/*
 	USBSend(KEY_SLASH,UPPER);
 	USBSendPROGString(Str_USB_Only);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
 	TeachHIDKey(KEY_SLASH|FORCE_UPPER,KeyPressed,Modifier);
-	USBSend(KEY_ENTER,LOWER);
+	USBSend(KEY_ENTER,LOWER);*/
 	
 	//!
 	USBSend(KEY_1|FORCE_UPPER,UPPER);
@@ -216,12 +258,83 @@ void Calibrate(){
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
-	if(!(Modifier&FN_MODIFIER)){ //don't bother dealing with complicated combinations of FN and Shift to produce an !
+	if(!(Modifier&FN_MODIFIER&UPPER)){ //don't bother dealing with complicated combinations of FN and Shift to produce an !
 		TeachHIDKey(KEY_1|FORCE_UPPER,KeyPressed,Modifier);
 		TeachASCIIKey('!',KeyPressed,Modifier);
-		USBSend(KEY_ENTER,LOWER);
 	}
+	USBSend(KEY_ENTER,LOWER);
 	
+//------TEACH REED SWITCHES--------//
+	CalibrateReeds();
+	
+	SaveCalibration();
+	
+	USBSendPROGString(Str_Settings_Saved);
+	
+}
+
+void QuickCalibrate(){
+	uint8_t KeyPressed; //
+	
+	
+	while(USB_DeviceState != DEVICE_STATE_Configured){;}//wait for configuration to complete
+	Delay_MS(1000);//wait 1 second.
+	
+	USBSendPROGString(Str_Quick_Calibrate);
+	
+	/*Measure the reed switch polarities*/
+	Reed1Polarity = is_low(REED_1); //if reed_1 is low at start of calibration, then the polarity of reed 1 is active high
+	Reed2Polarity= is_low(REED_2);
+	Reed3Polarity = is_low(REED_3);
+	Reed4Polarity = is_low(REED_4);
+	
+	
+	
+	//Find out if user wants to use the hall effect sensor (probably not).
+	DetectHallSensor();
+
+	USBSendPROGString(Str_Type_The_Following);
+
+	//--------TEACH SHIFT KEY-----------
+	USBSendString("SHIFT");
+	Shift_Reed = 0; //reset the shift reed to 0 (undefined) so that WaitForKeypress() doesn't ignore any of the reeds
+	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	KeyPressed = WaitForKeypress();
+	if((KeyPressed)&&(KeyPressed <= 8)){ //if keypressed is 1, 2, 3, or 4, it represents a reed switch being held down.
+		Shift_Reed = KeyPressed;
+		USBSendNumber(Shift_Reed);
+	}
+	else{
+		USBSendPROGString(Str_Shift_Error);
+	}
+	USBSend(KEY_ENTER,LOWER);
+	
+	CalibrateReeds();
+	
+	SaveCalibration();
+	
+	USBSendPROGString(Str_Settings_Saved);
+	
+}
+
+void SaveCalibration(){
+		 eeprom_write_block (KeyCodeLookUpTable, (void *) KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
+		 eeprom_write_block (FnKeyCodeLookUpTable, (void *) FN_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
+		 eeprom_write_block (ShiftKeyCodeLookUpTable, (void *) SHIFT_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
+		 eeprom_write_block (ASCIILookUpTable,(void *) ASCII_ADDR, KEYCODE_ARRAY_LENGTH);
+		 eeprom_write_block (ASCIIShiftLookUpTable,(void *) ASCII_SHIFT_ADDR, KEYCODE_ARRAY_LENGTH);
+		 
+		 eeprom_update_byte ((uint8_t *)SHIFT_REED_ADDR, Shift_Reed);
+		 
+		 eeprom_update_byte ((uint8_t *)REED_1_POLARITY_ADDR,Reed1Polarity);
+		 eeprom_update_byte ((uint8_t *)REED_2_POLARITY_ADDR,Reed2Polarity);
+		 eeprom_update_byte ((uint8_t *)REED_3_POLARITY_ADDR,Reed3Polarity);
+		 eeprom_update_byte ((uint8_t *)REED_4_POLARITY_ADDR,Reed4Polarity);
+}
+
+void CalibrateReeds(){	
+	uint8_t Modifier;
+	uint8_t KeyPressed;
 	
 //-------TEACH BACKSPACE KEY ---------
 	USBSendPROGString(Str_Backspace);
@@ -268,7 +381,7 @@ void Calibrate(){
 	TeachASCIIKey('\r',KeyPressed, LOWER);//return carriage for ascii users
 	USBSend(KEY_ENTER,LOWER);
 	
-//------TEACH SPACE BAR --------
+//------TEACH SPACE BAR ---- must be the last thing programmed (because of "Press space to skip" instruction)
 	USBSendPROGString(Str_Spacebar);
 	USBSend(KEY_SPACE,LOWER);
 	KeyPressed = WaitForKeypress();
@@ -276,20 +389,6 @@ void Calibrate(){
 	TeachHIDKey(KEY_SPACE,KeyPressed,LOWER); //space bar is independent of modifier.
 	TeachASCIIKey(' ',KeyPressed,LOWER); // ascii space key
 	USBSend(KEY_ENTER,LOWER);
-		
-   //Save calibration to eeprom:
-	 eeprom_write_block (KeyCodeLookUpTable, (void *) KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
-	 eeprom_write_block (FnKeyCodeLookUpTable, (void *) FN_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
-	 eeprom_write_block (ShiftKeyCodeLookUpTable, (void *) SHIFT_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
-	 eeprom_write_block (ASCIILookUpTable,(void *) ASCII_ADDR, KEYCODE_ARRAY_LENGTH);
-	 eeprom_write_block (ASCIIShiftLookUpTable,(void *) ASCII_SHIFT_ADDR, KEYCODE_ARRAY_LENGTH);
-	 
-	 eeprom_update_byte ((uint8_t *)SHIFT_REED_ADDR, Shift_Reed); 	 
-	 
-	 eeprom_update_byte ((uint8_t *)REED_1_POLARITY_ADDR,Reed1Polarity);
-	 eeprom_update_byte ((uint8_t *)REED_2_POLARITY_ADDR,Reed2Polarity);
-	 eeprom_update_byte ((uint8_t *)REED_3_POLARITY_ADDR,Reed3Polarity);
-	 eeprom_update_byte ((uint8_t *)REED_4_POLARITY_ADDR,Reed4Polarity);
 	
 }
 

@@ -41,7 +41,6 @@ extern uint8_t Reeds_Are_Independent;
 
 extern uint8_t Ignore_Flag;
 
-
-
+extern uint8_t UseDummyLoad;
 
 #endif /* GLOBALS_H_ */
