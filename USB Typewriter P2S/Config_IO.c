@@ -11,8 +11,7 @@
 #include <avr/interrupt.h>
 
 volatile uint8_t GlowDirection; //global variable that sets direction of led glow (fade up or down)
-	#define BRIGHTEN 0
-	#define DIM 1
+
 
 void Config_IO(){
 	
@@ -96,10 +95,12 @@ void GlowGreenLED(uint8_t speed, uint8_t mode){
 	cli();//disable interrupts;
 	OCR4C = 0xFF; //clear tmr4 when reaching this value
 	TC4H = 0x00; //clearing this register sets timer4 to 8-bit mode
-	OCR4A = 0x08; //when counter reaches this value, it triggers LED.
+	OCR4A = 0x20; //when counter reaches this value, it triggers LED.
 	
 	if(mode == SOLID){
-		set_low(GREEN_LED);
+		bit_clr(TCCR4E,OC4OE0);//disconnect ~oc4a output
+		bit_clr(TCCR4A,COM4A0); //clear the bit for ~OC4A pin to be active in fast pwm mode
+		set_low(GREEN_LED);	//manually pull led low
 	}
 	else{
 		bit_set(TCCR4E,OC4OE0);//enable the ~oc4a output
@@ -126,9 +127,9 @@ void GlowGreenLED(uint8_t speed, uint8_t mode){
 		break;
 	}
 		
-		
-	GlowDirection = BRIGHTEN;
-	TCNT4 = 0;//clear the timer to 0;
+		GlowDirection = BRIGHTEN;
+		TCNT4 = 0;//clear the timer to 0;}
+
 	sei();//enable interrupts again.
 }
 
@@ -136,24 +137,25 @@ ISR(TIMER4_OVF_vect){ //called each time timer1 counts up to the OCR1A register 
 
 	uint8_t temp;
 	temp = OCR4A;
-	if (GlowDirection == BRIGHTEN){
-		if(temp==0xFF){
-			GlowDirection = DIM;
-		}
-		else{
-			temp++;
-		}
-	}
-	else if (GlowDirection == DIM){
+	switch(GlowDirection){
+	case BRIGHTEN:
+		if(temp==0xFF) GlowDirection = DIM;
+		else temp++;
+	break;
+	case BRIGHTEN_ONLY:
+			if(temp!=0xFF) temp++;
+	break;
+	case DIM:
+	default:
 		if(temp == 0x00){
 			bit_clr(TCCR4A,COM4A0); //disconnect green led output pin
 			TCCR4B = 0;//clear the timer4 register (disable the timer);
 			set_high(GREEN_LED); //turn off led
-			GlowDirection = BRIGHTEN;
 		}
 		else{
 			temp--;
 		}
+	break;
 	}
 	OCR4A = temp;
 }

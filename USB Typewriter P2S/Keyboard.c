@@ -30,7 +30,7 @@ do not use it for commercial purposes, and you attribute its origins to Jack Zyl
 volatile int8_t Typewriter_Mode;
 
 volatile USB_KeyboardReport_Data_t* KeyBuffer; // Cleared each time a key is sent.
-volatile int TMR1_Count;
+volatile uint16_t TMR1_Count;
 
 uint8_t KeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
 uint8_t FnKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
@@ -60,6 +60,7 @@ uint8_t Ignore_Flag; //flag to tell processor to ignore the next character typed
 
 uint8_t UseDummyLoad; //dummy load is a 100 ohm resistor (or so) that makes the device draw more current from supply -- useful for power supplies with load minimum requirements.
 
+volatile uint16_t TimeoutCounter;
 
 char StringBuffer[60];//global buffer to store strings that are being forwarded from program memory to regular data memory
 
@@ -231,6 +232,7 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every 10 ms, I think)
 	TMR1_Count ++;
+	TimeoutCounter ++;
 
 		if ((Typewriter_Mode != USB_COMBO_MODE ) && (Typewriter_Mode != USB_LIGHT_MODE)){ //if we are not in the usual usb mode, usb tasks are taken care of by interrupts.  Otherwise, they are addressed in main flow.
 			MS_Device_USBTask(&Disk_MS_Interface);

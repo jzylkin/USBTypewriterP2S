@@ -9,7 +9,7 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-volatile extern int TMR1_Count;
+volatile extern uint16_t TMR1_Count;
 volatile extern USB_KeyboardReport_Data_t* KeyBuffer;
 extern uint8_t KeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t FnKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
@@ -42,5 +42,7 @@ extern uint8_t Reeds_Are_Independent;
 extern uint8_t Ignore_Flag;
 
 extern uint8_t UseDummyLoad;
+
+volatile extern uint16_t TimeoutCounter;
 
 #endif /* GLOBALS_H_ */

@@ -23,15 +23,20 @@ void LogKeystrokes(){
 	FRESULT filestatus;
 	FILINFO fileinfo;
 	uint16_t filenum;
-	uint8_t code;
+	uint8_t code = 0;
 	uint8_t modifier;
 	uint8_t key;
 	
+	SD_Buffer[0] = '\0'; // A simple way to erase the SD_Buffer string -- first character is now the end of the string;
+
 	diskstatus = MountFilesystem();
 	
 	if (diskstatus != FR_OK){
 		Typewriter_Mode = PANIC_MODE;
 		return;
+	}
+	else{
+		GlowGreenLED(VERY_SLOW,SOLID);
 	}
 	
 	filenum = eeprom_read_word((uint16_t *)FILENUM_ADDR); //filenum is the last used filenum, plus 1;
@@ -40,29 +45,35 @@ void LogKeystrokes(){
 		filenum = 0;
 	} //filenum can only be 4 digits long.
 
-	do{ //increment filenum until a file name is found that does not already exist 
+	do{ //increment filenum until a file name is found that does not already exist ("no file" error)
 		filenum++; //increment file number
 		sprintf(FileName,"PAGE%04d.TXT",filenum); //filename can only be 8 characters long (not including .TXT).
 		filestatus = f_stat(FileName, &fileinfo);
-	}while(filestatus == FR_OK);
+	}while(filestatus == FR_OK); //at the end of this loop, FileName is unique
 	
-	if (filestatus == FR_NO_FILE){
-		eeprom_write_word((uint16_t *)FILENUM_ADDR,filenum); // save the new filenumber for next time
-		sprintf(FileName,"PAGE%04d.TXT",filenum);
-		if (OpenLogFile()!=FR_OK){
-			Typewriter_Mode = PANIC_MODE; // go into panic mode
-			return;
-		}
-		else{
-			GlowGreenLED(VERY_SLOW,SOLID);
-		}
-	}
-	else{ //an error occurred
-		Typewriter_Mode = PANIC_MODE; // go into panic mode 
+	if (filestatus != FR_NO_FILE){ //if the error was not "no file" something went wrong
+		Typewriter_Mode = PANIC_MODE; // go into panic mode
 		return;
 	}
 	
-	while(1){
+	while(!code){ // wait for a key to be pressed before actually opening the file -- this stops lots of empty files from being created
+		key = GetKey();
+		modifier = GetModifier();
+		code = GetASCIIKeyCode(key,modifier);
+	}
+	
+	AddToSDBuffer(code); //save this first key pressed to the buffer.  there will be more, and those will be handled in the main loop
+
+	if (OpenLogFile()!=FR_OK){ //open the new log file.
+		Typewriter_Mode = PANIC_MODE; // go into panic mode
+		return;
+	}
+	
+	eeprom_write_word((uint16_t *)FILENUM_ADDR,filenum); // save the new filenumber for next time
+	
+	TimeoutCounter = 0; //reset timeout
+
+	while(TimeoutCounter < (SD_TIMEOUT)){ //keep listening for keys and adding them to buffer. Clear buffer occassionally.
 			key = GetKey();
 			modifier = GetModifier();
 			
@@ -72,12 +83,25 @@ void LogKeystrokes(){
 				if ((code == 's') && Ignore_Flag) code = 0; //if user is holding down S on startup, don't add this to file.
 				Ignore_Flag = 0;
 				AddToSDBuffer(code); //this adds the character to the sd write buffer.
+				TimeoutCounter = 0; //reset timeout every time a key is pressed.
 			}
 			if(code == '\r'){
+				GlowGreenLED(MEDIUM, GLOWING);//glow a green led to indicate write in progress.
 				WriteToLogFile(); //save your work every time enter key is pressed.
 			}
 			Delay_MS(SENSE_DELAY);
+			
+			if ((TimeoutCounter > SD_SAVE_TIME) && (SD_Buffer[0] != '\0')){
+				set_low(GREEN_LED);
+				Delay_MS(3000);
+				WriteToLogFile();
+				set_high(GREEN_LED);
+			}
 	}
+	
+			GlowGreenLED(MEDIUM, GLOWING);//glow a green led to indicate write in progress.
+			WriteToLogFile(); //save your work then "sleep" -- stop recording keystrokes
+			CloseLogFile(); // close log file so a new one can be opened later.
 }
 
 /** Opens the log file on the Dataflash's FAT formatted partition according to the current date */
@@ -89,8 +113,6 @@ FRESULT OpenLogFile(void)
 //		return FR_LOCKED; //the disk is locked if the USB is engaged.  This prevents collision with filesystem read/writes
 //	}
 	
-		SD_Buffer[0] = '\0'; // A simple way to erase the SD_Buffer string -- first character is now the end of the string;
-
 		diskstatus = f_open(&LogFile, FileName, FA_OPEN_ALWAYS | FA_WRITE);
 		f_sync(&LogFile);
 		f_close(&LogFile);
@@ -127,7 +149,6 @@ bool WriteToLogFile(){
 	UINT BytesWritten;
 	uint8_t result;
 	
-	GlowGreenLED(MEDIUM, GLOWING);//glow a green led to indicate write in progress.
 	
 	BytesWritten = strlen((char*)SD_Buffer);
 //	BytesWritten = sprintf(SD_Buffer, "TESTINGTESTING/r/n");//debug 

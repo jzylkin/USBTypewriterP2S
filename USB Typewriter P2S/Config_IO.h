@@ -19,6 +19,11 @@ void GlowGreenLED(uint8_t speed, uint8_t mode);
 #define GLOWING 0
 #define SOLID 1
 
+#define BRIGHTEN 0
+#define DIM 1
+#define BRIGHTEN_ONLY 2
+#define DIM_ONLY 3
+
 #define START 0b10100100
 #define STOP 0b10010100
 

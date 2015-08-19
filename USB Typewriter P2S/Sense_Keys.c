@@ -234,6 +234,10 @@ uint8_t GetHIDKeyCode(uint8_t key, uint8_t modifier){
 uint8_t GetASCIIKeyCode(uint8_t key, uint8_t modifier){
 	uint8_t code;
 	
+	if(key == 0){
+		return 0;
+	}
+	
 	if ((modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ASCIIShiftLookUpTable[key]){
 		code = ASCIIShiftLookUpTable[key];
 	}

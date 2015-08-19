@@ -17,18 +17,28 @@ extern USB_ClassInfo_HID_Device_t Keyboard_HID_Interface; //import the keyboard 
 void USBSend(uint8_t code,uint8_t mod){	
 	
 	TMR1_Count = 0;
-	while (KeyBuffer->KeyCode[0] && TMR1_Count < USB_SEND_TIMEOUT) {HID_Device_USBTask(&Keyboard_HID_Interface);} //if buffer is full, wait.  If timeout expires, stop waiting.
+	while (KeyBuffer->KeyCode[0] && TMR1_Count < USB_SEND_TIMEOUT) {
+		if((Typewriter_Mode == USB_COMBO_MODE) || (Typewriter_Mode == USB_LIGHT_MODE)){ //interrupts do not handle keyboard stuff during this mode.
+			HID_Device_USBTask(&Keyboard_HID_Interface);
+		} //if buffer is full, wait.  If timeout expires, stop waiting.
+	}
 	
 	if (code&FORCE_UPPER){ //in this program, we use the MSB of code to indicate that this key MUST be sent as upper case.
 		reg_clr(code,FORCE_UPPER); //clear the MSB,  
 		mod = UPPER; //and set the modifier to upper case.
 	}
 	
+	cli();//make sure there are no interrupts between setting code and setting the modifier that goes with it.
 	KeyBuffer->KeyCode[0] = code; //cue up keycode to be sent during next LUFA HID callback function.
 	KeyBufferMod = mod;
 	HID_Device_USBTask(&Keyboard_HID_Interface); //Dean Camera says to call this function regularly -- right after sending a character seems like an appropriate time.
+	sei();//re-enable the interrupts.
+	
 	Delay_MS(USB_SEND_DELAY);// wait X ms after sending each character.
+	
+	cli();//make sure no interrupts occur during the usb task.
 	HID_Device_USBTask(&Keyboard_HID_Interface); //do LUFA hid usb tasks
+	sei();
 }
 
 /*Send a string over USB. Only supports some characters.*/
@@ -87,6 +97,7 @@ void USBSendString(char *str){
 			modifier = UPPER;
 		}
 		USBSend(code,modifier);
+		Delay_MS(STRING_SEND_DELAY);
 	}
 } 
 

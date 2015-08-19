@@ -115,9 +115,9 @@
 		#define EEP_CHECKSUM_ADDR 0x3FF
 		#define EEP_CHECKSUM 71 //if eeprom doesn't have this random code in the checksum address, it has not been initialized yet. 
 		
-		#define DEFAULT_DOUBLE_TAP_TIME 7
-		#define DEFAULT_HOLD_TIME 7
-		#define DEFAULT_RELEASE_TIME 7
+		#define DEFAULT_DOUBLE_TAP_TIME 5
+		#define DEFAULT_HOLD_TIME 6
+		#define DEFAULT_RELEASE_TIME 3
 		#define DEFAULT_REED_HOLD_TIME 3
 		#define REEDS_ARE_INDEPENDENT_BY_DEFAULT 0
 		
@@ -151,7 +151,7 @@
 		#define SD_BUFFER_LENGTH 512
 		
 		#define USB_SEND_TIMEOUT 100 //wait 50ms if usb send buffer is full before discarding a character.
-		#define USB_SEND_DELAY 30// wait 30ms after sending each key to usb.
+		#define USB_SEND_DELAY 15// wait 30ms after sending each key to usb.
 		#define CALIBRATION_DELAY 500// wait 500ms between programming keys.
 		
 		#define SENSE_DELAY 2// wait X ms between reading the sensor.
@@ -159,6 +159,14 @@
 		#define INIT_DELAY 500// wait X ms after initializing.
 		
 		#define ENUMERATION_TIMEOUT 5000 //how long to wait for enumeration to happen.  this parameter might not be used.
+		
+		#define SD_TIMEOUT_S  (uint16_t)1800 //how many seconds to wait without any input before closing the file (half an hour?)
+		#define SD_TIMEOUT (uint16_t)SD_TIMEOUT_S*100
+		
+		#define SD_SAVE_TIME_S (uint16_t)60 //how many seconds before saving work if no keys are pressed.
+		#define SD_SAVE_TIME (uint16_t)SD_SAVE_TIME_S*100
+		
+		#define STRING_SEND_DELAY 50
 		
 		/** Indicates if the disk is write protected or not. */
 		#define DISK_READ_ONLY           false
