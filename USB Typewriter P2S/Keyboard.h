@@ -36,6 +36,8 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.0.3";
+
 	/* Includes: */
 		#include <avr/io.h>
 		#include <avr/wdt.h>
@@ -115,9 +117,10 @@
 		#define EEP_CHECKSUM_ADDR 0x3FF
 		#define EEP_CHECKSUM 71 //if eeprom doesn't have this random code in the checksum address, it has not been initialized yet. 
 		
-		#define DEFAULT_DOUBLE_TAP_TIME 5
-		#define DEFAULT_HOLD_TIME 6
+
+		#define DEFAULT_HOLD_TIME 8
 		#define DEFAULT_RELEASE_TIME 3
+		#define DEFAULT_DOUBLE_TAP_TIME 6
 		#define DEFAULT_REED_HOLD_TIME 3
 		#define REEDS_ARE_INDEPENDENT_BY_DEFAULT 0
 		

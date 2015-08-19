@@ -19,12 +19,11 @@ do not use it for commercial purposes, and you attribute its origins to Jack Zyl
  *  Main source file for the USB Tyewriter. This file contains the main tasks of
  *  the keyboard and is responsible for the initial application hardware configuration.
  */
+	
 
 #include "Keyboard.h"
 #include "Calibrate.h"
 #include "KeyCodes.h"
-
-
 
 //Globl variables:
 volatile int8_t Typewriter_Mode;
