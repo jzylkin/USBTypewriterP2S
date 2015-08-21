@@ -8,6 +8,7 @@
 #include "Sense_Keys.h"
 #include "KeyCodes.h"
 #include "globals.h"
+
 //extern USB_KeyboardReport_Data_t* KeyBuffer;
 
 const uint8_t REED_BITS[] = {62,61,60,59}; //these are the bits of the sensor array that represent the reed switches
@@ -200,7 +201,7 @@ unsigned long long ReadSensor(){
 		
 		/*The hall effect sensor on the end of the sensor board is only installed in certain cases -
 		- its job is to tell if the entire crossbar has moved(active), or if it is at rest (therefore no keys should be detected)*/
-		if(UseHallSensor){ //when the hall effect sensor is installed and activated
+		if((UseHallSensor)&&(Typewriter_Mode != TEST_MODE)){ //when the hall effect sensor is installed and activated
 			HallReading = Readout & LONGLONGBIT(HALL_SENSOR_BIT); //one of the bits of the sensor readout gives the state of the hall sensor
 			if(HallReading != HallSensorPolarity){
 				Readout = 0; //then if the hall effect sensor is not triggered, readout of keys is invalid -- clear it. 
@@ -249,7 +250,7 @@ uint8_t GetASCIIKeyCode(uint8_t key, uint8_t modifier){
 
 bool getHallState(){ //don't call this function from inside ReadSensor !  It will cause an infinite loop...
 	bool hallstate;
-	hallstate = (bool)(ReadSensor() & LONGLONGBIT(HALL_SENSOR_BIT));
+	hallstate = (ReadSensor() & LONGLONGBIT(HALL_SENSOR_BIT));
 	return hallstate;
 }
 

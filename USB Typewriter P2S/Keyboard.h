@@ -36,7 +36,7 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.0.3";
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.0.4";
 
 	/* Includes: */
 		#include <avr/io.h>

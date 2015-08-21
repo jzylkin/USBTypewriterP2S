@@ -163,16 +163,18 @@ int main(void)
 			break;
 			case TEST_MODE:
 				USB_Disable(); //USB not needed for testing
+				while(1){
+					parity = (uint8_t)is_low(REED_1) + (uint8_t)is_low(REED_2)+ (uint8_t)is_low(REED_3) + (uint8_t)is_low(REED_4) + (uint8_t)getHallState();
 				
-				parity = (uint8_t)is_low(REED_1) + (uint8_t)is_low(REED_2)+ (uint8_t)is_low(REED_3) + (uint8_t)is_low(REED_4) + (uint8_t)getHallState();
-				
-				if (parity & 1){
-					set_high(LED1);
-					set_low(LED2);
-				}
-				else{
-					set_low(LED1);
-					set_high(LED2);
+					if (parity & 1){  //if first bit of parity is 1, then an odd number of sensors are active.
+						set_high(LED1);
+						set_low(LED2);
+					}
+					else{ //otherwise, an even number (or zero) are active.
+						set_low(LED1);
+						set_high(LED2);
+					}
+					Delay_MS(SENSE_DELAY);
 				}
 			break;
 			case HARDWARE_TEST:				
