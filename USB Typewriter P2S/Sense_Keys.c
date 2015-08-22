@@ -201,18 +201,18 @@ unsigned long long ReadSensor(){
 		
 		/*The hall effect sensor on the end of the sensor board is only installed in certain cases -
 		- its job is to tell if the entire crossbar has moved(active), or if it is at rest (therefore no keys should be detected)*/
-		if((UseHallSensor)&&(Typewriter_Mode != TEST_MODE)){ //when the hall effect sensor is installed and activated
+		if(UseHallSensor){ //when the hall effect sensor is installed and activated
 			HallReading = Readout & LONGLONGBIT(HALL_SENSOR_BIT); //one of the bits of the sensor readout gives the state of the hall sensor
 			if(HallReading != HallSensorPolarity){
-				Readout = 0; //then if the hall effect sensor is not triggered, readout of keys is invalid -- clear it. 
+				Readout = 0; //then if the hall effect sensor is not triggered, readout of keys is invalid -- clear it (including the hall sensor bit). 
 			}
 		}
 
 		//add the reed switches to the last 4 bits of the readout array -- if the reed switch is for the shift key, ignore it!
-		if (Shift_Reed != 1 && is_high(REED_1)==Reed1Polarity){ Readout |= LONGLONGBIT(REED_BITS[0]);} //63rd bit of readout (or something like that) represents Reed1
-		if (Shift_Reed != 2 && is_high(REED_2)==Reed2Polarity){ Readout |= LONGLONGBIT(REED_BITS[1]);} //62nd bit of readout (or something like that) represents Reed2
-		if (Shift_Reed != 3 && is_high(REED_3)==Reed3Polarity){ Readout |= LONGLONGBIT(REED_BITS[2]);} //61st bit of readout (or something like that) represents Reed3
-		if (Shift_Reed != 4 && is_high(REED_4)==Reed4Polarity){ Readout |= LONGLONGBIT(REED_BITS[3]);} //60th bit of readout (or something like that) represents Reed4
+		if (Shift_Reed != 1 && is_high(REED_1)==(bool)Reed1Polarity){ Readout |= LONGLONGBIT(REED_BITS[0]);} //63rd bit of readout (or something like that) represents Reed1
+		if (Shift_Reed != 2 && is_high(REED_2)==(bool)Reed2Polarity){ Readout |= LONGLONGBIT(REED_BITS[1]);} //62nd bit of readout (or something like that) represents Reed2
+		if (Shift_Reed != 3 && is_high(REED_3)==(bool)Reed3Polarity){ Readout |= LONGLONGBIT(REED_BITS[2]);} //61st bit of readout (or something like that) represents Reed3
+		if (Shift_Reed != 4 && is_high(REED_4)==(bool)Reed4Polarity){ Readout |= LONGLONGBIT(REED_BITS[3]);} //60th bit of readout (or something like that) represents Reed4
 		
 		return Readout;
 }

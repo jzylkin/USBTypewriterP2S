@@ -5,6 +5,7 @@
  *  Author: Jack
  */ 
 #include <avr/io.h>
+#include <stdbool.h>
 
 #ifndef CUSTOMMACROS_H_
 #define CUSTOMMACROS_H_
@@ -33,8 +34,8 @@
 
 
 /***** Test Inputs *****/
-#define is_high(bit)                        (PIN(bit ## _PORT) & (1 << bit))
-#define is_low(bit)                         (!(PIN(bit ## _PORT) & (1 << bit))) // if the pin is 0, it will and to 0, then flip to 1. if it is 1 it will and to 1, then flip to 0
+#define is_high(bit)                        (bool)(PIN(bit ## _PORT) & (1 << bit))
+#define is_low(bit)                         (bool)(!(PIN(bit ## _PORT) & (1 << bit))) // if the pin is 0, it will and to 0, then flip to 1. if it is 1 it will and to 1, then flip to 0
 
 
 /****REGISTER MANIPULATION MACROS*****/

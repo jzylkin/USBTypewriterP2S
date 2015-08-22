@@ -164,6 +164,7 @@ int main(void)
 			case TEST_MODE:
 				USB_Disable(); //USB not needed for testing
 				while(1){
+					UseHallSensor = 0;//make sure hall sensor bit is not zeroed out by ReadSensor() as soon as it is read;
 					parity = (uint8_t)is_low(REED_1) + (uint8_t)is_low(REED_2)+ (uint8_t)is_low(REED_3) + (uint8_t)is_low(REED_4) + (uint8_t)getHallState();
 				
 					if (parity & 1){  //if first bit of parity is 1, then an odd number of sensors are active.

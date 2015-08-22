@@ -396,7 +396,8 @@ void CalibrateReeds(){
 bool DetectHallSensor(){
 	bool HallSensorTest1;
 	bool HallSensorTest2;
-	
+		
+			UseHallSensor = 0;  //make sure the hall effect bit is not cleared as soon as it is read.
 			HallSensorTest1 = getHallState(); //sample the hall effect sensor bit
 			USBSendPROGString(Str_Calibrate_Hall);
 			Delay_MS(4000);
