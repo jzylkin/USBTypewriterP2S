@@ -94,9 +94,9 @@ void Calibrate(){
 		Reed3Polarity = is_low(REED_3);
 		Reed4Polarity = is_low(REED_4);
 	
-	if (is_low(CMD_KEY)){ //holding this key down after the initial message is a hidden way to activate the hall effect sensor
-		DetectHallSensor();
-	}
+//	if (is_low(CMD_KEY)){ //holding this key down after the initial message is a hidden way to activate the hall effect sensor
+//		DetectHallSensor();
+//	}
 	
 	if (is_low(S2)){//hold down to activate the dummy load
 		if (UseDummyLoad) {
@@ -396,20 +396,27 @@ void CalibrateReeds(){
 bool DetectHallSensor(){
 	bool HallSensorTest1;
 	bool HallSensorTest2;
-		
-			UseHallSensor = 0;  //make sure the hall effect bit is not cleared as soon as it is read.
+
+	
+			UseHallSensor = HALL_NOT_PRESENT;  //make sure the hall effect bit is not cleared as soon as it is read.
 			HallSensorTest1 = getHallState(); //sample the hall effect sensor bit
 			USBSendPROGString(Str_Calibrate_Hall);
 			Delay_MS(4000);
 			HallSensorTest2 = getHallState(); //sample it again
 			if (HallSensorTest1 == HallSensorTest2){ //if it has not changed, hall effect sensor is not present.
 				USBSendPROGString(Str_No_Hall);
-				UseHallSensor = false;
+				UseHallSensor = HALL_NOT_PRESENT;
 			}
 			else{ // if it has changed, the "active" polarity of the hall effect sensor is HallSensorTest2
-				USBSendString("OK!\r");
-				UseHallSensor = true;
+				USBSendString("Hall Sensor Detected!\r");
+				UseHallSensor = HALL_NOT_ACTIVE;
 				HallSensorPolarity = HallSensorTest2;
+				USBSendString("Press CTRL key now to activate Hall Sensor...");
+				for (int i=1; i < 100; i++){
+					if(is_low(CTRL_KEY)) UseHallSensor = HALL_ACTIVE; 
+					Delay_MS(30);
+				}
+				if (UseHallSensor == HALL_ACTIVE) USBSendString("\rHall Sensor Activated!\r");
 			}
 			
 			/*Save the hall effect parameters to eeprom right away:*/

@@ -36,7 +36,7 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.0.5";
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.1.1";
 
 	/* Includes: */
 		#include <avr/io.h>
@@ -135,6 +135,10 @@
 		#define REED_3_BIT 61
 		#define REED_4_BIT 60
 		#define HALL_SENSOR_BIT 44
+		
+		#define HALL_ACTIVE 2
+		#define HALL_NOT_ACTIVE 1
+		#define HALL_NOT_PRESENT 0
 		
 		#define NO_MODE 0
 		#define USB_COMBO_MODE 1

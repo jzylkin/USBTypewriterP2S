@@ -85,7 +85,7 @@ void LogKeystrokes(){
 				AddToSDBuffer(code); //this adds the character to the sd write buffer.
 				TimeoutCounter = 0; //reset timeout every time a key is pressed.
 			}
-			if(code == '\r'){
+			if((code == '\r')||(code == '.')||(code == ',')||(code == '!')||(code == '?')||(code == ':')||(code == '\"')){
 				GlowGreenLED(MEDIUM, GLOWING);//glow a green led to indicate write in progress.
 				WriteToLogFile(); //save your work every time enter key is pressed.
 			}

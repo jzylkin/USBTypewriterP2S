@@ -42,7 +42,9 @@ uint8_t GetKeySimple(){
 	Key=0;//by default, there is no key to send, unless one is detected later.
 	
 	SensorReadout = ReadSensor();
-	SensorReadout &= ~LONGLONGBIT(HALL_SENSOR_BIT); //discard the hall effect bit of the array -- it is not an actual key, so don't report it as one.
+	if(UseHallSensor != HALL_NOT_PRESENT){
+		SensorReadout &= ~LONGLONGBIT(HALL_SENSOR_BIT); //discard the hall effect bit of the array -- it is not an actual key, so don't report it as one.
+	}
 
 	if(SensorReadout){
 		Key = (uint8_t) __builtin_clzll(SensorReadout); //this function finds the first nonzero bit in the bitfield SensorReadout (by counting leading zeros)
@@ -73,8 +75,11 @@ uint8_t GetKey(){
 	
 /*READ INPUT FROM SENSOR STRIP*/	
 		SensorReadout = ReadSensor();
-		SensorReadout &= ~LONGLONGBIT(HALL_SENSOR_BIT); //after detecting it, discard the hall effect bit of the array -- it is not an actual key, so don't report it as one.
-
+		
+		if (UseHallSensor != HALL_NOT_PRESENT){ //if the user has not installed the hall sensor, don't do this part.
+			SensorReadout &= ~LONGLONGBIT(HALL_SENSOR_BIT); //after detecting it, discard the hall effect bit of the array -- it is not an actual key, so don't report it as one.
+		}
+		
 /*READ AND DEBOUNCE REED SWITCH INPUTS*/
 
 		/*Detect which reeds have been pressed, and if they have been sent to the host already or if they still need to be*/
@@ -201,7 +206,7 @@ unsigned long long ReadSensor(){
 		
 		/*The hall effect sensor on the end of the sensor board is only installed in certain cases -
 		- its job is to tell if the entire crossbar has moved(active), or if it is at rest (therefore no keys should be detected)*/
-		if(UseHallSensor){ //when the hall effect sensor is installed and activated
+		if(UseHallSensor == HALL_ACTIVE){ //when the hall effect sensor is installed and activated
 			HallReading = Readout & LONGLONGBIT(HALL_SENSOR_BIT); //one of the bits of the sensor readout gives the state of the hall sensor
 			if(HallReading != HallSensorPolarity){
 				Readout = 0; //then if the hall effect sensor is not triggered, readout of keys is invalid -- clear it (including the hall sensor bit). 
@@ -285,7 +290,7 @@ void ClearKeyCodeTables(){
 	memset (&ASCIIShiftLookUpTable[0],0,KEYCODE_ARRAY_LENGTH);
 
 	Shift_Reed = 0;
-	UseHallSensor = 0;	
+	UseHallSensor = HALL_NOT_PRESENT;	
 }
 
 void InitializeEeprom(){
