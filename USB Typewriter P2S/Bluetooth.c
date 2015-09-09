@@ -31,7 +31,7 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
     uart_putc(0x02);//1 key is sent at a time
 	uart_putc(modifier);//modifier goes here
 	uart_putc(key);
-	uart_putc('G');
+
 
 	//clear the keystroke
 //	Delay_MS(10);
@@ -62,11 +62,11 @@ void Bluetooth_Init(){
 bool Bluetooth_Configure(){
 	bool cmdmode;
 	uint8_t attempt_count = 0;
-	bool success = true;
+	bool success;
 	
 //No longer necessary, since module is permanently fixed to 9600 baud.
-//	USBSendString("BT RESET...");
-//  set_high(BT_BAUD); //sets the baud rate to 9600 upon reset
+	USBSendString("BT RESET...");
+   // set_high(BT_BAUD); //sets the baud rate to 9600 upon reset
 
     Bluetooth_Reset(); //reset the module
 	
@@ -84,14 +84,15 @@ bool Bluetooth_Configure(){
 
 	Bluetooth_Send_CMD("SF,1"); //SF command resets factory defaults;
 	Delay_MS(1000); //delay for a little bit to make sure bluetooth has time to respond.
-
+	
+	success = true;
 	success &= Bluetooth_Send_CMD("SC,0000"); //DEFAULT; SC and SD commands set COD device identifier (identify as a keyboard);
 	success &= Bluetooth_Send_CMD("SD,0540");
 	success &= Bluetooth_Send_CMD("SA,1");//use pin-code
 	success &= Bluetooth_Send_CMD("SH,0302"); //set hid flags -- hid forced on by hid pin, ios keyboard toggles, device is keyboard, 0 device stored in reconnect queue on power-up
 	success &= Bluetooth_Send_CMD("SM,6"); //bluetooth is in slave connect mode
-	success &= Bluetooth_Send_CMD("SP,1234"); // set pin code, if used
-	success &= Bluetooth_Send_CMD("SS,Keyboard"); // set "service name"
+//	success &= Bluetooth_Send_CMD("SP,1234"); // set pin code, if used
+//	success &= Bluetooth_Send_CMD("SS,Keyboard"); // set "service name"
 	success &= Bluetooth_Send_CMD("ST,255"); // set configuration timer to never timeout
 	//	Bluetooth_Send_CMD("SW,8050"); // set sniff mode to 50ms intervals, with deep sleep enabled
 	success &= Bluetooth_Send_CMD("SY,0010"); // set transmit power -- default is 000C (see datasheet)
@@ -100,7 +101,7 @@ bool Bluetooth_Configure(){
 
 	success &= Bluetooth_Send_CMD("S~,6"); // set profile to HID
 	success &= Bluetooth_Send_CMD("R,1");
-
+	
 	Delay_MS(BLUETOOTH_RESET_DELAY);
 	return success; //if any of the commands failed, success will be false.
 }
@@ -215,9 +216,8 @@ bool Get_Response(){
 		response[2] = uart_getc() & 0xFF;
 		response[3]=  uart_getc() & 0xFF;
 		response[4] = '\0';
-		
-//		USBSendString(response);
-		if ((response[0] == 'C')||(response[0] == 'A')){  //if response is "CMD" or "AOK", bt module has received command successfully
+
+		if ((response[0] == 'C')||(response[0] == 'A')|| (response[0] == 'R')){  //if response is "CMD" or "AOK" or "REBOOT", bt module has received command successfully
 			return true;
 		}
 		else{

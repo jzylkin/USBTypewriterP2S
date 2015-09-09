@@ -135,9 +135,13 @@ int main(void)
 	LoadEepromParameters();
 	LoadKeyCodeTables();
 	SDCardManager_Init(); 
-	Init_Mode();
-	USB_Init();
+	USB_Init();//DEBUG ONLY
+	uart_init(UART_BAUD_SELECT(9600,F_CPU));//initialize the uart with a baud rate of x bps
+
+	//USB_Init(); COMMENTED FOR DEBUGGING
 	GlobalInterruptEnable();
+	
+	Init_Mode();
 //	Delay_MS(INIT_DELAY);
 	
 	while(1){
@@ -196,10 +200,11 @@ int main(void)
 			break;
 			case BLUETOOTH_MODE:
 				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
-				uart_init(UART_BAUD_SELECT(9600,F_CPU));//initialize the uart with a baud rate of x bps
-				Bluetooth_Init();
-				while(1){
-					while(is_low(BT_CONNECTED)){;}//wait for connection to happen
+				Bluetooth_Reset();
+				while(is_low(BT_CONNECTED)){set_low(RED_LED);set_high(GREEN_LED);}//wait for connection to happen, glow red until then.
+					set_high(RED_LED);//turn off red led if bt is connected.
+					set_low(GREEN_LED);
+				while(is_high(BT_CONNECTED)){
 					key = GetKey();
 					modifier = GetModifier();
 					code = GetHIDKeyCode(key, modifier);
@@ -455,7 +460,13 @@ void Init_Mode(){
 			RestoreFactoryDefaults();			
 	}
 	else if(is_low(S2)&&is_low(S3)){ //debug bluetooth and sd mode
-			Typewriter_Mode = BLUETOOTH_MODE;
+			if(Bluetooth_Configure()){
+					Typewriter_Mode = BLUETOOTH_MODE;
+					Default_Mode = BLUETOOTH_MODE;
+			}
+			else{ //if something goes wrong during configuration...
+				Typewriter_Mode = PANIC_MODE; //don't change default mode
+			}
 	}
 	else if(is_low(S1)&&is_low(S2)){
 			Typewriter_Mode = SD_MODE;
