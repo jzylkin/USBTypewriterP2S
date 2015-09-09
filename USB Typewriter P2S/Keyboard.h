@@ -36,7 +36,7 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.0";
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.1";
 
 	/* Includes: */
 		#include <avr/io.h>
@@ -118,7 +118,8 @@
 		#define EEP_CHECKSUM 71 //if eeprom doesn't have this random code in the checksum address, it has not been initialized yet. 
 		
 
-		#define DEFAULT_HOLD_TIME 5
+		#define SENSE_DELAY 1// wait X ms between reading the sensor.
+		#define DEFAULT_HOLD_TIME 6
 		#define DEFAULT_RELEASE_TIME 3
 		#define DEFAULT_DOUBLE_TAP_TIME 5
 		#define DEFAULT_REED_HOLD_TIME 3
@@ -161,7 +162,6 @@
 		#define USB_SEND_DELAY 15// wait 30ms after sending each key to usb.
 		#define CALIBRATION_DELAY 500// wait 500ms between programming keys.
 		
-		#define SENSE_DELAY 1// wait X ms between reading the sensor.
 		
 		#define INIT_DELAY 500// wait X ms after initializing.
 		

@@ -202,7 +202,7 @@ Disassembly of section .text:
 
 00000374 <Str_Firmware_Ver>:
      374:	46 49 52 4d 57 41 52 45 20 56 45 52 20 35 2e 32     FIRMWARE VER 5.2
-     384:	2e 30 00                                            .0.
+     384:	2e 31 00                                            .1.
 
 00000387 <Str_USB_Typewriter>:
      387:	55 53 42 20 54 59 50 45 57 52 49 54 45 52 20 28     USB TYPEWRITER (
@@ -9546,7 +9546,7 @@ Disassembly of section .text:
     50be:	80 e0       	ldi	r24, 0x00	; 0
     50c0:	92 e0       	ldi	r25, 0x02	; 2
     50c2:	0e 94 c3 34 	call	0x6986	; 0x6986 <__eeupd_byte_m32u4>
-    50c6:	65 e0       	ldi	r22, 0x05	; 5
+    50c6:	66 e0       	ldi	r22, 0x06	; 6
     50c8:	81 e0       	ldi	r24, 0x01	; 1
     50ca:	92 e0       	ldi	r25, 0x02	; 2
     50cc:	0e 94 c3 34 	call	0x6986	; 0x6986 <__eeupd_byte_m32u4>
