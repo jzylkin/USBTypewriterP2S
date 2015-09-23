@@ -65,7 +65,7 @@ bool Bluetooth_Configure(){
 	bool success;
 	
 //No longer necessary, since module is permanently fixed to 9600 baud.
-	USBSendString("BT RESET...");
+//	USBSendString("BT RESET...");
    // set_high(BT_BAUD); //sets the baud rate to 9600 upon reset
 
     Bluetooth_Reset(); //reset the module
@@ -89,14 +89,14 @@ bool Bluetooth_Configure(){
 	success &= Bluetooth_Send_CMD("SC,0000"); //DEFAULT; SC and SD commands set COD device identifier (identify as a keyboard);
 	success &= Bluetooth_Send_CMD("SD,0540");
 	success &= Bluetooth_Send_CMD("SA,1");//use pin-code
-	success &= Bluetooth_Send_CMD("SH,0302"); //set hid flags -- hid forced on by hid pin, ios keyboard toggles, device is keyboard, 0 device stored in reconnect queue on power-up
+	success &= Bluetooth_Send_CMD("SH,0302"); //set hid flags -- hid forced on by hid pin, ios keyboard toggles, device is keyboard, 2 devices stored in reconnect queue on power-up
 	success &= Bluetooth_Send_CMD("SM,6"); //bluetooth is in slave connect mode
-//	success &= Bluetooth_Send_CMD("SP,1234"); // set pin code, if used
+	Bluetooth_Send_CMD("SP,1234"); // set pin code, if used
 //	success &= Bluetooth_Send_CMD("SS,Keyboard"); // set "service name"
 	success &= Bluetooth_Send_CMD("ST,255"); // set configuration timer to never timeout
 	//	Bluetooth_Send_CMD("SW,8050"); // set sniff mode to 50ms intervals, with deep sleep enabled
 	success &= Bluetooth_Send_CMD("SY,0010"); // set transmit power -- default is 000C (see datasheet)
-	success &= Bluetooth_Send_CMD("S-,USB TYPEWRITER"); // set friendly name
+	Bluetooth_Send_CMD("S-,USB TYPEWRITER"); // set friendly name
 	//	Bluetooth_Send_CMD("S|,0A01");// cycle 10s off and 1s on when waiting for a connection
 
 	success &= Bluetooth_Send_CMD("S~,6"); // set profile to HID
@@ -122,6 +122,7 @@ bool Bluetooth_Connect(){
 		Typewriter_Mode = PANIC_MODE;
 		return false;
 	}
+	
 	Bluetooth_Send_CMD("C");
 	
 	return true; //todo: check connection status pin to see if device connects or not
@@ -216,6 +217,11 @@ bool Get_Response(){
 		response[2] = uart_getc() & 0xFF;
 		response[3]=  uart_getc() & 0xFF;
 		response[4] = '\0';
+		
+	//	USBSendString(response);
+	//	USBSend(KEY_ENTER,LOWER);
+	
+		
 
 		if ((response[0] == 'C')||(response[0] == 'A')|| (response[0] == 'R')){  //if response is "CMD" or "AOK" or "REBOOT", bt module has received command successfully
 			return true;

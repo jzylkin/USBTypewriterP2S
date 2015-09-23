@@ -18,7 +18,7 @@ bool Bluetooth_Connect();
 bool Get_Response();
 void Bluetooth_Exit_CMD_Mode();
 bool Bluetooth_Configure();
-#define BLUETOOTH_RESPONSE_DELAY 50 //delay for a little bit to make sure bluetooth has time to respond after each command --100ms recommended by makeymakey.
-#define BLUETOOTH_RESET_DELAY 500 //500ms recommended by datasheet	
+#define BLUETOOTH_RESPONSE_DELAY 100 //delay for a little bit to make sure bluetooth has time to respond after each command --100ms recommended by makeymakey.
+#define BLUETOOTH_RESET_DELAY 700 //500ms recommended by datasheet	
 
 #endif /* BLUETOOTH_H_ */
