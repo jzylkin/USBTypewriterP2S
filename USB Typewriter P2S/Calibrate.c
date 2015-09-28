@@ -94,9 +94,9 @@ void Calibrate(){
 		Reed3Polarity = is_low(REED_3);
 		Reed4Polarity = is_low(REED_4);
 	
-//	if (is_low(CMD_KEY)){ //holding this key down after the initial message is a hidden way to activate the hall effect sensor
-//		DetectHallSensor();
-//	}
+	if (is_low(CTRL_KEY)){ //holding this key down after the initial message is a hidden way to activate the hall effect sensor
+		DetectHallSensor();
+	}
 	
 	if (is_low(S2)){//hold down to activate the dummy load
 		if (UseDummyLoad) {
@@ -417,6 +417,10 @@ bool DetectHallSensor(){
 					Delay_MS(30);
 				}
 				if (UseHallSensor == HALL_ACTIVE) USBSendString("\rHall Sensor Activated!\r");
+			}
+			
+			if(is_low(CMD_KEY)){
+				UseHallSensor = HALL_NOT_ACTIVE; //In the event that the hall sensor is acting erratically or not at all, holding CMD can force it off.
 			}
 			
 			/*Save the hall effect parameters to eeprom right away:*/

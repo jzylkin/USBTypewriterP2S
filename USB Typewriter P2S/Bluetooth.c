@@ -229,7 +229,6 @@ bool Get_Response(){
 		else{
 			return false;
 		}
-		
 }
 	
 

@@ -154,6 +154,8 @@ int main(void)
 				modifier = GetModifier(); 
 				code = GetHIDKeyCode(key, modifier);
 				
+				if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
+					
 				if(code){//if the code is valid, send it
 						if ((code == KEY_U)&&Ignore_Flag) code = 0; //if user is holding down U on startup, don't add this U to file.
 						Ignore_Flag = 0;
@@ -207,8 +209,12 @@ int main(void)
 				while(is_high(BT_CONNECTED)){
 					key = GetKey();
 					modifier = GetModifier();
+									
 					code = GetHIDKeyCode(key, modifier);
-					if(code){
+					
+					if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
+									
+						if(code){
 						Bluetooth_Send(code,modifier);
 					}
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
