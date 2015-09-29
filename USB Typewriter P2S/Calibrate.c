@@ -124,6 +124,10 @@ void Calibrate(){
 		TeachHIDKey(HIDKey, KeyPressed, Modifier); //all alphanumeric keys programmed as a/A pairs -- no special shift keys allowed.
 		ASCIIKey = HIDKey-KEY_A+ASCII_A; //calculated corresponding sd card Ascii key
 		
+		if(HIDKey  == HID_KEYBOARD_SC_L){ //if the key is l, make sure fn+l=1
+			FnKeyCodeLookUpTable[KeyPressed] = KEY_1;
+		}
+		
 		if (!(Modifier & FN_MODIFIER)) { //only bother to program sd card letters if the fn key is not being pressed (sd card doesn't use fn key)
 			TeachASCIIKey(ASCIIKey, KeyPressed, UPPER);  //program this key into memory as an upper case key
 			TeachASCIIKey(ASCIIKey+0x20, KeyPressed, LOWER); // and as a lower case key
@@ -184,6 +188,7 @@ void Calibrate(){
 	else{
 		USBSendPROGString(Str_Shift_Error);
 	}
+	Delay_MS(CALIBRATION_DELAY);
 	USBSend(KEY_ENTER,LOWER);
 	
 //----------TEACH SYMBOL KEYS------------	
@@ -221,8 +226,15 @@ void Calibrate(){
 	Modifier = GetModifier();
 
 	TeachASCIIKey('@',KeyPressed,Modifier);
+	
+		if(Modifier==HID_KEYBOARD_MODIFIER_LEFTSHIFT){
+			USBSendString("SHIFT");
+			USBSend(KEY_EQ,UPPER); //send a + sign
+		}
 	USBSendNumber(KeyPressed);
 	USBSend(KEY_ENTER,LOWER);
+	
+	Delay_MS(CALIBRATION_DELAY);//delay between programming keys.
 	
 /*	//@ for usb
 	USBSend(KEY_2,UPPER);
@@ -240,8 +252,15 @@ void Calibrate(){
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachASCIIKey('?',KeyPressed,Modifier);
+	if(Modifier==HID_KEYBOARD_MODIFIER_LEFTSHIFT){
+		USBSendString("SHIFT");
+		USBSend(KEY_EQ,UPPER); //send a + sign
+	}
 	USBSendNumber(KeyPressed);
 	USBSend(KEY_ENTER,LOWER);
+	
+	
+	Delay_MS(CALIBRATION_DELAY);//delay between programming keys.
 	
 //for USB
 /*
@@ -263,7 +282,9 @@ void Calibrate(){
 		TeachHIDKey(KEY_1|FORCE_UPPER,KeyPressed,Modifier);
 		TeachASCIIKey('!',KeyPressed,Modifier);
 	}
+	 
 	USBSend(KEY_ENTER,LOWER);
+	
 	
 //------TEACH REED SWITCHES--------//
 	CalibrateReeds();
@@ -319,6 +340,7 @@ void QuickCalibrate(){
 }
 
 void SaveCalibration(){
+		 USBSendString("SAVING...\r");
 		 eeprom_write_block (KeyCodeLookUpTable, (void *) KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
 		 eeprom_write_block (FnKeyCodeLookUpTable, (void *) FN_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
 		 eeprom_write_block (ShiftKeyCodeLookUpTable, (void *) SHIFT_KEYCODE_ADDR, KEYCODE_ARRAY_LENGTH);
