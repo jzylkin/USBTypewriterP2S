@@ -46,6 +46,8 @@ uint8_t KeyReleaseTime;
 uint8_t KeyHoldTime;
 uint8_t ReedHoldTime;
 
+uint8_t BluetoothConfigured;
+
 uint8_t KeyBufferMod;
 
 bool Reed1Polarity; //reed switches are active low by default
@@ -201,6 +203,7 @@ int main(void)
 				Typewriter_Mode = USB_LIGHT_MODE;//after calibrating, go to usb light mode.
 			break;
 			case BLUETOOTH_MODE:
+				USB_Disable();//comment this out for debugging purposes
 				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
 				Bluetooth_Reset();
 				while(is_low(BT_CONNECTED)){set_low(RED_LED);set_high(GREEN_LED);}//wait for connection to happen, glow red until then.
@@ -463,14 +466,20 @@ void Init_Mode(){
 	if (is_low(S1)&&is_low(S2)&&is_low(S3)){ //reset device to known state
 			Typewriter_Mode = USB_COMBO_MODE;
 			Default_Mode = USB_COMBO_MODE;
+			GlowGreenLED(SLOW,GLOWING);
 			RestoreFactoryDefaults();			
 	}
-	else if(is_low(S2)&&is_low(S3)){ //debug bluetooth and sd mode
+	else if(is_low(S2)&&is_low(S3)){ //configure bluetooth and test bluetooth -- reset bluetooth module  -- force initialization next time bluetooth is used.
 			if(Bluetooth_Configure()){
+					//this test mode resets the bluetooth channel.
+					BluetoothConfigured = 0;// even though it has been configured, save it as "not configured" to force configuration next time (on customer's end.)
+					eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); 	
 					Typewriter_Mode = BLUETOOTH_MODE;
 					Default_Mode = BLUETOOTH_MODE;
 			}
 			else{ //if something goes wrong during configuration...
+				BluetoothConfigured = 0;
+				eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has not been configured already.
 				Typewriter_Mode = PANIC_MODE; //don't change default mode
 			}
 	}
@@ -506,12 +515,22 @@ void Init_Mode(){
 		}
 	}
 	else if(code == 'B'){ //if the letter B is being held by the user
-		if(Bluetooth_Configure()){
+		USB_Disable();
+		if(BluetoothConfigured){
+			BluetoothInquire();//get a new device to pair with when you hold b key down.
+			Typewriter_Mode = BLUETOOTH_MODE; // for now, this is commented out
+			Default_Mode = BLUETOOTH_MODE;
+		}
+		if(Bluetooth_Configure()){ // attempt to configure.
+			BluetoothConfigured = 1;
+			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has been configured already.	
 			Typewriter_Mode = BLUETOOTH_MODE;
 			Default_Mode = BLUETOOTH_MODE;
 		}
 		else{ //if something goes wrong during configuration...
-			Typewriter_Mode = PANIC_MODE; //don't change default mode
+			BluetoothConfigured = 0;
+			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has NOT been configured successfully.
+			Typewriter_Mode = PANIC_MODE; //indicate error
 		}
 	}
 	else if(code == 'L'){

@@ -36,7 +36,7 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.7";
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.9";
 
 	/* Includes: */
 		#include <avr/io.h>
@@ -112,7 +112,8 @@
 		#define DEFAULT_MODE_ADDR 0x20D
 		#define REEDS_INDEPENDENT_ADDR 0x20E
 		#define DUMMY_LOAD_ADDR 0x20F
-		#define EEP_BANK2_END 0x210
+		#define BLUETOOTH_CONFIGURED_ADDR 0x210
+		#define EEP_BANK2_END 0x211
 		
 		#define EEP_CHECKSUM_ADDR 0x3FF
 		#define EEP_CHECKSUM 71 //if eeprom doesn't have this random code in the checksum address, it has not been initialized yet. 

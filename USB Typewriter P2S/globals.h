@@ -27,6 +27,8 @@ extern uint8_t Shift_Reed;
 extern uint8_t UseHallSensor; 
 extern uint8_t HallSensorPolarity;
 
+extern uint8_t BluetoothConfigured;
+
 extern bool Reed1Polarity;
 extern bool Reed2Polarity;
 extern bool Reed3Polarity;

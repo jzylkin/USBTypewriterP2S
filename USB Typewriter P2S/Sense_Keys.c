@@ -280,6 +280,7 @@ void LoadEepromParameters(){
 	 Shift_Reed = eeprom_read_byte((uint8_t *)SHIFT_REED_ADDR);
 	 Reeds_Are_Independent = eeprom_read_byte((uint8_t *)REEDS_INDEPENDENT_ADDR);
 	 UseDummyLoad = eeprom_read_byte((uint8_t*)DUMMY_LOAD_ADDR);
+	 BluetoothConfigured = eeprom_read_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR);
 }
 
 void ClearKeyCodeTables(){

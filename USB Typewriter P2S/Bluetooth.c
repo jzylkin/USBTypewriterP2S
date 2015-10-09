@@ -53,9 +53,7 @@ void Bluetooth_Init(){
 
 	Bluetooth_Reset(); //reset the module
 	
-//	if(!eeprom_read_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR)){ // check if bluetooth needs to be configured, and if so:
-//		eeprom_write_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, (uint8_t)Bluetooth_Configure()); //configure, then tell eeprom if bluetooth configured successfully or not.
-//	}
+
 	
 }
 
@@ -89,8 +87,8 @@ bool Bluetooth_Configure(){
 	success &= Bluetooth_Send_CMD("SC,0000"); //DEFAULT; SC and SD commands set COD device identifier (identify as a keyboard);
 	success &= Bluetooth_Send_CMD("SD,0540");
 	success &= Bluetooth_Send_CMD("SA,1");//use pin-code
-	success &= Bluetooth_Send_CMD("SH,0302"); //set hid flags -- hid forced on by hid pin, ios keyboard toggles, device is keyboard, 2 devices stored in reconnect queue on power-up
-	success &= Bluetooth_Send_CMD("SM,6"); //bluetooth is in slave connect mode
+	success &= Bluetooth_Send_CMD("SH,0202"); //set hid flags -- hid forced on by hid pin, ios keyboard DOESNT toggle, device is keyboard, 2 devices stored in reconnect queue on power-up
+	success &= Bluetooth_Send_CMD("SM,6"); //bluetooth is in pairing mode WHATEVER THAT IS!
 	Bluetooth_Send_CMD("SP,1234"); // set pin code, if used
 //	success &= Bluetooth_Send_CMD("SS,Keyboard"); // set "service name"
 	success &= Bluetooth_Send_CMD("ST,255"); // set configuration timer to never timeout
@@ -229,6 +227,13 @@ bool Get_Response(){
 		else{
 			return false;
 		}
+}
+
+bool BluetoothInquire(){
+	if(!Bluetooth_Enter_CMD_Mode()){return false;} //get into command mode
+	if(!Bluetooth_Send_CMD("SR,0")){return false;}	//clear the stored address register, so inquiry happens instead.
+	if(!Bluetooth_Send_CMD("R,1")){return false;} //reset module
+	return true; //successfully cleared sr and reset -- device will inquire now.
 }
 	
 
