@@ -475,7 +475,7 @@ void Init_Mode(){
 					BluetoothConfigured = 0;// even though it has been configured, save it as "not configured" to force configuration next time (on customer's end.)
 					eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); 	
 					Typewriter_Mode = BLUETOOTH_MODE;
-					Default_Mode = BLUETOOTH_MODE;
+					//Default_Mode = BLUETOOTH_MODE;  Do not set bluetooth mode as the default, since this mode only tests the bluetooth
 			}
 			else{ //if something goes wrong during configuration...
 				BluetoothConfigured = 0;
