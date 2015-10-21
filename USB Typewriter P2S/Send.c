@@ -28,6 +28,11 @@ void USBSend(uint8_t code,uint8_t mod){
 		mod = UPPER; //and set the modifier to upper case.
 	}
 	
+	if(code == KEY_EXECUTE){ // the "execute" command is for posting emails -- it actually sends a "CTRL+ENTER" command.
+		code = KEY_ENTER;
+		mod = HID_KEYBOARD_MODIFIER_LEFTCTRL;
+	}
+	
 	cli();//make sure there are no interrupts between setting code and setting the modifier that goes with it.
 	KeyBuffer->KeyCode[0] = code; //cue up keycode to be sent during next LUFA HID callback function.
 	KeyBufferMod = mod;

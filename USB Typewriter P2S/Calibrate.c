@@ -34,8 +34,9 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_No_Dummy_Load[]		PROGMEM = "DUMMY LOAD DEACTIVATED\r";
 	const char Str_Quick_Calibrate[]	PROGMEM = "QUICK CALIBRATION MODE...\r";
 	const char Str_Spacebar[]			PROGMEM = "SPACEBAR";
-	const char Str_Enter[]				PROGMEM = "ENTER KEY";
-	const char Str_Second_Enter[]		PROGMEM = "SECONDARY ENTER KEY";
+	const char Str_Enter[]				PROGMEM = "ENTER";
+	const char Str_Second_Enter[]		PROGMEM = "SECONDARY ENTER";
+	const char Str_Post[]				PROGMEM = "SEND";
 	const char Str_Backspace[]			PROGMEM = "BACKSPACE";
 	const char Str_Calibrate_Hall[]		PROGMEM = "HOLD DOWN ANY KEY TO CALIBRATE HALL EFFECT SENSOR...\r";
 	const char Str_No_Hall[]			PROGMEM = "NO HALL EFFECT SENSOR DETECTED. (NOT A PROBLEM)\r";
@@ -409,10 +410,17 @@ void CalibrateReeds(){
 	
 	USBSendPROGString(Str_Second_Enter);
 	USBSend(KEY_SPACE,LOWER);// used to be a colon
-	KeyPressed = WaitForKeypress();
+	KeyPressed = WaitForKeypress(KEY_EXECUTE);
 	
 	//Enter key cannot use modifiers
 	TeachHIDKey(KEY_ENTER, KeyPressed, LOWER); //teach the hid keycode array about this key.
+	USBSend(KEY_ENTER,LOWER);
+	
+// -------TEACH SEND KEY --------------
+	USBSendPROGString(Str_Post);
+	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	KeyPressed = WaitForKeypress();
+	TeachHIDKey(KEY_EXECUTE, KeyPressed, LOWER); //teach the hid keycode array about this key.
 	USBSend(KEY_ENTER,LOWER);
 	
 //------TEACH SPACE BAR ---- must be the last thing programmed (because of "Press space to skip" instruction)
