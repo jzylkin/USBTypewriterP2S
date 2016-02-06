@@ -205,7 +205,7 @@ int main(void)
 			case BLUETOOTH_MODE:
 				USB_Disable();//comment this out for debugging purposes
 				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
-				Bluetooth_Reset();
+				Bluetooth_Connect(); //tell bluetooth to connect to device.
 				while(is_low(BT_CONNECTED)){set_low(RED_LED);set_high(GREEN_LED);}//wait for connection to happen, glow red until then.
 					set_high(RED_LED);//turn off red led if bt is connected.
 					set_low(GREEN_LED);
@@ -521,8 +521,9 @@ void Init_Mode(){
 			Typewriter_Mode = BLUETOOTH_MODE; // for now, this is commented out
 			Default_Mode = BLUETOOTH_MODE;
 		}
-		if(Bluetooth_Configure()){ // attempt to configure.
+		else if(Bluetooth_Configure()){ // attempt to configure.
 			BluetoothConfigured = 1;
+			BluetoothInquire(); //get a new device to pair with when you hold b key down.
 			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has been configured already.	
 			Typewriter_Mode = BLUETOOTH_MODE;
 			Default_Mode = BLUETOOTH_MODE;

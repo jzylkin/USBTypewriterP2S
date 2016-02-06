@@ -712,3 +712,12 @@ void uart1_puts_p(const char *progmem_s )
 
 
 #endif
+
+bool uart_check_rx(){ //Jack wrote this function to check if the uart RX channel had anything waiting for him
+	if (UART_RxHead != 0){
+		 return true;
+	}
+	else {
+		return false;
+	}
+}
