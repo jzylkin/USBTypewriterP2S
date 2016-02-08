@@ -11,7 +11,7 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_copy_data.o)
                               Bluetooth.o (__do_copy_data)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clear_bss.o)
-                              Config_IO.o (__do_clear_bss)
+                              Bluetooth.o (__do_clear_bss)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_muluhisi3.o)
                               KeyLogging.o (__muluhisi3)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzdi2.o)
@@ -36,6 +36,8 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
                               src/LUFA/LUFA/Drivers/USB/Class/Device/RNDISClassDevice.o (memcpy_P)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy_P.o)
                               Send.o (strcpy_P)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o)
+                              Bluetooth.o (strtok)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcmp.o)
                               src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o (memcmp)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcpy.o)
@@ -44,8 +46,10 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
                               src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o (memset)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy.o)
                               KeyLogging.o (strcpy)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok_r.o)
+                              c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o) (strtok_r)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
-                              KeyLogging.o (sprintf)
+                              Bluetooth.o (sprintf)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
                               c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o) (vfprintf)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
@@ -79,6 +83,7 @@ Allocating common symbols
 Common symbol       size              file
 
 Reed2Polarity       0x1               Keyboard.o
+response            0x40              Bluetooth.o
 USB_IsInitialized   0x1               src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
 UseDummyLoad        0x1               Keyboard.o
 Reeds_Are_Independent
@@ -129,14 +134,6 @@ Discarded input sections
  .text          0x00000000        0x0 Bluetooth.o
  .data          0x00000000        0x0 Bluetooth.o
  .bss           0x00000000        0x0 Bluetooth.o
- .text.Bluetooth_Disconnect
-                0x00000000       0x1c Bluetooth.o
- .text.Bluetooth_Init
-                0x00000000        0x4 Bluetooth.o
- .text.Bluetooth_Connect
-                0x00000000       0x22 Bluetooth.o
- .text.Bluetooth_Exit_CMD_Mode
-                0x00000000       0x1a Bluetooth.o
  .text          0x00000000        0x0 Calibrate.o
  .data          0x00000000        0x0 Calibrate.o
  .bss           0x00000000        0x0 Calibrate.o
@@ -201,6 +198,8 @@ Discarded input sections
                 0x00000000       0x18 uart.o
  .text.uart_puts_p
                 0x00000000       0x1e uart.o
+ .text.uart_check_rx
+                0x00000000        0xe uart.o
  .text          0x00000000        0x0 Keyboard.o
  .data          0x00000000        0x0 Keyboard.o
  .bss           0x00000000        0x0 Keyboard.o
@@ -713,6 +712,8 @@ Discarded input sections
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy_P.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy_P.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy_P.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o)
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcmp.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcmp.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcmp.o)
@@ -725,6 +726,9 @@ Discarded input sections
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok_r.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok_r.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok_r.o)
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
@@ -957,7 +961,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000     0x6db8
+.text           0x00000000     0x6f34
  *(.vectors)
  .vectors       0x00000000       0xac C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5/crtatmega32u4.o
                 0x00000000                __vector_default
@@ -1156,491 +1160,500 @@ END GROUP
                 0x000004d4                __vector_42
                 0x000004d6                . = ALIGN (0x2)
  *(.text.*)
- .text.Bluetooth_Send
-                0x000004d6       0x5c Bluetooth.o
-                0x000004d6                Bluetooth_Send
  .text.Bluetooth_Reset
-                0x00000532       0x38 Bluetooth.o
-                0x00000532                Bluetooth_Reset
+                0x000004d6       0x38 Bluetooth.o
+                0x000004d6                Bluetooth_Reset
  .text.Get_Response
-                0x0000056a       0x3e Bluetooth.o
-                0x0000056a                Get_Response
+                0x0000050e       0x76 Bluetooth.o
+                0x0000050e                Get_Response
  .text.Bluetooth_Send_CMD
-                0x000005a8       0x42 Bluetooth.o
-                0x000005a8                Bluetooth_Send_CMD
- .text.Bluetooth_Enter_CMD_Mode
-                0x000005ea       0x18 Bluetooth.o
-                0x000005ea                Bluetooth_Enter_CMD_Mode
+                0x00000584       0x50 Bluetooth.o
+                0x00000584                Bluetooth_Send_CMD
+ .text.Bluetooth_Send
+                0x000005d4       0xc4 Bluetooth.o
+                0x000005d4                Bluetooth_Send
+ .text.Bluetooth_Init
+                0x00000698       0x34 Bluetooth.o
+                0x00000698                Bluetooth_Init
  .text.Bluetooth_Configure
-                0x00000602       0xb4 Bluetooth.o
-                0x00000602                Bluetooth_Configure
+                0x000006cc       0x7e Bluetooth.o
+                0x000006cc                Bluetooth_Configure
  .text.BluetoothInquire
-                0x000006b6       0x1a Bluetooth.o
-                0x000006b6                BluetoothInquire
+                0x0000074a        0x8 Bluetooth.o
+                0x0000074a                BluetoothInquire
+ .text.Bluetooth_Connect
+                0x00000752       0x86 Bluetooth.o
+                0x00000752                Bluetooth_Connect
  .text.SaveCalibration
-                0x000006d0       0x94 Calibrate.o
-                0x000006d0                SaveCalibration
+                0x000007d8       0x94 Calibrate.o
+                0x000007d8                SaveCalibration
  .text.DetectHallSensor
-                0x00000764       0xba Calibrate.o
-                0x00000764                DetectHallSensor
+                0x0000086c       0xba Calibrate.o
+                0x0000086c                DetectHallSensor
  .text.WaitForKeypress
-                0x0000081e       0x1e Calibrate.o
-                0x0000081e                WaitForKeypress
+                0x00000926       0x1e Calibrate.o
+                0x00000926                WaitForKeypress
  .text.TeachHIDKey
-                0x0000083c       0x58 Calibrate.o
-                0x0000083c                TeachHIDKey
+                0x00000944       0x58 Calibrate.o
+                0x00000944                TeachHIDKey
  .text.CalibrateReeds
-                0x00000894      0x1ba Calibrate.o
-                0x00000894                CalibrateReeds
+                0x0000099c      0x1ba Calibrate.o
+                0x0000099c                CalibrateReeds
  .text.QuickCalibrate
-                0x00000a4e       0xa6 Calibrate.o
-                0x00000a4e                QuickCalibrate
+                0x00000b56       0xa6 Calibrate.o
+                0x00000b56                QuickCalibrate
  .text.TeachASCIIKey
-                0x00000af4       0x1a Calibrate.o
-                0x00000af4                TeachASCIIKey
+                0x00000bfc       0x1a Calibrate.o
+                0x00000bfc                TeachASCIIKey
  .text.Calibrate
-                0x00000b0e      0x4a6 Calibrate.o
-                0x00000b0e                Calibrate
+                0x00000c16      0x4a6 Calibrate.o
+                0x00000c16                Calibrate
  .text.Adjust_Sensitivity
-                0x00000fb4      0x200 Calibrate.o
-                0x00000fb4                Adjust_Sensitivity
+                0x000010bc      0x200 Calibrate.o
+                0x000010bc                Adjust_Sensitivity
  .text.Config_Interrupts
-                0x000011b4       0x28 Config_Interrupts.o
-                0x000011b4                Config_Interrupts
+                0x000012bc       0x28 Config_Interrupts.o
+                0x000012bc                Config_Interrupts
  .text.Config_IO
-                0x000011dc       0x60 Config_IO.o
-                0x000011dc                Config_IO
+                0x000012e4       0x60 Config_IO.o
+                0x000012e4                Config_IO
  .text.GlowGreenLED
-                0x0000123c       0x8a Config_IO.o
-                0x0000123c                GlowGreenLED
+                0x00001344       0x8a Config_IO.o
+                0x00001344                GlowGreenLED
  .text.__vector_41
-                0x000012c6       0x5e Config_IO.o
-                0x000012c6                __vector_41
+                0x000013ce       0x5e Config_IO.o
+                0x000013ce                __vector_41
  .text.CALLBACK_USB_GetDescriptor
-                0x00001324       0x86 Descriptors.o
-                0x00001324                CALLBACK_USB_GetDescriptor
+                0x0000142c       0x86 Descriptors.o
+                0x0000142c                CALLBACK_USB_GetDescriptor
  .text.OpenLogFile
-                0x000013aa       0x4e KeyLogging.o
-                0x000013aa                OpenLogFile
+                0x000014b2       0x4e KeyLogging.o
+                0x000014b2                OpenLogFile
  .text.CloseLogFile
-                0x000013f8       0x10 KeyLogging.o
-                0x000013f8                CloseLogFile
+                0x00001500       0x10 KeyLogging.o
+                0x00001500                CloseLogFile
  .text.MountFilesystem
-                0x00001408       0x1a KeyLogging.o
-                0x00001408                MountFilesystem
+                0x00001510       0x1a KeyLogging.o
+                0x00001510                MountFilesystem
  .text.get_num_of_sectors
-                0x00001422       0x60 KeyLogging.o
-                0x00001422                get_num_of_sectors
+                0x0000152a       0x60 KeyLogging.o
+                0x0000152a                get_num_of_sectors
  .text.WriteToLogFile
-                0x00001482       0x70 KeyLogging.o
-                0x00001482                WriteToLogFile
+                0x0000158a       0x70 KeyLogging.o
+                0x0000158a                WriteToLogFile
  .text.TestSDHardware
-                0x000014f2       0x40 KeyLogging.o
-                0x000014f2                TestSDHardware
+                0x000015fa       0x40 KeyLogging.o
+                0x000015fa                TestSDHardware
  .text.AddToSDBuffer
-                0x00001532       0xa0 KeyLogging.o
-                0x00001532                AddToSDBuffer
+                0x0000163a       0xa0 KeyLogging.o
+                0x0000163a                AddToSDBuffer
  .text.LogKeystrokes
-                0x000015d2      0x192 KeyLogging.o
-                0x000015d2                LogKeystrokes
- .text.dly_us   0x00001764        0xa Lib/FatFS/diskio.o
+                0x000016da      0x192 KeyLogging.o
+                0x000016da                LogKeystrokes
+ .text.dly_us   0x0000186c        0xa Lib/FatFS/diskio.o
  .text.xmit_mmc
-                0x0000176e       0x80 Lib/FatFS/diskio.o
+                0x00001876       0x80 Lib/FatFS/diskio.o
  .text.rcvr_mmc
-                0x000017ee       0x64 Lib/FatFS/diskio.o
+                0x000018f6       0x64 Lib/FatFS/diskio.o
  .text.wait_ready
-                0x00001852       0x46 Lib/FatFS/diskio.o
+                0x0000195a       0x46 Lib/FatFS/diskio.o
  .text.deselect
-                0x00001898       0x1e Lib/FatFS/diskio.o
- .text.select   0x000018b6       0x3a Lib/FatFS/diskio.o
+                0x000019a0       0x1e Lib/FatFS/diskio.o
+ .text.select   0x000019be       0x3a Lib/FatFS/diskio.o
  .text.rcvr_datablock
-                0x000018f0       0x72 Lib/FatFS/diskio.o
+                0x000019f8       0x72 Lib/FatFS/diskio.o
  .text.send_cmd
-                0x00001962       0xba Lib/FatFS/diskio.o
+                0x00001a6a       0xba Lib/FatFS/diskio.o
  .text.xmit_datablock
-                0x00001a1c       0x6e Lib/FatFS/diskio.o
+                0x00001b24       0x6e Lib/FatFS/diskio.o
  .text.disk_status
-                0x00001a8a        0xe Lib/FatFS/diskio.o
-                0x00001a8a                disk_status
+                0x00001b92        0xe Lib/FatFS/diskio.o
+                0x00001b92                disk_status
  .text.disk_initialize
-                0x00001a98      0x13c Lib/FatFS/diskio.o
-                0x00001a98                disk_initialize
+                0x00001ba0      0x13c Lib/FatFS/diskio.o
+                0x00001ba0                disk_initialize
  .text.disk_read
-                0x00001bd4       0x88 Lib/FatFS/diskio.o
-                0x00001bd4                disk_read
+                0x00001cdc       0x88 Lib/FatFS/diskio.o
+                0x00001cdc                disk_read
  .text.disk_write
-                0x00001c5c       0xc0 Lib/FatFS/diskio.o
-                0x00001c5c                disk_write
+                0x00001d64       0xc0 Lib/FatFS/diskio.o
+                0x00001d64                disk_write
  .text.disk_ioctl
-                0x00001d1c      0x138 Lib/FatFS/diskio.o
-                0x00001d1c                disk_ioctl
- .text.mem_cpy  0x00001e54       0x46 Lib/FatFS/ff.o
+                0x00001e24      0x138 Lib/FatFS/diskio.o
+                0x00001e24                disk_ioctl
+ .text.mem_cpy  0x00001f5c       0x46 Lib/FatFS/ff.o
  .text.get_fileinfo
-                0x00001e9a       0x90 Lib/FatFS/ff.o
+                0x00001fa2       0x90 Lib/FatFS/ff.o
  .text.get_ldnumber
-                0x00001f2a       0x3e Lib/FatFS/ff.o
+                0x00002032       0x3e Lib/FatFS/ff.o
  .text.validate
-                0x00001f68       0x3c Lib/FatFS/ff.o
+                0x00002070       0x3c Lib/FatFS/ff.o
  .text.sync_window
-                0x00001fa4       0xcc Lib/FatFS/ff.o
+                0x000020ac       0xcc Lib/FatFS/ff.o
  .text.move_window
-                0x00002070       0x78 Lib/FatFS/ff.o
+                0x00002178       0x78 Lib/FatFS/ff.o
  .text.check_fs
-                0x000020e8       0x78 Lib/FatFS/ff.o
+                0x000021f0       0x78 Lib/FatFS/ff.o
  .text.find_volume
-                0x00002160      0x4ca Lib/FatFS/ff.o
- .text.sync_fs  0x0000262a       0xce Lib/FatFS/ff.o
+                0x00002268      0x4ca Lib/FatFS/ff.o
+ .text.sync_fs  0x00002732       0xce Lib/FatFS/ff.o
  .text.clust2sect
-                0x000026f8       0x52 Lib/FatFS/ff.o
-                0x000026f8                clust2sect
- .text.get_fat  0x0000274a      0x188 Lib/FatFS/ff.o
-                0x0000274a                get_fat
- .text.dir_sdi  0x000028d2      0x14a Lib/FatFS/ff.o
- .text.put_fat  0x00002a1c      0x1e4 Lib/FatFS/ff.o
-                0x00002a1c                put_fat
+                0x00002800       0x52 Lib/FatFS/ff.o
+                0x00002800                clust2sect
+ .text.get_fat  0x00002852      0x188 Lib/FatFS/ff.o
+                0x00002852                get_fat
+ .text.dir_sdi  0x000029da      0x14a Lib/FatFS/ff.o
+ .text.put_fat  0x00002b24      0x1e4 Lib/FatFS/ff.o
+                0x00002b24                put_fat
  .text.create_chain
-                0x00002c00      0x1ba Lib/FatFS/ff.o
+                0x00002d08      0x1ba Lib/FatFS/ff.o
  .text.dir_next
-                0x00002dba      0x202 Lib/FatFS/ff.o
+                0x00002ec2      0x202 Lib/FatFS/ff.o
  .text.follow_path
-                0x00002fbc      0x236 Lib/FatFS/ff.o
+                0x000030c4      0x236 Lib/FatFS/ff.o
  .text.dir_register
-                0x000031f2       0x96 Lib/FatFS/ff.o
+                0x000032fa       0x96 Lib/FatFS/ff.o
  .text.remove_chain
-                0x00003288       0xe4 Lib/FatFS/ff.o
- .text.f_mount  0x0000336c       0x90 Lib/FatFS/ff.o
-                0x0000336c                f_mount
- .text.f_open   0x000033fc      0x254 Lib/FatFS/ff.o
-                0x000033fc                f_open
- .text.f_write  0x00003650      0x324 Lib/FatFS/ff.o
-                0x00003650                f_write
- .text.f_sync   0x00003974       0x86 Lib/FatFS/ff.o
-                0x00003974                f_sync
- .text.f_close  0x000039fa       0x20 Lib/FatFS/ff.o
-                0x000039fa                f_close
- .text.f_lseek  0x00003a1a      0x33e Lib/FatFS/ff.o
-                0x00003a1a                f_lseek
- .text.f_stat   0x00003d58       0x84 Lib/FatFS/ff.o
-                0x00003d58                f_stat
+                0x00003390       0xe4 Lib/FatFS/ff.o
+ .text.f_mount  0x00003474       0x90 Lib/FatFS/ff.o
+                0x00003474                f_mount
+ .text.f_open   0x00003504      0x254 Lib/FatFS/ff.o
+                0x00003504                f_open
+ .text.f_write  0x00003758      0x324 Lib/FatFS/ff.o
+                0x00003758                f_write
+ .text.f_sync   0x00003a7c       0x86 Lib/FatFS/ff.o
+                0x00003a7c                f_sync
+ .text.f_close  0x00003b02       0x20 Lib/FatFS/ff.o
+                0x00003b02                f_close
+ .text.f_lseek  0x00003b22      0x33e Lib/FatFS/ff.o
+                0x00003b22                f_lseek
+ .text.f_stat   0x00003e60       0x84 Lib/FatFS/ff.o
+                0x00003e60                f_stat
  .text.SCSI_Command_ReadWrite_10
-                0x00003ddc       0xa2 Lib/SCSI.o
+                0x00003ee4       0xa2 Lib/SCSI.o
  .text.SCSI_DecodeSCSICommand
-                0x00003e7e      0x2a4 Lib/SCSI.o
-                0x00003e7e                SCSI_DecodeSCSICommand
+                0x00003f86      0x2a4 Lib/SCSI.o
+                0x00003f86                SCSI_DecodeSCSICommand
  .text.SDCardManager_Init
-                0x00004122       0x18 Lib/SDCardManager.o
-                0x00004122                SDCardManager_Init
+                0x0000422a       0x18 Lib/SDCardManager.o
+                0x0000422a                SDCardManager_Init
  .text.SDCardManager_WriteBlockHandler
-                0x0000413a       0xa0 Lib/SDCardManager.o
-                0x0000413a                SDCardManager_WriteBlockHandler
+                0x00004242       0xa0 Lib/SDCardManager.o
+                0x00004242                SDCardManager_WriteBlockHandler
  .text.SDCardManager_WriteBlocks
-                0x000041da       0xa8 Lib/SDCardManager.o
-                0x000041da                SDCardManager_WriteBlocks
+                0x000042e2       0xa8 Lib/SDCardManager.o
+                0x000042e2                SDCardManager_WriteBlocks
  .text.SDCardManager_ReadBlockHandler
-                0x00004282       0xa4 Lib/SDCardManager.o
-                0x00004282                SDCardManager_ReadBlockHandler
+                0x0000438a       0xa4 Lib/SDCardManager.o
+                0x0000438a                SDCardManager_ReadBlockHandler
  .text.SDCardManager_ReadBlocks
-                0x00004326       0xb2 Lib/SDCardManager.o
-                0x00004326                SDCardManager_ReadBlocks
+                0x0000442e       0xb2 Lib/SDCardManager.o
+                0x0000442e                SDCardManager_ReadBlocks
  .text.SDCardManager_CheckSDCardOperation
-                0x000043d8        0x6 Lib/SDCardManager.o
-                0x000043d8                SDCardManager_CheckSDCardOperation
+                0x000044e0        0x6 Lib/SDCardManager.o
+                0x000044e0                SDCardManager_CheckSDCardOperation
  .text.__vector_25
-                0x000043de       0x5c uart.o
-                0x000043de                __vector_25
+                0x000044e6       0x5c uart.o
+                0x000044e6                __vector_25
  .text.__vector_26
-                0x0000443a       0x54 uart.o
-                0x0000443a                __vector_26
+                0x00004542       0x54 uart.o
+                0x00004542                __vector_26
  .text.uart_init
-                0x0000448e       0x32 uart.o
-                0x0000448e                uart_init
+                0x00004596       0x32 uart.o
+                0x00004596                uart_init
  .text.uart_getc
-                0x000044c0       0x32 uart.o
-                0x000044c0                uart_getc
+                0x000045c8       0x32 uart.o
+                0x000045c8                uart_getc
  .text.uart_clear_rx_buffer
-                0x000044f2        0xa uart.o
-                0x000044f2                uart_clear_rx_buffer
+                0x000045fa        0xa uart.o
+                0x000045fa                uart_clear_rx_buffer
  .text.uart_putc
-                0x000044fc       0x2a uart.o
-                0x000044fc                uart_putc
+                0x00004604       0x2a uart.o
+                0x00004604                uart_putc
  .text.__vector_17
-                0x00004526       0x94 Keyboard.o
-                0x00004526                __vector_17
+                0x0000462e       0x94 Keyboard.o
+                0x0000462e                __vector_17
  .text.Task_Manager
-                0x000045ba       0x3c Keyboard.o
-                0x000045ba                Task_Manager
+                0x000046c2       0x3e Keyboard.o
+                0x000046c2                Task_Manager
  .text.SetupHardware
-                0x000045f6       0xb2 Keyboard.o
-                0x000045f6                SetupHardware
+                0x00004700       0xb2 Keyboard.o
+                0x00004700                SetupHardware
  .text.EVENT_USB_Device_Connect
-                0x000046a8        0x2 Keyboard.o
-                0x000046a8                EVENT_USB_Device_Connect
+                0x000047b2        0x2 Keyboard.o
+                0x000047b2                EVENT_USB_Device_Connect
  .text.EVENT_USB_Device_Disconnect
-                0x000046aa        0xe Keyboard.o
-                0x000046aa                EVENT_USB_Device_Disconnect
+                0x000047b4        0xe Keyboard.o
+                0x000047b4                EVENT_USB_Device_Disconnect
  .text.EVENT_USB_Device_Suspend
-                0x000046b8        0x2 Keyboard.o
-                0x000046b8                EVENT_USB_Device_Suspend
+                0x000047c2        0x2 Keyboard.o
+                0x000047c2                EVENT_USB_Device_Suspend
  .text.EVENT_USB_Device_WakeUp
-                0x000046ba        0x2 Keyboard.o
-                0x000046ba                EVENT_USB_Device_WakeUp
+                0x000047c4        0x2 Keyboard.o
+                0x000047c4                EVENT_USB_Device_WakeUp
  .text.EVENT_USB_Device_ConfigurationChanged
-                0x000046bc       0x1a Keyboard.o
-                0x000046bc                EVENT_USB_Device_ConfigurationChanged
+                0x000047c6       0x1a Keyboard.o
+                0x000047c6                EVENT_USB_Device_ConfigurationChanged
  .text.EVENT_USB_Device_ControlRequest
-                0x000046d6        0xe Keyboard.o
-                0x000046d6                EVENT_USB_Device_ControlRequest
+                0x000047e0        0xe Keyboard.o
+                0x000047e0                EVENT_USB_Device_ControlRequest
  .text.EVENT_USB_Device_StartOfFrame
-                0x000046e4       0x18 Keyboard.o
-                0x000046e4                EVENT_USB_Device_StartOfFrame
+                0x000047ee       0x18 Keyboard.o
+                0x000047ee                EVENT_USB_Device_StartOfFrame
  .text.CALLBACK_MS_Device_SCSICommandReceived
-                0x000046fc        0x2 Keyboard.o
-                0x000046fc                CALLBACK_MS_Device_SCSICommandReceived
+                0x00004806        0x2 Keyboard.o
+                0x00004806                CALLBACK_MS_Device_SCSICommandReceived
  .text.CALLBACK_HID_Device_CreateHIDReport
-                0x000046fe       0x42 Keyboard.o
-                0x000046fe                CALLBACK_HID_Device_CreateHIDReport
+                0x00004808       0x42 Keyboard.o
+                0x00004808                CALLBACK_HID_Device_CreateHIDReport
  .text.CALLBACK_HID_Device_ProcessHIDReport
-                0x00004740       0x36 Keyboard.o
-                0x00004740                CALLBACK_HID_Device_ProcessHIDReport
+                0x0000484a       0x36 Keyboard.o
+                0x0000484a                CALLBACK_HID_Device_ProcessHIDReport
  .text.Init_Mode
-                0x00004776      0x128 Keyboard.o
-                0x00004776                Init_Mode
+                0x00004880      0x122 Keyboard.o
+                0x00004880                Init_Mode
  .text.startup.main
-                0x0000489e      0x1d2 Keyboard.o
-                0x0000489e                main
- .text.USBSend  0x00004a70       0x96 Send.o
-                0x00004a70                USBSend
+                0x000049a2      0x1ec Keyboard.o
+                0x000049a2                main
+ .text.USBSend  0x00004b8e       0x96 Send.o
+                0x00004b8e                USBSend
  .text.USBSendString
-                0x00004b06       0xd8 Send.o
-                0x00004b06                USBSendString
+                0x00004c24       0xe2 Send.o
+                0x00004c24                USBSendString
  .text.USBSendPROGString
-                0x00004bde       0x10 Send.o
-                0x00004bde                USBSendPROGString
+                0x00004d06       0x10 Send.o
+                0x00004d06                USBSendPROGString
  .text.USBSendNumber
-                0x00004bee       0x8c Send.o
-                0x00004bee                USBSendNumber
+                0x00004d16       0x8c Send.o
+                0x00004d16                USBSendNumber
  .text.GetModifier
-                0x00004c7a       0x60 Sense_Keys.o
-                0x00004c7a                GetModifier
+                0x00004da2       0x60 Sense_Keys.o
+                0x00004da2                GetModifier
  .text.ReadSensor
-                0x00004cda      0x164 Sense_Keys.o
-                0x00004cda                ReadSensor
+                0x00004e02      0x164 Sense_Keys.o
+                0x00004e02                ReadSensor
  .text.GetKeySimple
-                0x00004e3e       0x50 Sense_Keys.o
-                0x00004e3e                GetKeySimple
- .text.GetKey   0x00004e8e      0x27c Sense_Keys.o
-                0x00004e8e                GetKey
+                0x00004f66       0x50 Sense_Keys.o
+                0x00004f66                GetKeySimple
+ .text.GetKey   0x00004fb6      0x27c Sense_Keys.o
+                0x00004fb6                GetKey
  .text.GetHIDKeyCode
-                0x0000510a       0x2e Sense_Keys.o
-                0x0000510a                GetHIDKeyCode
+                0x00005232       0x2e Sense_Keys.o
+                0x00005232                GetHIDKeyCode
  .text.GetASCIIKeyCode
-                0x00005138       0x26 Sense_Keys.o
-                0x00005138                GetASCIIKeyCode
+                0x00005260       0x26 Sense_Keys.o
+                0x00005260                GetASCIIKeyCode
  .text.getHallState
-                0x0000515e       0x12 Sense_Keys.o
-                0x0000515e                getHallState
+                0x00005286       0x12 Sense_Keys.o
+                0x00005286                getHallState
  .text.LoadKeyCodeTables
-                0x00005170       0x50 Sense_Keys.o
-                0x00005170                LoadKeyCodeTables
+                0x00005298       0x50 Sense_Keys.o
+                0x00005298                LoadKeyCodeTables
  .text.LoadEepromParameters
-                0x000051c0       0x7a Sense_Keys.o
-                0x000051c0                LoadEepromParameters
+                0x000052e8       0x7a Sense_Keys.o
+                0x000052e8                LoadEepromParameters
  .text.ClearKeyCodeTables
-                0x0000523a       0x4c Sense_Keys.o
-                0x0000523a                ClearKeyCodeTables
+                0x00005362       0x4c Sense_Keys.o
+                0x00005362                ClearKeyCodeTables
  .text.RestoreFactoryDefaults
-                0x00005286       0x5e Sense_Keys.o
-                0x00005286                RestoreFactoryDefaults
+                0x000053ae       0x5e Sense_Keys.o
+                0x000053ae                RestoreFactoryDefaults
  .text.InitializeEeprom
-                0x000052e4       0x52 Sense_Keys.o
-                0x000052e4                InitializeEeprom
+                0x0000540c       0x52 Sense_Keys.o
+                0x0000540c                InitializeEeprom
  .text.HID_Device_ProcessControlRequest
-                0x00005336      0x274 src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
-                0x00005336                HID_Device_ProcessControlRequest
+                0x0000545e      0x274 src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
+                0x0000545e                HID_Device_ProcessControlRequest
  .text.HID_Device_ConfigureEndpoints
-                0x000055aa       0x26 src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
-                0x000055aa                HID_Device_ConfigureEndpoints
+                0x000056d2       0x26 src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
+                0x000056d2                HID_Device_ConfigureEndpoints
  .text.HID_Device_USBTask
-                0x000055d0      0x18a src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
-                0x000055d0                HID_Device_USBTask
+                0x000056f8      0x18a src/LUFA/LUFA/Drivers/USB/Class/Device/HIDClassDevice.o
+                0x000056f8                HID_Device_USBTask
  .text.MS_Device_ProcessControlRequest
-                0x0000575a       0x82 src/LUFA/LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.o
-                0x0000575a                MS_Device_ProcessControlRequest
+                0x00005882       0x82 src/LUFA/LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.o
+                0x00005882                MS_Device_ProcessControlRequest
  .text.MS_Device_ConfigureEndpoints
-                0x000057dc       0x3a src/LUFA/LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.o
-                0x000057dc                MS_Device_ConfigureEndpoints
+                0x00005904       0x3a src/LUFA/LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.o
+                0x00005904                MS_Device_ConfigureEndpoints
  .text.MS_Device_USBTask
-                0x00005816      0x234 src/LUFA/LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.o
-                0x00005816                MS_Device_USBTask
+                0x0000593e      0x234 src/LUFA/LUFA/Drivers/USB/Class/Device/MassStorageClassDevice.o
+                0x0000593e                MS_Device_USBTask
  .text.Endpoint_Null_Stream
-                0x00005a4a       0x7c src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005a4a                Endpoint_Null_Stream
+                0x00005b72       0x7c src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005b72                Endpoint_Null_Stream
  .text.Endpoint_Write_Stream_LE
-                0x00005ac6       0x94 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005ac6                Endpoint_Write_Stream_LE
+                0x00005bee       0x94 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005bee                Endpoint_Write_Stream_LE
  .text.Endpoint_Write_Stream_BE
-                0x00005b5a       0xa0 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005b5a                Endpoint_Write_Stream_BE
+                0x00005c82       0xa0 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005c82                Endpoint_Write_Stream_BE
  .text.Endpoint_Read_Stream_LE
-                0x00005bfa       0x94 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005bfa                Endpoint_Read_Stream_LE
+                0x00005d22       0x94 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005d22                Endpoint_Read_Stream_LE
  .text.Endpoint_Write_Control_Stream_LE
-                0x00005c8e       0xc6 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005c8e                Endpoint_Write_Control_Stream_LE
+                0x00005db6       0xc6 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005db6                Endpoint_Write_Control_Stream_LE
  .text.Endpoint_Read_Control_Stream_LE
-                0x00005d54       0x80 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005d54                Endpoint_Read_Control_Stream_LE
+                0x00005e7c       0x80 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005e7c                Endpoint_Read_Control_Stream_LE
  .text.Endpoint_Write_Control_PStream_LE
-                0x00005dd4       0xc2 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
-                0x00005dd4                Endpoint_Write_Control_PStream_LE
+                0x00005efc       0xc2 src/LUFA/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.o
+                0x00005efc                Endpoint_Write_Control_PStream_LE
  .text.Endpoint_ConfigureEndpoint_Prv
-                0x00005e96       0x6a src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
-                0x00005e96                Endpoint_ConfigureEndpoint_Prv
+                0x00005fbe       0x6a src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
+                0x00005fbe                Endpoint_ConfigureEndpoint_Prv
  .text.Endpoint_ConfigureEndpointTable
-                0x00005f00       0x90 src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
-                0x00005f00                Endpoint_ConfigureEndpointTable
+                0x00006028       0x90 src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
+                0x00006028                Endpoint_ConfigureEndpointTable
  .text.Endpoint_ClearStatusStage
-                0x00005f90       0x3e src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
-                0x00005f90                Endpoint_ClearStatusStage
+                0x000060b8       0x3e src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
+                0x000060b8                Endpoint_ClearStatusStage
  .text.Endpoint_WaitUntilReady
-                0x00005fce       0x64 src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
-                0x00005fce                Endpoint_WaitUntilReady
+                0x000060f6       0x64 src/LUFA/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.o
+                0x000060f6                Endpoint_WaitUntilReady
  .text.USB_Disable
-                0x00006032       0x30 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
-                0x00006032                USB_Disable
+                0x0000615a       0x30 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
+                0x0000615a                USB_Disable
  .text.USB_ResetInterface
-                0x00006062       0x80 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
-                0x00006062                USB_ResetInterface
+                0x0000618a       0x80 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
+                0x0000618a                USB_ResetInterface
  .text.USB_Init
-                0x000060e2       0x20 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
-                0x000060e2                USB_Init
+                0x0000620a       0x20 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.o
+                0x0000620a                USB_Init
  .text.USB_INT_DisableAllInterrupts
-                0x00006102       0x10 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
-                0x00006102                USB_INT_DisableAllInterrupts
+                0x0000622a       0x10 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
+                0x0000622a                USB_INT_DisableAllInterrupts
  .text.USB_INT_ClearAllInterrupts
-                0x00006112        0xa src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
-                0x00006112                USB_INT_ClearAllInterrupts
+                0x0000623a        0xa src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
+                0x0000623a                USB_INT_ClearAllInterrupts
  .text.__vector_10
-                0x0000611c      0x190 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
-                0x0000611c                __vector_10
+                0x00006244      0x190 src/LUFA/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.o
+                0x00006244                __vector_10
  .text.USB_Device_ProcessControlRequest
-                0x000062ac      0x2aa src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
-                0x000062ac                USB_Device_ProcessControlRequest
+                0x000063d4      0x2aa src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
+                0x000063d4                USB_Device_ProcessControlRequest
  .text.USB_Event_Stub
-                0x00006556        0x2 src/LUFA/LUFA/Drivers/USB/Core/Events.o
-                0x00006556                EVENT_USB_Device_Reset
-                0x00006556                USB_Event_Stub
+                0x0000667e        0x2 src/LUFA/LUFA/Drivers/USB/Core/Events.o
+                0x0000667e                EVENT_USB_Device_Reset
+                0x0000667e                USB_Event_Stub
  .text.USB_USBTask
-                0x00006558       0x34 src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
-                0x00006558                USB_USBTask
+                0x00006680       0x34 src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
+                0x00006680                USB_USBTask
  .text.libgcc.div
-                0x0000658c       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodqi4.o)
-                0x0000658c                __udivmodqi4
+                0x000066b4       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodqi4.o)
+                0x000066b4                __udivmodqi4
  .text.libgcc.div
-                0x000065a4       0x26 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_divmodhi4.o)
-                0x000065a4                _div
-                0x000065a4                __divmodhi4
+                0x000066cc       0x26 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_divmodhi4.o)
+                0x000066cc                _div
+                0x000066cc                __divmodhi4
  .text.libgcc.div
-                0x000065ca       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodsi4.o)
-                0x000065ca                __udivmodsi4
+                0x000066f2       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodsi4.o)
+                0x000066f2                __udivmodsi4
  .text.libgcc.mul
-                0x0000660e       0x14 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_muluhisi3.o)
-                0x0000660e                __muluhisi3
+                0x00006736       0x14 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_muluhisi3.o)
+                0x00006736                __muluhisi3
  .text.libgcc.builtins
-                0x00006622       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzdi2.o)
-                0x00006622                __clzdi2
+                0x0000674a       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzdi2.o)
+                0x0000674a                __clzdi2
  .text.libgcc.builtins
-                0x00006632       0x32 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_ashldi3.o)
-                0x00006632                __ashldi3
+                0x0000675a       0x32 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_ashldi3.o)
+                0x0000675a                __ashldi3
  .text.libgcc.builtins
-                0x00006664       0x3c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_ashrdi3.o)
-                0x00006664                __ashrdi3
-                0x00006668                __lshrdi3
- .text.libgcc   0x000066a0       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_cmpdi2_s8.o)
-                0x000066a0                __cmpdi2_s8
+                0x0000678c       0x3c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_ashrdi3.o)
+                0x0000678c                __ashrdi3
+                0x00006790                __lshrdi3
+ .text.libgcc   0x000067c8       0x18 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_cmpdi2_s8.o)
+                0x000067c8                __cmpdi2_s8
  .text.libgcc.div
-                0x000066b8       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodhi4.o)
-                0x000066b8                __udivmodhi4
+                0x000067e0       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_udivmodhi4.o)
+                0x000067e0                __udivmodhi4
  .text.libgcc.builtins
-                0x000066e0        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzsi2.o)
-                0x000066e0                __clzsi2
+                0x00006808        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzsi2.o)
+                0x00006808                __clzsi2
  .text.libgcc.builtins
-                0x000066ee       0x24 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzhi2.o)
-                0x000066ee                __clzhi2
+                0x00006816       0x24 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_clzhi2.o)
+                0x00006816                __clzhi2
  .text.libgcc.mul
-                0x00006712       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_umulhisi3.o)
-                0x00006712                __umulhisi3
+                0x0000683a       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_umulhisi3.o)
+                0x0000683a                __umulhisi3
  .text.avr-libc
-                0x00006730       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(toupper.o)
-                0x00006730                toupper
+                0x00006858       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(toupper.o)
+                0x00006858                toupper
  .text.avr-libc
-                0x00006740        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy_P.o)
-                0x00006740                strcpy_P
+                0x00006868        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy_P.o)
+                0x00006868                strcpy_P
  .text.avr-libc
-                0x0000674e       0x1a c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcmp.o)
-                0x0000674e                memcmp
+                0x00006876        0x6 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o)
+                0x00006876                strtok
  .text.avr-libc
-                0x00006768       0x12 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcpy.o)
-                0x00006768                memcpy
+                0x0000687c       0x1a c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcmp.o)
+                0x0000687c                memcmp
  .text.avr-libc
-                0x0000677a        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memset.o)
-                0x0000677a                memset
+                0x00006896       0x12 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memcpy.o)
+                0x00006896                memcpy
  .text.avr-libc
-                0x00006788        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy.o)
-                0x00006788                strcpy
+                0x000068a8        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(memset.o)
+                0x000068a8                memset
  .text.avr-libc
-                0x00006796       0x40 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
-                0x00006796                sprintf
+                0x000068b6        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strcpy.o)
+                0x000068b6                strcpy
  .text.avr-libc
-                0x000067d6      0x386 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
-                0x000067d6                vfprintf
+                0x000068c4       0x4e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok_r.o)
+                0x000068c4                strtok_r
  .text.avr-libc
-                0x00006b5c       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
-                0x00006b5c                strnlen_P
+                0x00006912       0x40 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
+                0x00006912                sprintf
  .text.avr-libc
-                0x00006b72       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strnlen.o)
-                0x00006b72                strnlen
+                0x00006952      0x386 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
+                0x00006952                vfprintf
  .text.avr-libc
-                0x00006b88       0x70 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(fputc.o)
-                0x00006b88                fputc
+                0x00006cd8       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strnlen_P.o)
+                0x00006cd8                strnlen_P
  .text.avr-libc
-                0x00006bf8       0xbc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(ultoa_invert.o)
-                0x00006bf8                __ultoa_invert
+                0x00006cee       0x16 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strnlen.o)
+                0x00006cee                strnlen
  .text.avr-libc
-                0x00006cb4       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eerd_block.o)
-                0x00006cb4                eeprom_read_block
-                0x00006cb8                eeprom_read_blraw
+                0x00006d04       0x70 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(fputc.o)
+                0x00006d04                fputc
  .text.avr-libc
-                0x00006cd4       0x10 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eerd_byte.o)
-                0x00006cd4                eeprom_read_byte
+                0x00006d74       0xbc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(ultoa_invert.o)
+                0x00006d74                __ultoa_invert
  .text.avr-libc
-                0x00006ce4        0xa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eerd_word.o)
-                0x00006ce4                eeprom_read_word
+                0x00006e30       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eerd_block.o)
+                0x00006e30                eeprom_read_block
+                0x00006e34                eeprom_read_blraw
  .text.avr-libc
-                0x00006cee       0x24 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eeupd_byte.o)
-                0x00006cee                eeprom_update_byte
-                0x00006cf0                eeprom_update_r18
+                0x00006e50       0x10 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eerd_byte.o)
+                0x00006e50                eeprom_read_byte
  .text.avr-libc
-                0x00006d12       0x12 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eewr_block.o)
-                0x00006d12                eeprom_write_block
+                0x00006e60        0xa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eerd_word.o)
+                0x00006e60                eeprom_read_word
  .text.avr-libc
-                0x00006d24       0x1c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eewr_byte.o)
-                0x00006d24                eeprom_write_byte
-                0x00006d26                eeprom_write_r18
+                0x00006e6a       0x24 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eeupd_byte.o)
+                0x00006e6a                eeprom_update_byte
+                0x00006e6c                eeprom_update_r18
  .text.avr-libc
-                0x00006d40        0x6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eewr_word.o)
-                0x00006d40                eeprom_write_word
+                0x00006e8e       0x12 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eewr_block.o)
+                0x00006e8e                eeprom_write_block
+ .text.avr-libc
+                0x00006ea0       0x1c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eewr_byte.o)
+                0x00006ea0                eeprom_write_byte
+                0x00006ea2                eeprom_write_r18
+ .text.avr-libc
+                0x00006ebc        0x6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.0.90/gcc/dev/atmega32u4/avr5\libatmega32u4.a(eewr_word.o)
+                0x00006ebc                eeprom_write_word
  .text.libgcc.prologue
-                0x00006d46       0x38 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_prologue.o)
-                0x00006d46                __prologue_saves__
+                0x00006ec2       0x38 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_prologue.o)
+                0x00006ec2                __prologue_saves__
  .text.libgcc.prologue
-                0x00006d7e       0x36 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_epilogue.o)
-                0x00006d7e                __epilogue_restores__
-                0x00006db4                . = ALIGN (0x2)
+                0x00006efa       0x36 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_epilogue.o)
+                0x00006efa                __epilogue_restores__
+                0x00006f30                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00006db4        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
-                0x00006db4                _exit
-                0x00006db4                exit
+ .fini9         0x00006f30        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+                0x00006f30                _exit
+                0x00006f30                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -1659,11 +1672,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00006db4        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
+ .fini0         0x00006f30        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00006db8                _etext = .
+                0x00006f34                _etext = .
 
-.data           0x00800100      0x254 load address 0x00006db8
+.data           0x00800100      0x2b0 load address 0x00006f34
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -1682,131 +1695,134 @@ END GROUP
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x00800169       0x5e Bluetooth.o
-                                 0x60 (size before relaxing)
+                0x00800169       0xb9 Bluetooth.o
  .rodata.str1.1
-                0x008001c7       0x96 Calibrate.o
+                0x00800222       0x96 Calibrate.o
  .rodata.ASCIINumSymbols
-                0x0080025d        0xa Calibrate.o
-                0x0080025d                ASCIINumSymbols
+                0x008002b8        0xa Calibrate.o
+                0x008002b8                ASCIINumSymbols
  .rodata.ASCIINumbers
-                0x00800267        0xa Calibrate.o
-                0x00800267                ASCIINumbers
+                0x008002c2        0xa Calibrate.o
+                0x008002c2                ASCIINumbers
  .rodata.HIDNumbers
-                0x00800271        0xa Calibrate.o
-                0x00800271                HIDNumbers
+                0x008002cc        0xa Calibrate.o
+                0x008002cc                HIDNumbers
  .rodata.str1.1
-                0x0080027b       0x22 KeyLogging.o
+                0x008002d6       0x22 KeyLogging.o
                                  0x23 (size before relaxing)
  .rodata.str1.1
-                0x0080029d        0xf Lib/FatFS/ff.o
- .rodata.ExCvt  0x008002ac       0x80 Lib/FatFS/ff.o
+                0x008002f8        0xf Lib/FatFS/ff.o
+ .rodata.ExCvt  0x00800307       0x80 Lib/FatFS/ff.o
  .rodata.InquiryData
-                0x0080032c       0x24 Lib/SCSI.o
+                0x00800387       0x24 Lib/SCSI.o
  .rodata.REED_BITS
-                0x00800350        0x4 Sense_Keys.o
-                0x00800350                REED_BITS
+                0x008003ab        0x4 Sense_Keys.o
+                0x008003ab                REED_BITS
  *(.gnu.linkonce.d*)
-                0x00800354                . = ALIGN (0x2)
-                0x00800354                _edata = .
-                0x00800354                PROVIDE (__data_end, .)
+                0x008003b0                . = ALIGN (0x2)
+ *fill*         0x008003af        0x1 
+                0x008003b0                _edata = .
+                0x008003b0                PROVIDE (__data_end, .)
 
-.bss            0x00800354      0x635
-                0x00800354                PROVIDE (__bss_start, .)
+.bss            0x008003b0      0x6a7
+                0x008003b0                PROVIDE (__bss_start, .)
  *(.bss)
+ .bss           0x008003b0        0x2 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o)
  *(.bss*)
- .bss.prevcharacter.4485
-                0x00800354        0x1 KeyLogging.o
- .bss.tot_sect.4472
-                0x00800355        0x4 KeyLogging.o
- .bss.LogFile   0x00800359       0x20 KeyLogging.o
+ .bss.prevcharacter.4488
+                0x008003b2        0x1 KeyLogging.o
+ .bss.tot_sect.4475
+                0x008003b3        0x4 KeyLogging.o
+ .bss.LogFile   0x008003b7       0x20 KeyLogging.o
  .bss.DiskFATState
-                0x00800379      0x22e KeyLogging.o
- .bss.CardType  0x008005a7        0x1 Lib/FatFS/diskio.o
- .bss.Fsid      0x008005a8        0x2 Lib/FatFS/ff.o
- .bss.FatFs     0x008005aa        0x2 Lib/FatFS/ff.o
+                0x008003d7      0x22e KeyLogging.o
+ .bss.CardType  0x00800605        0x1 Lib/FatFS/diskio.o
+ .bss.Fsid      0x00800606        0x2 Lib/FatFS/ff.o
+ .bss.FatFs     0x00800608        0x2 Lib/FatFS/ff.o
  .bss.SDCard_Present
-                0x008005ac        0x1 Lib/SDCardManager.o
+                0x0080060a        0x1 Lib/SDCardManager.o
  .bss.UART_LastRxError
-                0x008005ad        0x1 uart.o
+                0x0080060b        0x1 uart.o
  .bss.UART_RxTail
-                0x008005ae        0x1 uart.o
+                0x0080060c        0x1 uart.o
  .bss.UART_RxHead
-                0x008005af        0x1 uart.o
+                0x0080060d        0x1 uart.o
  .bss.UART_TxTail
-                0x008005b0        0x1 uart.o
+                0x0080060e        0x1 uart.o
  .bss.UART_TxHead
-                0x008005b1        0x1 uart.o
+                0x0080060f        0x1 uart.o
  .bss.UART_RxBuf
-                0x008005b2       0x10 uart.o
+                0x00800610       0x40 uart.o
  .bss.UART_TxBuf
-                0x008005c2       0x10 uart.o
+                0x00800650       0x10 uart.o
  .bss.PrevKeyboardHIDReportBuffer
-                0x008005d2        0x8 Keyboard.o
- .bss.KeyReleaseCounter.4464
-                0x008005da        0x1 Sense_Keys.o
- .bss.KeyHoldCounter.4463
-                0x008005db        0x1 Sense_Keys.o
- .bss.DoubleTapCounter.4462
-                0x008005dc        0x1 Sense_Keys.o
- .bss.PreviousKey.4460
-                0x008005dd        0x1 Sense_Keys.o
- .bss.ActiveKey.4461
-                0x008005de        0x1 Sense_Keys.o
- .bss.ActiveReeds.4465
-                0x008005df        0x4 Sense_Keys.o
- .bss.ReedDebounce.4466
-                0x008005e3        0x4 Sense_Keys.o
+                0x00800660        0x8 Keyboard.o
+ .bss.KeyReleaseCounter.4467
+                0x00800668        0x1 Sense_Keys.o
+ .bss.KeyHoldCounter.4466
+                0x00800669        0x1 Sense_Keys.o
+ .bss.DoubleTapCounter.4465
+                0x0080066a        0x1 Sense_Keys.o
+ .bss.PreviousKey.4463
+                0x0080066b        0x1 Sense_Keys.o
+ .bss.ActiveKey.4464
+                0x0080066c        0x1 Sense_Keys.o
+ .bss.ActiveReeds.4468
+                0x0080066d        0x4 Sense_Keys.o
+ .bss.ReedDebounce.4469
+                0x00800671        0x4 Sense_Keys.o
  *(COMMON)
- COMMON         0x008005e7        0x1 Config_IO.o
-                0x008005e7                GlowDirection
- COMMON         0x008005e8      0x394 Keyboard.o
-                0x008005e8                Reed2Polarity
-                0x008005e9                UseDummyLoad
-                0x008005ea                Reeds_Are_Independent
-                0x008005eb                Scheduled_Task
-                0x008005ec                KeyReleaseTime
-                0x008005ed                KeyBufferMod
-                0x008005ee                KeyCodeLookUpTable
-                0x0080062e                BluetoothConfigured
-                0x0080062f                ReedHoldTime
-                0x00800630                DoubleTapTime
-                0x00800631                Shift_Reed
-                0x00800632                TMR1_Count
-                0x00800634                Ignore_Flag
-                0x00800635                KeyBuffer
-                0x00800637                HallSensorPolarity
-                0x00800638                Reed1Polarity
-                0x00800639                ShiftKeyCodeLookUpTable
-                0x00800679                KeyHoldTime
-                0x0080067a                ASCIIShiftLookUpTable
-                0x008006ba                Reed3Polarity
-                0x008006bb                UseHallSensor
-                0x008006bc                StringBuffer
-                0x008006f8                Reed4Polarity
-                0x008006f9                ASCIILookUpTable
-                0x00800739                TimeoutCounter
-                0x0080073b                Typewriter_Mode
-                0x0080073c                SD_Buffer
-                0x0080093c                FnKeyCodeLookUpTable
- COMMON         0x0080097c        0x3 src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
-                0x0080097c                USB_Device_ConfigurationNumber
-                0x0080097d                USB_Device_CurrentlySelfPowered
-                0x0080097e                USB_Device_RemoteWakeupEnabled
- COMMON         0x0080097f        0xa src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
-                0x0080097f                USB_IsInitialized
-                0x00800980                USB_DeviceState
-                0x00800981                USB_ControlRequest
-                0x00800989                PROVIDE (__bss_end, .)
-                0x00006db8                __data_load_start = LOADADDR (.data)
-                0x0000700c                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x00800675       0x40 Bluetooth.o
+                0x00800675                response
+ COMMON         0x008006b5        0x1 Config_IO.o
+                0x008006b5                GlowDirection
+ COMMON         0x008006b6      0x394 Keyboard.o
+                0x008006b6                Reed2Polarity
+                0x008006b7                UseDummyLoad
+                0x008006b8                Reeds_Are_Independent
+                0x008006b9                Scheduled_Task
+                0x008006ba                KeyReleaseTime
+                0x008006bb                KeyBufferMod
+                0x008006bc                KeyCodeLookUpTable
+                0x008006fc                BluetoothConfigured
+                0x008006fd                ReedHoldTime
+                0x008006fe                DoubleTapTime
+                0x008006ff                Shift_Reed
+                0x00800700                TMR1_Count
+                0x00800702                Ignore_Flag
+                0x00800703                KeyBuffer
+                0x00800705                HallSensorPolarity
+                0x00800706                Reed1Polarity
+                0x00800707                ShiftKeyCodeLookUpTable
+                0x00800747                KeyHoldTime
+                0x00800748                ASCIIShiftLookUpTable
+                0x00800788                Reed3Polarity
+                0x00800789                UseHallSensor
+                0x0080078a                StringBuffer
+                0x008007c6                Reed4Polarity
+                0x008007c7                ASCIILookUpTable
+                0x00800807                TimeoutCounter
+                0x00800809                Typewriter_Mode
+                0x0080080a                SD_Buffer
+                0x00800a0a                FnKeyCodeLookUpTable
+ COMMON         0x00800a4a        0x3 src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
+                0x00800a4a                USB_Device_ConfigurationNumber
+                0x00800a4b                USB_Device_CurrentlySelfPowered
+                0x00800a4c                USB_Device_RemoteWakeupEnabled
+ COMMON         0x00800a4d        0xa src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
+                0x00800a4d                USB_IsInitialized
+                0x00800a4e                USB_DeviceState
+                0x00800a4f                USB_ControlRequest
+                0x00800a57                PROVIDE (__bss_end, .)
+                0x00006f34                __data_load_start = LOADADDR (.data)
+                0x000071e4                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800989        0x0
-                0x00800989                PROVIDE (__noinit_start, .)
+.noinit         0x00800a57        0x0
+                0x00800a57                PROVIDE (__noinit_start, .)
  *(.noinit*)
-                0x00800989                PROVIDE (__noinit_end, .)
-                0x00800989                _end = .
-                0x00800989                PROVIDE (__heap_start, .)
+                0x00800a57                PROVIDE (__noinit_end, .)
+                0x00800a57                _end = .
+                0x00800a57                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
  *(.eeprom*)
@@ -1872,6 +1888,7 @@ END GROUP
  .comment       0x00000060       0x31 src/LUFA/LUFA/Drivers/USB/Core/DeviceStandardReq.o
  .comment       0x00000060       0x31 src/LUFA/LUFA/Drivers/USB/Core/Events.o
  .comment       0x00000060       0x31 src/LUFA/LUFA/Drivers/USB/Core/USBTask.o
+ .comment       0x00000060       0x31 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(strtok.o)
  .comment       0x00000060       0x31 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(sprintf.o)
  .comment       0x00000060       0x2c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/../../../../avr/lib/avr5\libc.a(vfprintf_std.o)
                                  0x2d (size before relaxing)

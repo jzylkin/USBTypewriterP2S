@@ -86,6 +86,10 @@ void USBSendString(char *str){
 			code = HID_KEYBOARD_SC_SEMICOLON_AND_COLON;
 			modifier = UPPER;
 		}
+		else if(str[i] == '='){
+			code = KEY_EQ;
+			modifier = LOWER;
+		}
 		else if(str[i] == '!'){
 			code = KEY_1;
 			modifier = UPPER;

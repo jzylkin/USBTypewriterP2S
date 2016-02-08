@@ -143,10 +143,15 @@ int main(void)
 	//USB_Init(); COMMENTED FOR DEBUGGING
 	GlobalInterruptEnable();
 	
+	Bluetooth_Init();
+	
 	Init_Mode();
 //	Delay_MS(INIT_DELAY);
 	
 	while(1){
+		if(Typewriter_Mode != BLUETOOTH_MODE){
+			
+		}
 		switch (Typewriter_Mode){
 			case USB_LIGHT_MODE:
 			case USB_COMBO_MODE:				
@@ -203,12 +208,20 @@ int main(void)
 				Typewriter_Mode = USB_LIGHT_MODE;//after calibrating, go to usb light mode.
 			break;
 			case BLUETOOTH_MODE:
-				USB_Disable();//comment this out for debugging purposes
+				#ifndef _DEBUG
+					USB_Disable();//don't disable usb if it is debug mode
+				#endif
 				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
-				Bluetooth_Connect(); //tell bluetooth to connect to device.
-				while(is_low(BT_CONNECTED)){set_low(RED_LED);set_high(GREEN_LED);}//wait for connection to happen, glow red until then.
-					set_high(RED_LED);//turn off red led if bt is connected.
-					set_low(GREEN_LED);
+				
+				while(is_low(BT_CONNECTED)){
+					set_low(RED_LED);
+					set_high(GREEN_LED);
+					Bluetooth_Connect();
+					Delay_MS(4000);					
+				}//wait for connection to happen, glow red until then.
+				
+				set_high(RED_LED);//turn off red led if bt is connected.
+				set_low(GREEN_LED);
 				while(is_high(BT_CONNECTED)){
 					key = GetKey();
 					modifier = GetModifier();
@@ -472,10 +485,11 @@ void Init_Mode(){
 	else if(is_low(S2)&&is_low(S3)){ //configure bluetooth and test bluetooth -- reset bluetooth module  -- force initialization next time bluetooth is used.
 			if(Bluetooth_Configure()){
 					//this test mode resets the bluetooth channel.
+					BluetoothInquire();//clear paired device list and try to pair.
 					BluetoothConfigured = 0;// even though it has been configured, save it as "not configured" to force configuration next time (on customer's end.)
 					eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); 	
 					Typewriter_Mode = BLUETOOTH_MODE;
-					//Default_Mode = BLUETOOTH_MODE;  Do not set bluetooth mode as the default, since this mode only tests the bluetooth
+					Default_Mode = BLUETOOTH_MODE;  //Do not set bluetooth mode as the default, since this mode only tests the bluetooth
 			}
 			else{ //if something goes wrong during configuration...
 				BluetoothConfigured = 0;
