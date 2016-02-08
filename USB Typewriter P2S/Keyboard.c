@@ -46,7 +46,7 @@ uint8_t KeyReleaseTime;
 uint8_t KeyHoldTime;
 uint8_t ReedHoldTime;
 
-uint8_t BluetoothConfigured;
+//uint8_t BluetoothConfigured;
 
 uint8_t KeyBufferMod;
 
@@ -61,7 +61,7 @@ uint8_t Ignore_Flag; //flag to tell processor to ignore the next character typed
 
 uint8_t UseDummyLoad; //dummy load is a 100 ohm resistor (or so) that makes the device draw more current from supply -- useful for power supplies with load minimum requirements.
 
-volatile uint16_t TimeoutCounter;
+volatile uint16_t myTimeoutCounter;
 
 char StringBuffer[60];//global buffer to store strings that are being forwarded from program memory to regular data memory
 
@@ -143,15 +143,10 @@ int main(void)
 	//USB_Init(); COMMENTED FOR DEBUGGING
 	GlobalInterruptEnable();
 	
-	Bluetooth_Init();
-	
 	Init_Mode();
 //	Delay_MS(INIT_DELAY);
 	
 	while(1){
-		if(Typewriter_Mode != BLUETOOTH_MODE){
-			
-		}
 		switch (Typewriter_Mode){
 			case USB_LIGHT_MODE:
 			case USB_COMBO_MODE:				
@@ -208,9 +203,10 @@ int main(void)
 				Typewriter_Mode = USB_LIGHT_MODE;//after calibrating, go to usb light mode.
 			break;
 			case BLUETOOTH_MODE:
-				#ifndef _DEBUG
-					USB_Disable();//don't disable usb if it is debug mode
+				#ifndef BT_DEBUG
+					USB_Disable();//don't disable usb if it is debug mode.
 				#endif
+				if(Get_Bluetooth_State() != INITIALIZED){Bluetooth_Init();};//initialize bluetooth if it hasn't been already.
 				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
 				
 				while(is_low(BT_CONNECTED)){
@@ -228,12 +224,12 @@ int main(void)
 									
 					code = GetHIDKeyCode(key, modifier);
 					
-					if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
-									
-						if(code){
-						Bluetooth_Send(code,modifier);
-					}
+					if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..					
+					
+					if(code){Bluetooth_Send(code,modifier);}
+						
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
+					
 				}
 			break;
 			case PANIC_MODE:
@@ -261,7 +257,7 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every 10 ms, I think)
 	TMR1_Count ++;
-	TimeoutCounter ++;
+	myTimeoutCounter ++;
 
 		if ((Typewriter_Mode != USB_COMBO_MODE ) && (Typewriter_Mode != USB_LIGHT_MODE)){ //if we are not in the usual usb mode, usb tasks are taken care of by interrupts.  Otherwise, they are addressed in main flow.
 			MS_Device_USBTask(&Disk_MS_Interface);
@@ -484,17 +480,15 @@ void Init_Mode(){
 	}
 	else if(is_low(S2)&&is_low(S3)){ //configure bluetooth and test bluetooth -- reset bluetooth module  -- force initialization next time bluetooth is used.
 			if(Bluetooth_Configure()){
-					//this test mode resets the bluetooth channel.
+					#ifndef BT_DEBUG
+						USB_Disable(); //leave usb active if this is debug mode.
+					#endif
 					BluetoothInquire();//clear paired device list and try to pair.
-					BluetoothConfigured = 0;// even though it has been configured, save it as "not configured" to force configuration next time (on customer's end.)
-					eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); 	
 					Typewriter_Mode = BLUETOOTH_MODE;
-					Default_Mode = BLUETOOTH_MODE;  //Do not set bluetooth mode as the default, since this mode only tests the bluetooth
+					//Default_Mode = BLUETOOTH_MODE;  //Do not set bluetooth mode as the default, since this mode only TESTS the bluetooth
 			}
 			else{ //if something goes wrong during configuration...
-				BluetoothConfigured = 0;
-				eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has not been configured already.
-				Typewriter_Mode = PANIC_MODE; //don't change default mode
+					Typewriter_Mode = PANIC_MODE; //don't change default mode
 			}
 	}
 	else if(is_low(S1)&&is_low(S2)){
@@ -529,22 +523,15 @@ void Init_Mode(){
 		}
 	}
 	else if(code == 'B'){ //if the letter B is being held by the user
-		USB_Disable();
-		if(BluetoothConfigured){
-			BluetoothInquire();//get a new device to pair with when you hold b key down.
-			Typewriter_Mode = BLUETOOTH_MODE; // for now, this is commented out
-			Default_Mode = BLUETOOTH_MODE;
-		}
-		else if(Bluetooth_Configure()){ // attempt to configure.
-			BluetoothConfigured = 1;
-			BluetoothInquire(); //get a new device to pair with when you hold b key down.
-			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has been configured already.	
+		#ifndef BT_DEBUG
+			USB_Disable(); //if this is not debug mode, disable the usb port.
+		#endif
+		if(Bluetooth_Configure()){ // attempt to configure.
+			BluetoothInquire(); //if configuration is successful, delete the paired device list so device can become discoverable.
 			Typewriter_Mode = BLUETOOTH_MODE;
 			Default_Mode = BLUETOOTH_MODE;
 		}
 		else{ //if something goes wrong during configuration...
-			BluetoothConfigured = 0;
-			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has NOT been configured successfully.
 			Typewriter_Mode = PANIC_MODE; //indicate error
 		}
 	}

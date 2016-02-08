@@ -27,7 +27,7 @@ extern uint8_t Shift_Reed;
 extern uint8_t UseHallSensor; 
 extern uint8_t HallSensorPolarity;
 
-extern uint8_t BluetoothConfigured;
+//extern uint8_t BluetoothConfigured;
 
 extern bool Reed1Polarity;
 extern bool Reed2Polarity;
@@ -45,6 +45,6 @@ extern uint8_t Ignore_Flag;
 
 extern uint8_t UseDummyLoad;
 
-volatile extern uint16_t TimeoutCounter;
+volatile extern uint16_t myTimeoutCounter;
 
 #endif /* GLOBALS_H_ */

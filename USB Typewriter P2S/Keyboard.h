@@ -37,6 +37,7 @@
 #define _KEYBOARD_H_
 
 		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.13";
+//		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
 
 	/* Includes: */
 		#include <avr/io.h>
@@ -112,7 +113,7 @@
 		#define DEFAULT_MODE_ADDR 0x20D
 		#define REEDS_INDEPENDENT_ADDR 0x20E
 		#define DUMMY_LOAD_ADDR 0x20F
-		#define BLUETOOTH_CONFIGURED_ADDR 0x210
+//		#define BLUETOOTH_CONFIGURED_ADDR 0x210
 		#define EEP_BANK2_END 0x211
 		
 		#define EEP_CHECKSUM_ADDR 0x3FF
@@ -171,8 +172,11 @@
 		#define SD_TIMEOUT_S  (uint16_t)1800 //how many seconds to wait without any input before closing the file (half an hour?)
 		#define SD_TIMEOUT (uint16_t)SD_TIMEOUT_S*100
 		
-		#define SD_SAVE_TIME_S (uint16_t)60 //how many seconds before saving work if no keys are pressed.
+		#define SD_SAVE_TIME_S (uint16_t)30 //how many seconds before saving work if no keys are pressed.
 		#define SD_SAVE_TIME (uint16_t)SD_SAVE_TIME_S*100
+		
+		#define BT_SLEEP_TIMEOUT_S  (uint16_t)6000 //how many seconds to wait without any input before sleeping bluetooth (10 min)
+		#define BT_SLEEP_TIMEOUT (uint16_t)BT_SLEEP_TIMEOUT_S*100
 		
 		#define STRING_SEND_DELAY 50
 		

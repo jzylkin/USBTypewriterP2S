@@ -12,7 +12,8 @@
 
 #define response_buffer_len 64
 char response[response_buffer_len]; //array to store bluetooth module's responses to commands
-
+uint8_t BT_State; //BT state is "inactive" by default
+bool BT_Asleep; //BT
 
 /**
  * Bluetooth Send -- send keystrokes to bluetooth module using "shorthand" protocol
@@ -59,30 +60,29 @@ void Bluetooth_Init(){
 	Get_Response(true);
 	Bluetooth_Send_CMD("AT+BP=00,00", true); //get into proxy mode so that commands work correctly.
 	Delay_MS(1000);
-	
+	BT_State = INITIALIZED;
 }
 
 bool Bluetooth_Configure(){
 	bool success;
 	success = true;
 	
-	while(USB_DeviceState != DEVICE_STATE_Configured){;}
-	Delay_MS(500);
-	#ifdef _DEBUG
+	#ifdef BT_DEBUG
+		while(USB_DeviceState != DEVICE_STATE_Configured){;} //usb must be connected for debug to work
+		Delay_MS(500);
 		USBSendString("BT DEBUG MODE");
 	#endif
 	
-	Bluetooth_Reset();
-	Delay_MS(3000);
-	
-	Get_Response(true);
-	
+	Bluetooth_Init();
+
 	success &= Bluetooth_Send_CMD("AT+UI=01",true); //enable responses from bluetooth module -- if response is "OK" then bluetooth module is present and responsive.		
-	Bluetooth_Send_CMD("AT+NM=USBTYPE",true); //set friendly name
+	Bluetooth_Send_CMD("AT+NM=USB Typewriter BT",true); //set friendly name
 	Bluetooth_Send_CMD("AT+BP=00,00",true); //bypass channel is proxy
 	Bluetooth_Send_CMD("AT+PF=00,01,00,00,00",true);//set hid parameters
 	Delay_MS(500);
 	Bluetooth_Send_CMD("AT+FT=00,01,FF,05,01,0258",true); //configure module features (see manual):
+	Bluetooth_Send_CMD("AT+MM=00",true); //do not use man-in-middle protection
+	Bluetooth_Send_CMD("AT+IO=03",true);//set IO setting to "no input or output" hopefully this means no need for pin-code.
  //
 	/*disable the auto connection after power on as permanent mode;
 	enable the auto connect after paired; -- was disabled by default.
@@ -110,7 +110,7 @@ bool Bluetooth_Send_CMD(char* command, bool verbose){
 	int i = 0;
 	
 	uart_clear_rx_buffer();
-	#ifdef _DEBUG
+	#ifdef BT_DEBUG
 	if(verbose){USBSendString("sending command\n");}
 	#endif
 	
@@ -156,7 +156,7 @@ bool Get_Response(bool verbose){
 			response[i] = tmpchar & 0xFF; //store lower byte of getc as a uart character received
 			
 		}
-		#ifdef _DEBUG
+		#ifdef BT_DEBUG
 			USBSendString(response);
 		#endif
 		
@@ -178,6 +178,24 @@ bool BluetoothInquire(){
 	bool success = true;
 	success &= Bluetooth_Send_CMD("AT+CP",true); //clear the paired device list.  This makes bluetooth enter discoverable state by default.
 	return success;
+}
+
+uint8_t Get_Bluetooth_State(){
+	return BT_State;
+}
+
+void BT_Sleep(){
+	if (!BT_Asleep){ //if not already asleep:
+		Bluetooth_Send_CMD("AT+SP=01",true); //tell bt module to sleep
+		BT_Asleep = true;
+	}
+}
+
+void BT_Wake(){
+	if (BT_Asleep){
+		Bluetooth_Send_CMD("AT+SP=00",true); //disable sleep mode
+		BT_Asleep = false; //bt is no longer asleep
+	}
 }
 
 bool Bluetooth_Connect(){
