@@ -36,7 +36,7 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.13";
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.3.0.E"; //E identifies this as the version for E-HONG bluetooth modules.
 //		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
 
 	/* Includes: */
