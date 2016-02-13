@@ -222,14 +222,17 @@ unsigned long long ReadSensor(){
 		return Readout;
 }
 
-uint8_t GetHIDKeyCode(uint8_t key, uint8_t modifier){ 
+uint8_t GetHIDKeyCode(uint8_t key, uint8_t* modifier){ 
 	uint8_t code;
 
-	if ((modifier & HID_KEYBOARD_MODIFIER_LEFTALT) && FnKeyCodeLookUpTable[key]){ //if the FN key is held down, look up key in FN array.
+	if ((*modifier & HID_KEYBOARD_MODIFIER_LEFTALT) && FnKeyCodeLookUpTable[key]){ //if the FN key is held down, look up key in FN array.
 		code = FnKeyCodeLookUpTable[key];
+		*modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
+
 	}
-	else if ((modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ShiftKeyCodeLookUpTable[key]){
+	else if ((*modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ShiftKeyCodeLookUpTable[key]){
 		code = ShiftKeyCodeLookUpTable[key];
+		*modifier &= ~HID_KEYBOARD_MODIFIER_LEFTSHIFT;// if the key is in the shift table, it is a special key.  The shift modifier should not be sent..
 	}
 	else {
 		code = KeyCodeLookUpTable[key]; //otherwise, look up the key in the regular array.
@@ -246,7 +249,7 @@ uint8_t GetASCIIKeyCode(uint8_t key, uint8_t modifier){
 	
 	if ((modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ASCIIShiftLookUpTable[key]){
 		code = ASCIIShiftLookUpTable[key];
-	}
+		}
 	else {
 		code = ASCIILookUpTable[key];
 	}

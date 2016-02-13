@@ -11,6 +11,7 @@
 void Bluetooth_Send(uint8_t key, uint8_t modifier);
 void Bluetooth_Init();
 bool Bluetooth_Send_CMD(char* command, bool verbose);
+bool Bluetooth_Send_PROGMEM_CMD(const char* progcommand, bool verbose);
 bool Bluetooth_Enter_CMD_Mode();
 void Bluetooth_Reset();
 bool Bluetooth_Disconnect();

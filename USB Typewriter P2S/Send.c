@@ -110,7 +110,7 @@ void USBSendString(char *str){
 	}
 } 
 
-/*Send a string literal over USB, using a string stored in program memory instead of data memory (this saves on data RAM)*/
+/*Send a string literal to Bluetooth Module, using a string stored in program memory instead of data memory (this saves RAM)*/
 void USBSendPROGString(const char*  ProgStr){
 	strcpy_P(StringBuffer, (char*) ProgStr);
 	USBSendString(StringBuffer);
@@ -148,6 +148,56 @@ void USBSendNumber(uint8_t number){
 	}
 	
 	Delay_MS(100);
+
+}
+
+/*Send an ascii character between 0 and 255 over usb)*/
+void USBSendASCII(uint8_t number){
+	uint8_t ones ;
+	uint8_t tens;
+	
+	ones = number%10;
+	tens = ((number - ones)%100)/10;
+	
+	Hold_Alt_Down = true; //hold down the alt key
+	
+	Delay_MS(100);
+	
+	USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER); //send a leading 0
+	
+	//send hundreds digit
+	if (number >= 200){  
+		USBSend(HID_KEYBOARD_SC_KEYPAD_2_AND_DOWN_ARROW,LOWER);
+	}
+	else if (number >= 100){
+		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END, LOWER);
+	}
+	else{
+		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER);
+	}
+	
+	//send tens digit
+	if (tens != 0){
+		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END + tens,LOWER); //send 1-9
+	}
+	else{
+		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT,LOWER); //send 0
+	}
+
+	Delay_MS(100);
+	
+	//send ones digit
+	if (ones!=0){
+		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END + ones,LOWER);
+	}
+	else{
+		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT,LOWER);
+	}
+	
+	Delay_MS(100);
+	
+	//release alt key
+	Hold_Alt_Down = false;
 
 }
 

@@ -28,8 +28,8 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Calibrating[]		PROGMEM = "CALIBRATING...\r";
 	const char Str_Type_The_Following[] PROGMEM = "TYPE THE FOLLOWING KEYS (PRESS SPACE TO SKIP)...\r";
 	const char Str_Shift_Error[]		PROGMEM = "ERROR...SHIFT MUST BE A REED SWITCH.\r";
-	const char Str_SD_Only[]			PROGMEM = " (SD MODE)";
-	const char Str_USB_Only[]			PROGMEM = " (USB MODE)";
+	const char Str_SD_Only[]			PROGMEM = " KEY TO USE DURING SD CARD MODE:";
+	const char Str_USB_Only[]			PROGMEM = " KEY TO USE DURING USB/BLUETOOTH MODE:";
 	const char Str_Dummy_Load[]			PROGMEM = "DUMMY LOAD ACTIVATED\r";
 	const char Str_No_Dummy_Load[]		PROGMEM = "DUMMY LOAD DEACTIVATED\r";
 	const char Str_Quick_Calibrate[]	PROGMEM = "QUICK CALIBRATION MODE...\r";
@@ -48,7 +48,13 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Set_Reed_Time[]		PROGMEM = "\rNOW SET REED REACTION TIME...\r";
 	const char Str_Spacebar_Blocks_Enter[] PROGMEM = "\rIGNORE ENTER KEY WHEN SPACEBAR IS HELD?\r";
 	const char Str_Settings_Saved[]		PROGMEM = "SETTINGS SAVED!\r";
-	
+	const char Str_Manual_Calibration[] PROGMEM = "MANUAL CALIBRATION MODE...\r";
+	const char Str_U_For_USB[]   PROGMEM = "Press U if changes should apply to USB/BT mode.\r";
+	const char Str_S_For_SD[]	 PROGMEM = "Press S if changes should apply to SD mode.\r";
+	const char Str_How_To_Scroll[]	PROGMEM = "Press CTRL to scroll through characters.\r";
+	const char Str_How_To_Select[]  PROGMEM = "Press ALT to select a character.\r";
+	const char Str_How_To_Exit[] PROGMEM = "Press CMD to save and exit.\r";
+	const char Str_Assign[]	PROGMEM = " KEY SELECTED. PRESS A TYPEWRITER KEY TO ASSIGN... ";
 
 void Calibrate(){
 	uint8_t ASCIIKey;
@@ -212,6 +218,8 @@ void Calibrate(){
 				if(HIDKey == KEY_COMMA){TeachASCIIKey(',', KeyPressed, LOWER); TeachASCIIKey('?', KeyPressed, UPPER);}
 				if(HIDKey == KEY_PERIOD){TeachASCIIKey('.', KeyPressed, LOWER); TeachASCIIKey('.', KeyPressed, UPPER);}
 			}
+			
+			
 				
 			USBSend(KEY_ENTER,LOWER);
 		}
@@ -220,12 +228,10 @@ void Calibrate(){
 //-------TEACH VARIOUS UPPER CASE SYMBOLS ---------
 	//@ for sd
 	USBSend(KEY_2,UPPER);
-//	USBSendPROGString(Str_SD_Only);
+	USBSendPROGString(Str_SD_Only);
 	USBSend(KEY_SPACE,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
-
-	TeachASCIIKey('@',KeyPressed,Modifier);
 	
 		if(Modifier==HID_KEYBOARD_MODIFIER_LEFTSHIFT){
 			USBSendString("SHIFT");
@@ -236,18 +242,18 @@ void Calibrate(){
 	
 	Delay_MS(CALIBRATION_DELAY);//delay between programming keys.
 	
-/*	//@ for usb
+	//@ for usb
 	USBSend(KEY_2,UPPER);
 	USBSendPROGString(Str_USB_Only);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
 	TeachHIDKey(KEY_2|FORCE_UPPER,KeyPressed,Modifier);
-	USBSend(KEY_ENTER,LOWER);*/
+	USBSend(KEY_ENTER,LOWER);
 	
 	//?
 	USBSend(KEY_SLASH,UPPER);
-//	USBSendPROGString(Str_SD_Only);
+	USBSendPROGString(Str_SD_Only);
 	USBSend(KEY_SPACE,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
@@ -263,14 +269,14 @@ void Calibrate(){
 	Delay_MS(CALIBRATION_DELAY);//delay between programming keys.
 	
 //for USB
-/*
+
 	USBSend(KEY_SLASH,UPPER);
 	USBSendPROGString(Str_USB_Only);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
 	TeachHIDKey(KEY_SLASH|FORCE_UPPER,KeyPressed,Modifier);
-	USBSend(KEY_ENTER,LOWER);*/
+	USBSend(KEY_ENTER,LOWER);
 	
 	//!
 	USBSend(KEY_1|FORCE_UPPER,UPPER);
@@ -338,6 +344,79 @@ void QuickCalibrate(){
 	USBSendPROGString(Str_Settings_Saved);
 	
 }
+
+#define INCREMENT_CODE() {\
+		code++;\
+		if (code > codeend2) {code = codestart1;}\
+		else if((code > codeend1) && (code < codestart2)){code = codestart2;}\
+		if (edit_mode == 'u'){USBSend(code,LOWER);}\
+		else {USBSendASCII(code);}\
+	}
+
+void Calibrate_Manually(){
+	
+
+	uint8_t code;
+	uint8_t codestart1;
+	uint8_t codeend1;
+	uint8_t codestart2;
+	uint8_t codeend2;
+	uint8_t keypressed;
+	uint8_t modifier;
+	
+	//tell user what is up
+	USBSendPROGString(Str_Manual_Calibration);
+	USBSendPROGString(Str_U_For_USB);
+	USBSendPROGString(Str_S_For_SD);
+	char edit_mode = Get_User_Response();
+	USBSendPROGString(Str_How_To_Scroll);
+	USBSendPROGString(Str_How_To_Select);
+	USBSendPROGString(Str_How_To_Exit);
+	
+	//set ranges of ascii/hid codes over which to calibrate.  there are two ranges.
+	if(edit_mode == 'u'){
+		codestart1 = 0x1E;
+		codeend1 = 0x38;
+		codestart2 = 0x1E|FORCE_UPPER;
+		codestart2 = 0x38|FORCE_UPPER;
+	}
+	else{
+		codestart1 = 0x21;
+		codeend1 = 0x7E;
+		codestart2 = 0xBC;
+		codeend2 = 0xFF;
+	}
+	
+	code = codestart1;
+	
+	while(is_high(CMD_KEY)){
+		if(is_low(CTRL_KEY)){
+			INCREMENT_CODE();
+		}
+		if(is_low(ALT_KEY)){
+			USBSendPROGString(Str_Assign);
+			
+			keypressed = WaitForKeypress();
+			modifier = GetModifier();
+			
+			if (edit_mode == 'u'){TeachHIDKey(code,keypressed,modifier);}
+			else{TeachASCIIKey(code,keypressed,modifier);}
+				
+			USBSendNumber(keypressed);
+			USBSend(KEY_ENTER,LOWER);
+			
+			INCREMENT_CODE();
+		}
+		
+		Delay_MS(CALIBRATION_DELAY);
+		
+	}
+	
+	SaveCalibration(); //save your work.
+	USBSendPROGString(Str_Settings_Saved);
+	
+}
+
 
 void SaveCalibration(){
 		 USBSendString("SAVING...\r");
@@ -571,6 +650,17 @@ void Adjust_Sensitivity(){
 	eeprom_update_byte((uint8_t*)REEDS_INDEPENDENT_ADDR,Reeds_Are_Independent);
 	
 	USBSendPROGString(Str_Settings_Saved);
+}
+
+char Get_User_Response(){
+	uint8_t code;
+	while(1){
+		code = WaitForKeypress();
+		if ((ASCIILookUpTable[code]	== 'u')||(ASCIILookUpTable[code]	== 's')){
+			break;
+		}
+	}
+	return ASCIILookUpTable[code];
 }
 
 

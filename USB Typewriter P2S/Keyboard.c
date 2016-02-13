@@ -40,6 +40,7 @@ uint8_t ASCIIShiftLookUpTable[KEYCODE_ARRAY_LENGTH];
 uint8_t Shift_Reed;
 uint8_t UseHallSensor; 
 uint8_t HallSensorPolarity;
+bool Hold_Alt_Down;
 
 uint8_t DoubleTapTime;
 uint8_t KeyReleaseTime;
@@ -48,7 +49,7 @@ uint8_t ReedHoldTime;
 
 //uint8_t BluetoothConfigured;
 
-uint8_t KeyBufferMod;
+volatile uint8_t KeyBufferMod;
 
 bool Reed1Polarity; //reed switches are active low by default
 bool Reed2Polarity; //reed switches are active low by default
@@ -154,9 +155,7 @@ int main(void)
 			while(1){
 				key = GetKey();
 				modifier = GetModifier(); 
-				code = GetHIDKeyCode(key, modifier);
-				
-				if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
+				code = GetHIDKeyCode(key, &modifier);
 					
 				if(code){//if the code is valid, send it
 						if ((code == KEY_U)&&Ignore_Flag) code = 0; //if user is holding down U on startup, don't add this U to file.
@@ -202,6 +201,10 @@ int main(void)
 				QuickCalibrate();
 				Typewriter_Mode = USB_LIGHT_MODE;//after calibrating, go to usb light mode.
 			break;
+			case MANUAL_CAL_MODE:
+				Calibrate_Manually();
+				Typewriter_Mode = USB_LIGHT_MODE;
+			break;
 			case BLUETOOTH_MODE:
 				#ifndef BT_DEBUG
 					USB_Disable();//don't disable usb if it is debug mode.
@@ -222,9 +225,7 @@ int main(void)
 					key = GetKey();
 					modifier = GetModifier();
 									
-					code = GetHIDKeyCode(key, modifier);
-					
-					if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..					
+					code = GetHIDKeyCode(key, &modifier);
 					
 					if(code){Bluetooth_Send(code,modifier);}
 						
@@ -418,10 +419,13 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 //	memcpy((void*)KeyboardReport->KeyCode, (void*)KeyBuffer->KeyCode, 6); //copy the keybuffer into the keyboard report being sent to host.
 	KeyboardReport->KeyCode[0] = KeyBuffer->KeyCode[0];
 
-	if (KeyboardReport->KeyCode[0]){ //if there is a key waiting to be sent, then use the modifier that goes with that key.
+	if (Hold_Alt_Down) { //this flag instructs us to hold alt down continuously, so that numpad ascii can be sent.
+		KeyboardReport->Modifier = HID_KEYBOARD_MODIFIER_LEFTALT;
+	}
+	else if (KeyboardReport->KeyCode[0]){ //if there is a key waiting to be sent, then use the modifier that goes with that key.
 		KeyboardReport->Modifier = KeyBufferMod;
 	}
-	else {
+	else{
 		KeyboardReport->Modifier = 0; //otherwise, clear the modifiers so the host doesn't think we are holding down shift or alt or whatever for no reason.
 	}
 	
@@ -450,8 +454,8 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
 
 	uint8_t* LEDReport = (uint8_t*)ReportData;
 
-	if (*LEDReport & HID_KEYBOARD_LED_NUMLOCK) //if numlock is somehow active,
-	  KeyBuffer->KeyCode[0] = HID_KEYBOARD_LED_NUMLOCK; //press numlock key to deactivate it.
+	if (!(*LEDReport & HID_KEYBOARD_LED_NUMLOCK)) //if numlock is somehow inactive,  -- numlock always active!
+	  KeyBuffer->KeyCode[0] = HID_KEYBOARD_LED_NUMLOCK; //press numlock key to activate it.
 
 	else if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) //if capslock is somehow active,
 	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_LED_CAPSLOCK; //press capslock key to deactivate it.
@@ -492,7 +496,7 @@ void Init_Mode(){
 			}
 	}
 	else if(is_low(S1)&&is_low(S2)){
-			Typewriter_Mode = SD_MODE;
+			Typewriter_Mode = MANUAL_CAL_MODE;
 	}
 	else if(is_low(S1)&&is_low(S3)){//quick calibration mode
 			Typewriter_Mode = QUICK_CAL_MODE;

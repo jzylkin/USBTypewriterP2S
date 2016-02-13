@@ -16,7 +16,7 @@ extern uint8_t FnKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t ShiftKeyCodeLookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t ASCIILookUpTable[KEYCODE_ARRAY_LENGTH];
 extern uint8_t ASCIIShiftLookUpTable[KEYCODE_ARRAY_LENGTH];
-extern uint8_t KeyBufferMod;
+volatile extern uint8_t KeyBufferMod;
 
 extern uint8_t DoubleTapTime;
 extern uint8_t KeyReleaseTime;
@@ -26,7 +26,7 @@ extern uint8_t ReedHoldTime;
 extern uint8_t Shift_Reed;
 extern uint8_t UseHallSensor; 
 extern uint8_t HallSensorPolarity;
-
+extern bool Hold_Alt_Down;
 //extern uint8_t BluetoothConfigured;
 
 extern bool Reed1Polarity;

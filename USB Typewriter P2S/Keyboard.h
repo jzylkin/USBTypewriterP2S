@@ -157,11 +157,12 @@
 		#define HARDWARE_TEST 11
 		#define INITIALIZING 12
 		#define USB_LIGHT_MODE 13
+		#define MANUAL_CAL_MODE 14
 		
 		#define SD_BUFFER_LENGTH 512
 		
 		#define USB_SEND_TIMEOUT 100 //wait 50ms if usb send buffer is full before discarding a character.
-		#define USB_SEND_DELAY 15// wait 30ms after sending each key to usb.
+		#define USB_SEND_DELAY 20// wait 30ms after sending each key to usb.
 		#define CALIBRATION_DELAY 500// wait 500ms between programming keys.
 		
 		
