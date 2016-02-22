@@ -54,7 +54,7 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_How_To_Scroll[]	PROGMEM = "Press CTRL to scroll through characters.\r";
 	const char Str_How_To_Select[]  PROGMEM = "Press ALT to select a character.\r";
 	const char Str_How_To_Exit[] PROGMEM = "Press CMD to save and exit.\r";
-	const char Str_Assign[]	PROGMEM = " KEY SELECTED. PRESS A TYPEWRITER KEY TO ASSIGN... ";
+	const char Str_Assign[]	PROGMEM = " CHARACTER SELECTED. PRESS A KEY TO ASSIGN... ";
 
 void Calibrate(){
 	uint8_t ASCIIKey;
@@ -225,6 +225,20 @@ void Calibrate(){
 		}
 	}
 	
+//=======TEACH ARROW KEYS========
+uint8_t hid_arrows[] = {HID_KEYBOARD_SC_LEFT_ARROW,HID_KEYBOARD_SC_RIGHT_ARROW,HID_KEYBOARD_SC_UP_ARROW,HID_KEYBOARD_SC_DOWN_ARROW};
+uint8_t unicode_arrows[] = {27,26,24,25}; //corresponding unicode for the arrow keys above
+	
+for(int i=0;i<4;i++){
+	USBSendASCII(unicode_arrows[i]);
+	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	KeyPressed = WaitForKeypress();
+	Modifier = GetModifier();
+	TeachHIDKey(hid_arrows[i],KeyPressed,Modifier);
+	USBSend(KEY_ENTER,LOWER);
+}
+
+
 //-------TEACH VARIOUS UPPER CASE SYMBOLS ---------
 	//@ for sd
 	USBSend(KEY_2,UPPER);
@@ -345,13 +359,24 @@ void QuickCalibrate(){
 	
 }
 
+//increment the code to program during manual calibration mode. In USB mode, if code is Enter or space or other character in between, skip it.  
 #define INCREMENT_CODE() {\
 		code++;\
-		if (code > codeend2) {code = codestart1;}\
+		if ((code == 0)||(code > codeend2)) {code = codestart1;}\
 		else if((code > codeend1) && (code < codestart2)){code = codestart2;}\
-		if (edit_mode == 'u'){USBSend(code,LOWER);}\
-		else {USBSendASCII(code);}\
-	}
+		USBSend(KEY_ENTER,LOWER);\
+		if (edit_mode == 'u'){\
+			while (((code|FORCE_UPPER) >= (KEY_ENTER|FORCE_UPPER)) && ((code|FORCE_UPPER) <= (KEY_SPACE|FORCE_UPPER))){code++;}\
+			USBSend(code,LOWER);\
+		}\
+		else {\
+			if(code == 'a'){code = 'z'+1;}\
+			if(code == 'A'){code = 'Z'+1;}\
+			if(code == '0'){code = '9'+1;}\
+			USBSendASCII(code);\
+		}\
+}
+
 
 void Calibrate_Manually(){
 	
@@ -363,35 +388,43 @@ void Calibrate_Manually(){
 	uint8_t codeend2;
 	uint8_t keypressed;
 	uint8_t modifier;
+	char edit_mode = 's';
 	
+	while(USB_DeviceState != DEVICE_STATE_Configured){;}//wait for configuration to complete
+	Delay_MS(1000);
+		
 	//tell user what is up
 	USBSendPROGString(Str_Manual_Calibration);
 	USBSendPROGString(Str_U_For_USB);
 	USBSendPROGString(Str_S_For_SD);
-	char edit_mode = Get_User_Response();
+	edit_mode = Get_User_Response();
+	USBSendString("OK\r");
 	USBSendPROGString(Str_How_To_Scroll);
 	USBSendPROGString(Str_How_To_Select);
 	USBSendPROGString(Str_How_To_Exit);
 	
 	//set ranges of ascii/hid codes over which to calibrate.  there are two ranges.
 	if(edit_mode == 'u'){
-		codestart1 = 0x1E;
+		codestart1 = 0x2D;
 		codeend1 = 0x38;
 		codestart2 = 0x1E|FORCE_UPPER;
-		codestart2 = 0x38|FORCE_UPPER;
+		codeend2 = 0x38|FORCE_UPPER;
 	}
 	else{
 		codestart1 = 0x21;
-		codeend1 = 0x7E;
-		codestart2 = 0xBC;
-		codeend2 = 0xFF;
+		codeend1 = 175;
+		codestart2 = 224;
+		codeend2 = 251;
 	}
 	
 	code = codestart1;
+	if (edit_mode == 'u'){USBSend(code,LOWER);}
+	else {USBSendASCII(code);}
 	
 	while(is_high(CMD_KEY)){
 		if(is_low(CTRL_KEY)){
 			INCREMENT_CODE();
+			Delay_MS(CALIBRATION_DELAY);
 		}
 		if(is_low(ALT_KEY)){
 			USBSendPROGString(Str_Assign);
@@ -400,15 +433,20 @@ void Calibrate_Manually(){
 			modifier = GetModifier();
 			
 			if (edit_mode == 'u'){TeachHIDKey(code,keypressed,modifier);}
-			else{TeachASCIIKey(code,keypressed,modifier);}
+			else{
+				TeachASCIIKey(code,keypressed,modifier);
+				USBSendNumber(keypressed);
+			}
 				
-			USBSendNumber(keypressed);
 			USBSend(KEY_ENTER,LOWER);
 			
+			SaveCalibration();
+			
 			INCREMENT_CODE();
+			Delay_MS(CALIBRATION_DELAY);
 		}
 		
-		Delay_MS(CALIBRATION_DELAY);
+		
 		
 	}
 	

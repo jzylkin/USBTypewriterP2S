@@ -10,7 +10,7 @@
 #include "KeyCodes.h"
 #include <util/delay.h>
 
-#define response_buffer_len 64
+#define response_buffer_len 32
 char response[response_buffer_len]; //array to store bluetooth module's responses to commands
 
 uint8_t BT_State; //BT state is "inactive" by default

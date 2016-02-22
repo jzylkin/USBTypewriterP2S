@@ -451,18 +451,23 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const void* ReportData,
                                           const uint16_t ReportSize)
 {
-
 	uint8_t* LEDReport = (uint8_t*)ReportData;
+	static bool NumLockActivated;
+	static bool CapsLockDeactivated;
 
-	if (!(*LEDReport & HID_KEYBOARD_LED_NUMLOCK)) //if numlock is somehow inactive,  -- numlock always active!
-	  KeyBuffer->KeyCode[0] = HID_KEYBOARD_LED_NUMLOCK; //press numlock key to activate it.
+		if (!(*LEDReport & HID_KEYBOARD_LED_NUMLOCK) && !(NumLockActivated)){ //if numlock is somehow inactive, and numlock not already deactivated by code,
+		  KeyBuffer->KeyCode[0] = HID_KEYBOARD_SC_NUM_LOCK; //press numlock key to activate it.  -- NumLockDeactivated flag makes sure this only happens once per session.
+		  NumLockActivated = true;
+		}
 
-	else if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) //if capslock is somehow active,
-	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_LED_CAPSLOCK; //press capslock key to deactivate it.
+		else if ((*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) && !(CapsLockDeactivated)){ //if capslock is somehow active,
+		 KeyBuffer ->KeyCode[0] = HID_KEYBOARD_SC_CAPS_LOCK; //press capslock key to deactivate it.
+		 CapsLockDeactivated = true;
+		}
 
-	else if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK) //if scrolllock is somehow active,
-	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_LED_SCROLLLOCK; //press scrolllock key to deactivate it.
-
+	//	else if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK) //if scrolllock is somehow active, nobody cares about scrolllock
+	//	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_SC_SCROLL_LOCK; //press scrolllock key to deactivate it.
+	
 }
 
 

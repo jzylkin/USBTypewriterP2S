@@ -163,7 +163,7 @@ void USBSendASCII(uint8_t number){
 	
 	Delay_MS(100);
 	
-	USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER); //send a leading 0
+//	USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER); //send a leading 0
 	
 	//send hundreds digit
 	if (number >= 200){  
@@ -173,22 +173,23 @@ void USBSendASCII(uint8_t number){
 		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END, LOWER);
 	}
 	else{
-		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER);
+//		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER);
 	}
+	Delay_MS(50);
 	
 	//send tens digit
 	if (tens != 0){
-		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END + tens,LOWER); //send 1-9
+		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END + tens -1,LOWER); //send 1-9
 	}
 	else{
 		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT,LOWER); //send 0
 	}
 
-	Delay_MS(100);
+	Delay_MS(50);
 	
 	//send ones digit
 	if (ones!=0){
-		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END + ones,LOWER);
+		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END + ones -1,LOWER);
 	}
 	else{
 		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT,LOWER);
