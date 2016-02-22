@@ -130,6 +130,7 @@ int main(void)
 	uint8_t code;
 	uint8_t modifier;
 	uint8_t parity;
+	uint8_t clearCounter = 0;
 	
 	Typewriter_Mode = INITIALIZING;
 
@@ -221,13 +222,18 @@ int main(void)
 				
 				set_high(RED_LED);//turn off red led if bt is connected.
 				set_low(GREEN_LED);
+				Delay_MS(500);
+				Bluetooth_Send(0,0); //clear off keyboard report.
+				
 				while(is_high(BT_CONNECTED)){
 					key = GetKey();
 					modifier = GetModifier();
 									
 					code = GetHIDKeyCode(key, &modifier);
 					
-					if(code){Bluetooth_Send(code,modifier);}
+					if(code){
+						Bluetooth_Send(code,modifier);
+					}
 						
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
 					

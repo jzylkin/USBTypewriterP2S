@@ -34,7 +34,6 @@ const char SEND_EMPTY_HID_REPORT[] PROGMEM = "AT+KR=A1,01,00,00,00,00,00,00,00,0
 
 
 
-
 /**
  * Bluetooth Send -- send keystrokes to bluetooth module using "shorthand" protocol
  * 
@@ -48,8 +47,8 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 //	set_high(BT_CTS);//toggle cts to wake module from deep sleep.
 //	_delay_us(100);
 
-	Bluetooth_Send_CMD("AT+UI=01",false);
-	Delay_MS(1);
+//	Bluetooth_Send_CMD("AT+UI=00",false); // disable the ui
+//	Delay_MS(10);
 		if (key&FORCE_UPPER){ //in this program, we use the MSB of code to indicate that this key MUST be sent as upper case.
 			reg_clr(key,FORCE_UPPER); //clear the MSB,
 			modifier = UPPER; //and set the modifier to upper case.
@@ -59,12 +58,12 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 			key = KEY_ENTER;
 			modifier = HID_KEYBOARD_MODIFIER_LEFTCTRL;
 		}
-		sprintf(cmd_buffer,"AT+KR=A1,01,%02x,00,%02x,00,00,00,00,00",modifier,key);
+	
+		sprintf(cmd_buffer,"AT+KR=A1,01,%02x,00,%02x,00,00,00,00,00",modifier,key);	
 		Bluetooth_Send_CMD(cmd_buffer, false);
 			//clear the keystroke
-		Delay_MS(1);
+		Delay_MS(5);
 		Bluetooth_Send_PROGMEM_CMD(SEND_EMPTY_HID_REPORT, false);
-
 }
 
 /**
@@ -77,6 +76,11 @@ void Bluetooth_Init(){
 	Bluetooth_Reset(); //reset the module
 	Delay_MS(1000);
 	Get_Response(true);
+	Delay_MS(1000);
+	Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 5600
+	Delay_MS(1000);
+	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart
+
 	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE, true); //get into proxy mode so that commands work correctly.
 	Delay_MS(1000);
 	BT_State = INITIALIZED;
@@ -102,6 +106,9 @@ bool Bluetooth_Configure(){
 	Bluetooth_Send_PROGMEM_CMD(SET_MODULE_FEATURES,true); //configure module features (see manual):
 	Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true); //do not use man-in-middle protection
 	Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true);//set IO setting to "no input or output" hopefully this means no need for pin-code.
+	Bluetooth_Send_PROGMEM_CMD(DISABLE_SLEEP,true);//no sleep mode.
+	
+	
  //
 	/*disable the auto connection after power on as permanent mode;
 	enable the auto connect after paired; -- was disabled by default.
@@ -139,13 +146,17 @@ bool Bluetooth_Send_CMD(char* command, bool verbose){
 	}
 	uart_putc('\r');
 	uart_putc('\n'); //send return carriage
-
-	return Get_Response(verbose);
+    if(verbose){
+		return Get_Response(verbose);
+	}
+	return true;
 }
 
 bool Bluetooth_Send_PROGMEM_CMD(const char* progcommand, bool verbose){
 		strcpy_P(StringBuffer, (char*) progcommand);
 		return Bluetooth_Send_CMD(StringBuffer,verbose);
+
+\
 }
 
 	
@@ -189,7 +200,7 @@ bool Get_Response(bool verbose){
 			USBSendString(response);
 		#endif
 		
-		if ((response[0] == 'O')||(response[2] == '=')){  //if response is "OK" or "XX=...", bt module has received command successfully
+		if ((response[0] == 'O')||(response[2] == '=')||(response[0] == 'C')){  //if response is "OK" or "XX=...", or "Copyright" bt module has received command successfully
 			return true;
 		}
 		else{
