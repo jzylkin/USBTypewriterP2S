@@ -31,6 +31,7 @@ const char DISABLE_SLEEP[] PROGMEM = "AT+SP=00";
 const char MAKE_DISCOVERABLE[] PROGMEM = "AT+MD";
 const char CONNECT_TO_PAIRED_DEVICE[] PROGMEM = "AT+CI";
 const char SEND_EMPTY_HID_REPORT[] PROGMEM = "AT+KR=A1,01,00,00,00,00,00,00,00,00";
+const char SET_BYPASS_MODE[] PROGMEM = "AT+BP=04,07,00";
 
 
 
@@ -59,11 +60,9 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 			modifier = HID_KEYBOARD_MODIFIER_LEFTCTRL;
 		}
 	
-		sprintf(cmd_buffer,"AT+KR=A1,01,%02x,00,%02x,00,00,00,00,00",modifier,key);	
-		Bluetooth_Send_CMD(cmd_buffer, false);
-			//clear the keystroke
+		uart_putc(0xA1);uart_putc(0x01);uart_putc(modifier);uart_putc(0);uart_putc(key);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);
 		Delay_MS(5);
-		Bluetooth_Send_PROGMEM_CMD(SEND_EMPTY_HID_REPORT, false);
+		uart_putc(0xA1);uart_putc(0x01);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);
 }
 
 /**
@@ -76,13 +75,14 @@ void Bluetooth_Init(){
 	Bluetooth_Reset(); //reset the module
 	Delay_MS(1000);
 	Get_Response(true);
-	Delay_MS(1000);
-	Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 5600
-	Delay_MS(1000);
+	Delay_MS(100);
+	
+	Bluetooth_Enter_Proxy_Mode();
+	Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 57600
+	Delay_MS(500);
 	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart
 
-	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE, true); //get into proxy mode so that commands work correctly.
-	Delay_MS(1000);
+		
 	BT_State = INITIALIZED;
 }
 
@@ -119,6 +119,7 @@ bool Bluetooth_Configure(){
 	This command is only needed when the first time use this Bluetooth module.*/
 	
 	Bluetooth_Send_PROGMEM_CMD(CLEAR_PAIRED_LIST,true); //clear paired device list, which forces the device to go into discovery mode.
+	Bluetooth_Send_PROGMEM_CMD(SET_BYPASS_MODE,false);//go into hid bypass mode
 	
 	return success; //if any of the commands failed, success will be false.
 }
@@ -171,6 +172,15 @@ void Bluetooth_Reset(){
 	
 }
 
+void Bluetooth_Enter_Proxy_Mode(){
+	Delay_MS(1000);
+	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE,false);
+	Delay_MS(1000);
+}
+
+void Bluetooth_Exit_Proxy_Mode(){
+	Bluetooth_Send_PROGMEM_CMD(SET_BYPASS_MODE,false);
+}
 
 bool Get_Response(bool verbose){
 	uint16_t tmpchar;

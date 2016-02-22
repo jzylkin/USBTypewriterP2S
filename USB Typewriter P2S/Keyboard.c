@@ -210,19 +210,20 @@ int main(void)
 				#ifndef BT_DEBUG
 					USB_Disable();//don't disable usb if it is debug mode.
 				#endif
-				if(Get_Bluetooth_State() != INITIALIZED){Bluetooth_Init();};//initialize bluetooth if it hasn't been already.
-				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
+					
+					if(Get_Bluetooth_State() != INITIALIZED){Bluetooth_Init();};//initialize bluetooth if it hasn't been already. this sets up proxy mode, too.
+					if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
 				
 				while(is_low(BT_CONNECTED)){
 					set_low(RED_LED);
 					set_high(GREEN_LED);
 					Bluetooth_Connect();
-					Delay_MS(4000);					
+					Delay_MS(4000);			
 				}//wait for connection to happen, glow red until then.
 				
 				set_high(RED_LED);//turn off red led if bt is connected.
 				set_low(GREEN_LED);
-				Delay_MS(500);
+				Bluetooth_Exit_Proxy_Mode();
 				Bluetooth_Send(0,0); //clear off keyboard report.
 				
 				while(is_high(BT_CONNECTED)){
@@ -238,6 +239,9 @@ int main(void)
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
 					
 				}
+				
+				Bluetooth_Enter_Proxy_Mode(); //if connection is lost, go back into proxy mode so we can communicate with BT module
+		
 			break;
 			case PANIC_MODE:
 				USB_Disable();

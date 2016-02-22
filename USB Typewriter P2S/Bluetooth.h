@@ -14,6 +14,8 @@ bool Bluetooth_Send_CMD(char* command, bool verbose);
 bool Bluetooth_Send_PROGMEM_CMD(const char* progcommand, bool verbose);
 bool Bluetooth_Enter_CMD_Mode();
 void Bluetooth_Reset();
+void Bluetooth_Enter_Proxy_Mode();
+void Bluetooth_Exit_Proxy_Mode();
 bool Bluetooth_Disconnect();
 void BT_Wake();
 void BT_Sleep();
