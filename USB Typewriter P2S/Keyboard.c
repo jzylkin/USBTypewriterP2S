@@ -25,6 +25,7 @@ do not use it for commercial purposes, and you attribute its origins to Jack Zyl
 #include "Calibrate.h"
 #include "KeyCodes.h"
 
+
 //Globl variables:
 volatile int8_t Typewriter_Mode;
 
@@ -216,14 +217,19 @@ int main(void)
 				while(is_low(BT_CONNECTED)){
 					set_low(RED_LED);
 					set_high(GREEN_LED);
+					#if MODULE_NAME==EHONG
 					Bluetooth_Connect();
-					Delay_MS(4000);			
+					Delay_MS(4000);	
+					#endif		
 				}//wait for connection to happen, glow red until then.
 				
 				set_high(RED_LED);//turn off red led if bt is connected.
 				set_low(GREEN_LED);
+				
+				#if MODULE_NAME==EHONG
 				Bluetooth_Exit_Proxy_Mode();
 				Bluetooth_Send(0,0); //clear off keyboard report.
+				#endif
 				
 				while(is_high(BT_CONNECTED)){
 					key = GetKey();
@@ -239,8 +245,10 @@ int main(void)
 					
 				}
 				
+				#if MODULE_NAME==EHONG
 				Bluetooth_Enter_Proxy_Mode(); //if connection is lost, go back into proxy mode so we can communicate with BT module
-		
+				#endif
+			
 			break;
 			case PANIC_MODE:
 				USB_Disable();
@@ -501,7 +509,11 @@ void Init_Mode(){
 					#ifndef BT_DEBUG
 						USB_Disable(); //leave usb active if this is debug mode.
 					#endif
+					
+					#if MODULE_NAME==EHONG //ehong module requires you to manually clear the pairing list to enter inquiry mode
 					BluetoothInquire();//clear paired device list and try to pair.
+					#endif
+					
 					Typewriter_Mode = BLUETOOTH_MODE;
 					//Default_Mode = BLUETOOTH_MODE;  //Do not set bluetooth mode as the default, since this mode only TESTS the bluetooth
 			}
@@ -545,7 +557,10 @@ void Init_Mode(){
 			USB_Disable(); //if this is not debug mode, disable the usb port.
 		#endif
 		if(Bluetooth_Configure()){ // attempt to configure.
+			#if MODULE_NAME==EHONG
 			BluetoothInquire(); //if configuration is successful, delete the paired device list so device can become discoverable.
+			#endif
+			
 			Typewriter_Mode = BLUETOOTH_MODE;
 			Default_Mode = BLUETOOTH_MODE;
 		}

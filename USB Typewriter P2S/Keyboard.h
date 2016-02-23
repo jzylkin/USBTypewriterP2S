@@ -38,6 +38,18 @@
 
 		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.3.0.E"; //E identifies this as the version for E-HONG bluetooth modules.
 //		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
+	
+		#define		EHONG 1
+		#define		RN42 2
+		#define	MODULE_NAME   RN42
+		
+		#ifndef MODULE_NAME
+		#error "YOU MUST SELECT A BT MODULE"
+		#endif
+		
+		#if MODULE_NAME>2
+		#error "INVALID BT MODULE SELECTION"
+		#endif
 
 	/* Includes: */
 		#include <avr/io.h>
