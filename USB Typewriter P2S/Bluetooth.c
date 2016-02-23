@@ -290,6 +290,16 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 //	set_high(BT_CTS);//toggle cts to wake module from deep sleep.
 //	_delay_us(100);
 
+		if (key&FORCE_UPPER){ //in this program, we use the MSB of code to indicate that this key MUST be sent as upper case.
+			reg_clr(key,FORCE_UPPER); //clear the MSB,
+			modifier = UPPER; //and set the modifier to upper case.
+		}
+		
+		if(key == KEY_EXECUTE){ // the "execute" command is for posting emails -- it actually sends a "CTRL+ENTER" command.
+			key = KEY_ENTER;
+			modifier = HID_KEYBOARD_MODIFIER_LEFTCTRL;
+		}
+
 	set_low(BT_CTS);
 	Delay_MS(10);//5 ms is worst-case wakeup time
 		
