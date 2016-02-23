@@ -72,17 +72,21 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
  * \return void
  */
 void Bluetooth_Init(){
+	uart_init(UART_BAUD_SELECT(9600,F_CPU));//reinitialize uart to 9600 baud
+	
 	Bluetooth_Reset(); //reset the module
 	Delay_MS(1000);
-	Get_Response(true);
-	Delay_MS(100);
 	
-	Bluetooth_Enter_Proxy_Mode();
-	Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 57600
-	Delay_MS(500);
-	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart
+	bool btbaudis9600 = Get_Response(true); //getresponse will only be intelligible if baud is 9600 still, because Atmega's baud rate is still 9600
 
-		
+	if(btbaudis9600){ //if bt module still has baud 9600, change it to 57600
+		Bluetooth_Enter_Proxy_Mode();
+		Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 57600 if 
+	}
+	
+	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+	Bluetooth_Enter_Proxy_Mode();
+
 	BT_State = INITIALIZED;
 }
 

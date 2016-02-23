@@ -130,7 +130,6 @@ int main(void)
 	uint8_t code;
 	uint8_t modifier;
 	uint8_t parity;
-	uint8_t clearCounter = 0;
 	
 	Typewriter_Mode = INITIALIZING;
 
