@@ -324,7 +324,7 @@ void RestoreFactoryDefaults(){
 			eeprom_update_byte((uint8_t*)DEFAULT_MODE_ADDR,USB_COMBO_MODE);
 			eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR,0); //do not use dummy load unless told to.
 			eeprom_write_word((uint16_t *)FILENUM_ADDR,0);//reset sd card file number to zero.
-			eeprom_write_byte((uint8_t*)USE_HALL_SENSOR_ADDR,HALL_NOT_PRESENT);
+//			eeprom_write_byte((uint8_t*)USE_HALL_SENSOR_ADDR,HALL_NOT_PRESENT); //dont change hall sensor when resetting defaults.
 			
 			LoadEepromParameters(); //load new defaults into RAM
 }

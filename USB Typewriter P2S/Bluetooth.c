@@ -85,6 +85,7 @@ void Bluetooth_Init(){
 	if(btbaudis9600){ //if bt module still has baud 9600, change it to 57600
 		Bluetooth_Enter_Proxy_Mode();
 		Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 57600 if 
+		Delay_MS(100); //delay necessary for command to send before re-initializing uart.
 	}
 	
 	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
@@ -237,10 +238,6 @@ bool BluetoothInquire(){
 	return success;
 }
 
-uint8_t Get_Bluetooth_State(){
-	return BT_State;
-}
-
 void BT_Sleep(){
 	if (!BT_Asleep){ //if not already asleep:
 		Bluetooth_Send_PROGMEM_CMD(ENABLE_SLEEP,true); //tell bt module to sleep
@@ -351,7 +348,6 @@ bool Bluetooth_Configure(){
 	do {
 		attempt_count++;
 		cmdmode = Bluetooth_Enter_CMD_Mode();
-		Delay_MS(200);
 	}while((attempt_count < 5)&&(!cmdmode));
 	
 	if(!cmdmode){ //if the bluetooth failed to enter command mode, fail out.
@@ -390,17 +386,30 @@ bool Bluetooth_Configure(){
  * \return bool
  */
 bool Bluetooth_Connect(){ 
-	bool cmdmode;
-	Bluetooth_Disconnect();
-	
-	cmdmode = Bluetooth_Enter_CMD_Mode();
+	bool cmdmode =0;
+	bool response;
+	static bool Paired;
+
+	for(uint8_t i=0;i<5;i++){
+		cmdmode = Bluetooth_Enter_CMD_Mode();
+		if(cmdmode) break;//exit loop on success
+	}
 	
 	if(!cmdmode){ //if the bluetooth failed to enter command mode, fail out.
-		Typewriter_Mode = PANIC_MODE;
 		return false;
 	}
 	
-	Bluetooth_Send_CMD("C");
+	response = Bluetooth_Send_CMD("GR");//read modules paired device list
+	
+	if(!response){ // if response isn't "NOT SET"  device is paired to a device (but not necessarily connected)
+		Paired = true;
+	}
+
+	if((Paired) && (is_low(BT_CONNECTED))){//if response is GR, then maybe there is a paired device in the list -- if not already connected, connect to that device
+		Bluetooth_Send_CMD("C");
+	}
+	Delay_MS(100);
+	Bluetooth_Exit_CMD_Mode();
 	
 	return true; //todo: check connection status pin to see if device connects or not
 }
@@ -455,11 +464,12 @@ void Bluetooth_Reset(){
 
 
 bool Bluetooth_Enter_CMD_Mode(){
-
+	Delay_MS(500);//must wait 250 ms before entering cmd mode.
 	uart_clear_rx_buffer();
 	uart_putc('$');
 	uart_putc('$');
 	uart_putc('$'); //send $$$ to enter command mode
+	Delay_MS(500); //wait an additional 250ms after sending characters
 	
 	if (Get_Response()){ //first character sent back from host should be 'C' (For "CMD")
 		return true; //entering command mode succeeded.
@@ -467,17 +477,19 @@ bool Bluetooth_Enter_CMD_Mode(){
 	else{
 		return false; //failed to enter command mode
 	}
+	
 }
 
 void Bluetooth_Exit_CMD_Mode(){
-
-
-	uart_clear_rx_buffer();
-	uart_putc('-');
-	uart_putc('-');
-	uart_putc('-'); //send --- to exit command mode
-	Get_Response();
-
+	for(uint8_t i=0; i<=10; i++){ //try 10 times
+		uart_clear_rx_buffer();
+		uart_putc('-');
+		uart_putc('-');
+		uart_putc('-'); //send --- to exit command mode
+		uart_putc('\r'); //carriage return important.
+//		if(Get_Response()){break;} //if get response is successful, exit command succeeded.
+		Delay_MS(500);
+	}
 }
 
 //void Bluetooth_Save_Address(){
@@ -495,12 +507,18 @@ bool Get_Response(){
 		response[3]=  uart_getc() & 0xFF;
 		response[4] = '\0';
 		
-	//	USBSendString(response);
-	//	USBSend(KEY_ENTER,LOWER);
+		USBSendString(response);
+		USBSend(KEY_ENTER,LOWER);
 	
 		
 
 		if ((response[0] == 'C')||(response[0] == 'A')|| (response[0] == 'R')){  //if response is "CMD" or "AOK" or "REBOOT", bt module has received command successfully
+			return true;
+		}
+		else if(response[0] == 'N'){ //"NOT SET"  means bt is discoverable.
+			return true;
+		}
+		else if(response[0] == 'E'){ //"END" means successfully ended cmd mode;
 			return true;
 		}
 		else{

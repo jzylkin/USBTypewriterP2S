@@ -28,8 +28,8 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Calibrating[]		PROGMEM = "CALIBRATING...\r";
 	const char Str_Type_The_Following[] PROGMEM = "TYPE THE FOLLOWING KEYS (PRESS SPACE TO SKIP)...\r";
 	const char Str_Shift_Error[]		PROGMEM = "ERROR...SHIFT MUST BE A REED SWITCH.\r";
-	const char Str_SD_Only[]			PROGMEM = " KEY TO USE DURING SD CARD MODE:";
-	const char Str_USB_Only[]			PROGMEM = " KEY TO USE DURING USB/BLUETOOTH MODE:";
+	const char Str_SD_Only[]			PROGMEM = " (DURING SD CARD MODE):";
+	const char Str_USB_Only[]			PROGMEM = " (DURING USB/BLUETOOTH MODE):";
 	const char Str_Dummy_Load[]			PROGMEM = "DUMMY LOAD ACTIVATED\r";
 	const char Str_No_Dummy_Load[]		PROGMEM = "DUMMY LOAD DEACTIVATED\r";
 	const char Str_Quick_Calibrate[]	PROGMEM = "QUICK CALIBRATION MODE...\r";
@@ -51,10 +51,13 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Manual_Calibration[] PROGMEM = "MANUAL CALIBRATION MODE...\r";
 	const char Str_U_For_USB[]   PROGMEM = "Press U if changes should apply to USB/BT mode.\r";
 	const char Str_S_For_SD[]	 PROGMEM = "Press S if changes should apply to SD mode.\r";
-	const char Str_How_To_Scroll[]	PROGMEM = "Press CTRL to scroll through characters.\r";
-	const char Str_How_To_Select[]  PROGMEM = "Press ALT to select a character.\r";
-	const char Str_How_To_Exit[] PROGMEM = "Press CMD to save and exit.\r";
+	const char Str_How_To_Scroll[]	PROGMEM = "Press SPACEBAR to scroll through characters.\r";
+	const char Str_How_To_Scroll_Back[]  PROGMEM = "Press CTRL+SPACEBAR to scroll backwards.\r";
+	const char Str_How_To_Exit[] PROGMEM = "Press CMD+SPACEBAR to save changes and exit.\r";
 	const char Str_Assign[]	PROGMEM = " CHARACTER SELECTED. PRESS A KEY TO ASSIGN... ";
+	const char Str_Shift_Plus[] PROGMEM = "SHIFT+";
+	const char Str_Reed[] PROGMEM ="REED";
+	const char Str_Header[] PROGMEM = "\rCHAR:\tCONTACT#:\r";
 
 void Calibrate(){
 	uint8_t ASCIIKey;
@@ -91,7 +94,7 @@ void Calibrate(){
 		case USB_LIGHT_MODE:
 			USBSendPROGString(Str_Light_Mode);
 		break;
-		default: USBSendString("Unknown"); break;
+		default: USBSendString("NONE\r"); break;
 	}
 	
 	USBSendPROGString(Str_Calibrating);
@@ -117,11 +120,12 @@ void Calibrate(){
 	}
 	
 	USBSendPROGString(Str_Type_The_Following);
+	USBSendPROGString(Str_Header);
 	
 //--------TEACH LETTER KEYS----------
 	for (HIDKey = KEY_A; HIDKey <= KEY_Z; HIDKey ++){
 		USBSend(HIDKey, UPPER);
-		USBSend(KEY_SPACE,LOWER);// used to be a colon
+		USBSend(KEY_TAB,LOWER);// used to be a colon
 		KeyPressed = WaitForKeypress();
 		Modifier = GetModifier();
 		
@@ -145,7 +149,7 @@ void Calibrate(){
 //--------TEACH NUMBER KEYS---------
 	for (int i = 0; i <= 9; i ++){
 			USBSend(HIDNumbers[i], LOWER);
-			USBSend(KEY_SPACE,LOWER);// used to be a colon
+			USBSend(KEY_TAB,LOWER);// used to be a colon
 			KeyPressed = WaitForKeypress();
 			Modifier = GetModifier();
 			
@@ -163,21 +167,21 @@ void Calibrate(){
 	
 //----TEACH F1, F11, F12
 	USBSendString("F1");
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachHIDKey(KEY_F1, KeyPressed, Modifier); 
 	USBSend(KEY_ENTER,LOWER);
 	
 	USBSendString("F11");
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachHIDKey(KEY_F11, KeyPressed, Modifier);
 	USBSend(KEY_ENTER,LOWER);
 	
 	USBSendString("F12");
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachHIDKey(KEY_F12, KeyPressed, Modifier);
@@ -185,7 +189,7 @@ void Calibrate(){
 	
 //--------TEACH SHIFT KEY-----------
 	USBSendString("SHIFT");
-	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress();
 	if((KeyPressed)&&(KeyPressed <= 8)){ //if keypressed is 1, 2, 3, or 4, it represents a reed switch being held down.
 		Shift_Reed = KeyPressed;
@@ -201,7 +205,7 @@ void Calibrate(){
 	for (HIDKey = KEY_DASH; HIDKey <= KEY_SLASH; HIDKey ++){
 			if (HIDKey != HID_KEYBOARD_SC_NON_US_HASHMARK_AND_TILDE){ //don't bother to program the non-us hash key, which is a weird and confusing key.
 			USBSend(HIDKey, LOWER);
-			USBSend(KEY_SPACE,LOWER);// used to be a colon
+			USBSend(KEY_TAB,LOWER);// used to be a colon
 			KeyPressed = WaitForKeypress();
 			Modifier = GetModifier();
 			
@@ -231,7 +235,7 @@ uint8_t unicode_arrows[] = {27,26,24,25}; //corresponding unicode for the arrow 
 	
 for(int i=0;i<4;i++){
 	USBSendASCII(unicode_arrows[i]);
-	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachHIDKey(hid_arrows[i],KeyPressed,Modifier);
@@ -243,7 +247,7 @@ for(int i=0;i<4;i++){
 	//@ for sd
 	USBSend(KEY_2,UPPER);
 	USBSendPROGString(Str_SD_Only);
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	
@@ -268,7 +272,7 @@ for(int i=0;i<4;i++){
 	//?
 	USBSend(KEY_SLASH,UPPER);
 	USBSendPROGString(Str_SD_Only);
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachASCIIKey('?',KeyPressed,Modifier);
@@ -294,7 +298,7 @@ for(int i=0;i<4;i++){
 	
 	//!
 	USBSend(KEY_1|FORCE_UPPER,UPPER);
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 
@@ -340,7 +344,7 @@ void QuickCalibrate(){
 	//--------TEACH SHIFT KEY-----------
 	USBSendString("SHIFT");
 	Shift_Reed = 0; //reset the shift reed to 0 (undefined) so that WaitForKeypress() doesn't ignore any of the reeds
-	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress();
 	if((KeyPressed)&&(KeyPressed <= 8)){ //if keypressed is 1, 2, 3, or 4, it represents a reed switch being held down.
 		Shift_Reed = KeyPressed;
@@ -359,6 +363,8 @@ void QuickCalibrate(){
 	
 }
 
+#define CODE_IS_SKIPPED (code == 129)||(code == 130)||(code==132)||(code==141)||(code==155)||(code==157)||(code==160)||(code==168)||(code == 175)||(code == 180)||(code== 173)||(code== 183)||(code== 184)
+
 //increment the code to program during manual calibration mode. In USB mode, if code is Enter or space or other character in between, skip it.  
 #define INCREMENT_CODE() {\
 		code++;\
@@ -373,8 +379,28 @@ void QuickCalibrate(){
 			if(code == 'a'){code = 'z'+1;}\
 			if(code == 'A'){code = 'Z'+1;}\
 			if(code == '0'){code = '9'+1;}\
+			while(CODE_IS_SKIPPED){code ++;}\
 			USBSendASCII(code);\
 		}\
+}
+
+#define DECREMENT_CODE() {\
+	if(code <= codestart1){code=codeend2;}\
+	else if((code <= codestart2)&&(code>codeend1)){code = codeend1;}\
+	else{code--;}\
+	USBSend(KEY_ENTER,LOWER);\
+	if (edit_mode == 'u'){\
+		while (((code|FORCE_UPPER) >= (KEY_ENTER|FORCE_UPPER)) && ((code|FORCE_UPPER) <= (KEY_SPACE|FORCE_UPPER))){code--;}\
+		USBSend(code,LOWER);\
+	}\
+	else {\
+		if(code == 'z'){code = 'a'-1;}\
+		if(code == 'Z'){code = 'A'-1;}\
+		if(code == '9'){code = '0'-1;}\
+		if(code == 145){code = 154;}\
+		while(CODE_IS_SKIPPED){code --;}\
+		USBSendASCII(code);\
+	}\
 }
 
 
@@ -400,7 +426,7 @@ void Calibrate_Manually(){
 	edit_mode = Get_User_Response();
 	USBSendString("OK\r");
 	USBSendPROGString(Str_How_To_Scroll);
-	USBSendPROGString(Str_How_To_Select);
+	USBSendPROGString(Str_How_To_Scroll_Back);
 	USBSendPROGString(Str_How_To_Exit);
 	
 	//set ranges of ascii/hid codes over which to calibrate.  there are two ranges.
@@ -412,42 +438,35 @@ void Calibrate_Manually(){
 	}
 	else{
 		codestart1 = 0x21;
-		codeend1 = 175;
-		codestart2 = 224;
-		codeend2 = 251;
+		codeend1 = 142;// see http://www.peterstagg.com/blog/wp-content/uploads/2012/05/letter-spagetti.png
+		codestart2 = 153;
+		codeend2 = 0xFF;
 	}
 	
 	code = codestart1;
 	if (edit_mode == 'u'){USBSend(code,LOWER);}
 	else {USBSendASCII(code);}
 	
-	while(is_high(CMD_KEY)){
-		if(is_low(CTRL_KEY)){
-			INCREMENT_CODE();
-			Delay_MS(CALIBRATION_DELAY);
-		}
-		if(is_low(ALT_KEY)){
-			USBSendPROGString(Str_Assign);
-			
+	while(1){			
 			keypressed = WaitForKeypress();
 			modifier = GetModifier();
-			
-			if (edit_mode == 'u'){TeachHIDKey(code,keypressed,modifier);}
-			else{
-				TeachASCIIKey(code,keypressed,modifier);
-				USBSendNumber(keypressed);
-			}
-				
-			USBSend(KEY_ENTER,LOWER);
-			
-			SaveCalibration();
-			
-			INCREMENT_CODE();
+			if(KeyCodeLookUpTable[keypressed]!=KEY_SPACE){//if the key pressed is not spacebar, program the code -- otherwise skip to next line
+				if (edit_mode == 'u'){
+					TeachHIDKey(code,keypressed,modifier);
+				}
+				else if (edit_mode=='s'){
+					TeachASCIIKey(code,keypressed,modifier);
+					if(modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT){USBSendPROGString(Str_Shift_Plus);}
+					USBSendNumber(keypressed);
+				}
+			INCREMENT_CODE();			
 			Delay_MS(CALIBRATION_DELAY);
-		}
-		
-		
-		
+			}
+			else{ //if key pressed is spacebar
+				if (is_low(CTRL_KEY)){DECREMENT_CODE();}
+				else if (is_low(CMD_KEY)){break;}
+				else {INCREMENT_CODE();}
+			}
 	}
 	
 	SaveCalibration(); //save your work.
@@ -478,7 +497,7 @@ void CalibrateReeds(){
 	
 //-------TEACH BACKSPACE KEY ---------
 	USBSendPROGString(Str_Backspace);
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	
@@ -490,7 +509,7 @@ void CalibrateReeds(){
 	
 //------TEACH ESC KEY ----------
 	USBSendString("ESC");
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachHIDKey(KEY_ESC,KeyPressed,Modifier); 
@@ -499,7 +518,7 @@ void CalibrateReeds(){
 	
 	//------TEACH TAB KEY ---------
 	USBSendString("TAB");
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachHIDKey(KEY_TAB,KeyPressed,Modifier);
@@ -513,7 +532,7 @@ void CalibrateReeds(){
 	
 //--------TEACH ENTER KEY --------
 	USBSendPROGString(Str_Enter);
-	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress();
 	
 	//Enter key cannot use modifiers
@@ -524,7 +543,7 @@ void CalibrateReeds(){
 //-------TEACH SECONDARY ENTER KEY ----------
 	
 	USBSendPROGString(Str_Second_Enter);
-	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress(KEY_EXECUTE);
 	
 	//Enter key cannot use modifiers
@@ -533,14 +552,14 @@ void CalibrateReeds(){
 	
 // -------TEACH SEND KEY --------------
 	USBSendPROGString(Str_Post);
-	USBSend(KEY_SPACE,LOWER);// used to be a colon
+	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress();
 	TeachHIDKey(KEY_EXECUTE, KeyPressed, LOWER); //teach the hid keycode array about this key.
 	USBSend(KEY_ENTER,LOWER);
 	
 //------TEACH SPACE BAR ---- must be the last thing programmed (because of "Press space to skip" instruction)
 	USBSendPROGString(Str_Spacebar);
-	USBSend(KEY_SPACE,LOWER);
+	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	
 	TeachHIDKey(KEY_SPACE,KeyPressed,LOWER); //space bar is independent of modifier.
@@ -601,21 +620,20 @@ int WaitForKeypress(){
 void TeachHIDKey(char teachkey, int keypressed, char Modifier){
 	if (Modifier == UPPER){
 		ShiftKeyCodeLookUpTable[keypressed] = teachkey;
-		USBSendString("SHIFT");
-		USBSend(KEY_EQ,UPPER); //send a + sign
-		USBSendNumber(keypressed);
+		USBSendPROGString(Str_Shift_Plus);
 	}
 	else if (Modifier == HID_KEYBOARD_MODIFIER_LEFTALT){ //if FN is being held down,
 		FnKeyCodeLookUpTable[keypressed] = teachkey;
 		//send "FN+number"
 		USBSendString("FN");
 		USBSend(KEY_EQ,UPPER); //send a + sign
-		USBSendNumber(keypressed);
 	}
 	else{
 		KeyCodeLookUpTable[keypressed] = teachkey;
-		USBSendNumber(keypressed);
 	}
+	
+	if(keypressed <= NUM_REED_SWITCHES+1){USBSendPROGString(Str_Reed);}
+	USBSendNumber(keypressed);
 	Delay_MS(CALIBRATION_DELAY);//delay between programming keys.
 }
 

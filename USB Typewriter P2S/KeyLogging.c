@@ -23,7 +23,7 @@ void LogKeystrokes(){
 	FRESULT filestatus;
 	FILINFO fileinfo;
 	uint16_t filenum;
-	uint8_t code = 0;
+	char code = 0;
 	uint8_t modifier;
 	uint8_t key;
 	
@@ -61,9 +61,10 @@ void LogKeystrokes(){
 		modifier = GetModifier();
 		code = GetASCIIKeyCode(key,modifier);
 	}
-	
-	AddToSDBuffer(code); //save this first key pressed to the buffer.  there will be more, and those will be handled in the main loop
-
+	if((code!='s')||(Ignore_Flag==0)){
+		AddToSDBuffer(code); //save this first key pressed to the buffer.  there will be more, and those will be handled in the main loop
+		Ignore_Flag = 0;
+	}
 	if (OpenLogFile()!=FR_OK){ //open the new log file.
 		Typewriter_Mode = PANIC_MODE; // go into panic mode
 		return;
@@ -80,8 +81,8 @@ void LogKeystrokes(){
 			code = GetASCIIKeyCode(key, modifier);
 			
 			if(code){
-				if ((code == 's') && Ignore_Flag) code = 0; //if user is holding down S on startup, don't add this to file.
-				Ignore_Flag = 0;
+				//if ((code == 's') && Ignore_Flag) code = 0; //if user is holding down S on startup, don't add this to file.
+				//Ignore_Flag = 0;
 				AddToSDBuffer(code); //this adds the character to the sd write buffer.
 				myTimeoutCounter = 0; //reset timeout every time a key is pressed.
 			}

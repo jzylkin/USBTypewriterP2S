@@ -90,6 +90,18 @@ void USBSendString(char *str){
 			code = KEY_EQ;
 			modifier = LOWER;
 		}
+		else if(str[i] == '+'){
+			code = KEY_EQ;
+			modifier = UPPER;
+		}
+		else if(str[i] == '\t'){
+			code = KEY_TAB;
+			modifier = LOWER;
+		}
+		else if(str[i] == '#'){
+			code = KEY_1 +2;
+			modifier = UPPER;
+		}
 		else if(str[i] == '!'){
 			code = KEY_1;
 			modifier = UPPER;
@@ -163,7 +175,9 @@ void USBSendASCII(uint8_t number){
 	
 	Delay_MS(100);
 	
-//	USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER); //send a leading 0
+	if(number>=0x80){//leading zero indicates utf-8 instead of extended ascii format
+		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER); //send a leading 0
+	}
 	
 	//send hundreds digit
 	if (number >= 200){  

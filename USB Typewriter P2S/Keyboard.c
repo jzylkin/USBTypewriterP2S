@@ -159,7 +159,7 @@ int main(void)
 				code = GetHIDKeyCode(key, &modifier);
 					
 				if(code){//if the code is valid, send it
-						if ((code == KEY_U)&&Ignore_Flag) code = 0; //if user is holding down U on startup, don't add this U to file.
+						if ((code == KEY_U) && Ignore_Flag) code = 0; //if user is holding down U on startup, don't add this U to file.
 						Ignore_Flag = 0;
 						USBSend(code,modifier);
 				}
@@ -219,8 +219,8 @@ int main(void)
 					set_high(GREEN_LED);
 					#if MODULE_NAME==EHONG
 					Bluetooth_Connect();
-					Delay_MS(4000);	
-					#endif		
+					Delay_MS(5000);		
+					#endif
 				}//wait for connection to happen, glow red until then.
 				
 				set_high(RED_LED);//turn off red led if bt is connected.
@@ -494,7 +494,7 @@ void Init_Mode(){
 	uint8_t Default_Mode;
 	
 	Default_Mode = eeprom_read_byte((uint8_t*)DEFAULT_MODE_ADDR);
-	
+
 	key = GetKeySimple(); //read the key that is being held during startup (if any)
 	code = GetASCIIKeyCode(key,UPPER);
 	
@@ -523,12 +523,15 @@ void Init_Mode(){
 	}
 	else if(is_low(S1)&&is_low(S2)){
 			Typewriter_Mode = MANUAL_CAL_MODE;
+			Default_Mode = USB_COMBO_MODE;
 	}
 	else if(is_low(S1)&&is_low(S3)){//quick calibration mode
 			Typewriter_Mode = QUICK_CAL_MODE;
+			Default_Mode = USB_COMBO_MODE;
 	}
 	else if (is_low(S1)){ //hold down S1 during initialization to calibrate
 			Typewriter_Mode = CAL_MODE;
+			Default_Mode = USB_COMBO_MODE;
 	}
 	else if(is_low(S2)){
 		Typewriter_Mode = SENSITIVITY_MODE;
@@ -556,9 +559,9 @@ void Init_Mode(){
 		#ifndef BT_DEBUG
 			USB_Disable(); //if this is not debug mode, disable the usb port.
 		#endif
-		if(Bluetooth_Configure()){ // attempt to configure.
-			#if MODULE_NAME==EHONG
-			BluetoothInquire(); //if configuration is successful, delete the paired device list so device can become discoverable.
+		if(Bluetooth_Configure()){ // attempt to configure. this erases rn42 paired device list, but not ehong's
+			#if MODULE_NAME==EHONG 
+				BluetoothInquire(); //if configuration is successful, delete the paired device list so device can become discoverable.
 			#endif
 			
 			Typewriter_Mode = BLUETOOTH_MODE;
