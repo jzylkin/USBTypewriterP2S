@@ -218,8 +218,13 @@ int main(void)
 					set_low(RED_LED);
 					set_high(GREEN_LED);
 					#if MODULE_NAME==EHONG
-					Bluetooth_Connect();
-					Delay_MS(5000);		
+					
+						Bluetooth_Connect();
+						for (int i=0; i<=1000; i++){
+							Delay_MS(10); //10 seconds between connection attempts
+							if (is_high(BT_CONNECTED)){break;} //break FOR loop
+						}
+				
 					#endif
 				}//wait for connection to happen, glow red until then.
 				
@@ -227,7 +232,6 @@ int main(void)
 				set_low(GREEN_LED);
 				
 				#if MODULE_NAME==EHONG
-				Bluetooth_Exit_Proxy_Mode();
 				Bluetooth_Send(0,0); //clear off keyboard report.
 				#endif
 				
@@ -244,10 +248,6 @@ int main(void)
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
 					
 				}
-				
-				#if MODULE_NAME==EHONG
-				Bluetooth_Enter_Proxy_Mode(); //if connection is lost, go back into proxy mode so we can communicate with BT module
-				#endif
 			
 			break;
 			case PANIC_MODE:
@@ -474,12 +474,12 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
 
 		if (!(*LEDReport & HID_KEYBOARD_LED_NUMLOCK) && !(NumLockActivated)){ //if numlock is somehow inactive, and numlock not already deactivated by code,
 		  KeyBuffer->KeyCode[0] = HID_KEYBOARD_SC_NUM_LOCK; //press numlock key to activate it.  -- NumLockDeactivated flag makes sure this only happens once per session.
-		  NumLockActivated = true;
+		  NumLockActivated = true;//only activate numlock once per session -- that way user can override
 		}
 
 		else if ((*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) && !(CapsLockDeactivated)){ //if capslock is somehow active,
 		 KeyBuffer ->KeyCode[0] = HID_KEYBOARD_SC_CAPS_LOCK; //press capslock key to deactivate it.
-		 CapsLockDeactivated = true;
+		 CapsLockDeactivated = true; //only deactivate caps lock once per session -- that way user can override
 		}
 
 	//	else if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK) //if scrolllock is somehow active, nobody cares about scrolllock

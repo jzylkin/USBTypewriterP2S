@@ -25,14 +25,14 @@ const char SET_FRIENDLY_NAME[] PROGMEM = "AT+NM=USB Typewriter BT";
 const char ENABLE_UI[] PROGMEM = "AT+UI=01";
 const char SET_PROXY_MODE[] PROGMEM = "AT+BP=00,00";
 const char SET_HID_PARAMS[] PROGMEM = "AT+PF=00,01,00,00,00";
-const char SET_MODULE_FEATURES[] PROGMEM = "AT+FT=00,01,FF,05,01,0258";
+const char SET_MODULE_FEATURES[] PROGMEM = "AT+FT=FF,01,FF,10,01,010";//try it autoconnect way
 const char DISABLE_MIM[] PROGMEM = "AT+MM=00"; 
 const char DISABLE_PIN[] PROGMEM = "AT+IO=03";
 const char CLEAR_PAIRED_LIST[] PROGMEM = "AT+CP";
 const char ENABLE_SLEEP[] PROGMEM = "AT+SP=01";
 const char DISABLE_SLEEP[] PROGMEM = "AT+SP=00";
-const char MAKE_DISCOVERABLE[] PROGMEM = "AT+MD";
-const char CONNECT_TO_PAIRED_DEVICE[] PROGMEM = "AT+CI";
+const char CHECK_DISCOVERABLE[] PROGMEM = "AT+MD";
+const char CONNECT_TO_PAIRED_DEVICE[] PROGMEM = "AT+CT";
 const char SEND_EMPTY_HID_REPORT[] PROGMEM = "AT+KR=A1,01,00,00,00,00,00,00,00,00";
 const char SET_BYPASS_MODE[] PROGMEM = "AT+BP=04,07,00";
 
@@ -86,10 +86,12 @@ void Bluetooth_Init(){
 		Bluetooth_Enter_Proxy_Mode();
 		Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 57600 if 
 		Delay_MS(100); //delay necessary for command to send before re-initializing uart.
+		uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+		Bluetooth_Exit_Proxy_Mode();
+		Delay_MS(100);
 	}
 	
 	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
-	Bluetooth_Enter_Proxy_Mode();
 
 	BT_State = INITIALIZED;
 }
@@ -105,7 +107,8 @@ bool Bluetooth_Configure(){
 	#endif
 	
 	Bluetooth_Init();
-
+	
+	Bluetooth_Enter_Proxy_Mode();
 	success &= Bluetooth_Send_PROGMEM_CMD(ENABLE_UI,true); //enable responses from bluetooth module -- if response is "OK" then bluetooth module is present and responsive.		
 	Bluetooth_Send_PROGMEM_CMD(SET_FRIENDLY_NAME,true); //set friendly name
 	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE,true); //bypass channel is proxy
@@ -118,7 +121,7 @@ bool Bluetooth_Configure(){
 	
 	
  //
-	/*disable the auto connection after power on as permanent mode;
+	/*enable the auto connection after power on as permanent mode;
 	enable the auto connect after paired; -- was disabled by default.
 	enable auto reconnect after link lost as permanent mode;
 	set the interval of auto reconnect to 5s.
@@ -127,7 +130,8 @@ bool Bluetooth_Configure(){
 	This command is only needed when the first time use this Bluetooth module.*/
 	
 	Bluetooth_Send_PROGMEM_CMD(CLEAR_PAIRED_LIST,true); //clear paired device list, which forces the device to go into discovery mode.
-	Bluetooth_Send_PROGMEM_CMD(SET_BYPASS_MODE,false);//go into hid bypass mode
+	
+	Bluetooth_Exit_Proxy_Mode();//enter bypass mode
 	
 	return success; //if any of the commands failed, success will be false.
 }
@@ -175,8 +179,8 @@ void Bluetooth_Reset(){
 	set_high(BT_RESET); //reactivate bluetooth module
 	Delay_MS(BLUETOOTH_RESET_DELAY);//takes 500ms from power on for module to be able to receive commands.
 	
-	set_low(BT_CTS);//this wakes the buetooth module
-	Delay_MS(5);//it takes 5ms to wake up from low-power state
+//	set_low(BT_CTS);//this wakes the buetooth module
+//	Delay_MS(5);//it takes 5ms to wake up from low-power state
 	
 }
 
@@ -256,20 +260,28 @@ bool Bluetooth_Connect(){
 //	if (is_low(BT_CONNECTED)) // if bluetooth is not already connected:
 	const char s[4] = "MD=";
 	
+	Bluetooth_Enter_Proxy_Mode();
+	
 	#ifdef BT_DEBUG
 		USBSendString("connect\n");
 	#endif
 	
 	Delay_MS(1000);
 	Bluetooth_Send_PROGMEM_CMD(ENABLE_UI,false); //enable ui
-	Bluetooth_Send_PROGMEM_CMD(MAKE_DISCOVERABLE,true);
+	Bluetooth_Send_PROGMEM_CMD(CHECK_DISCOVERABLE,true);
 	char* numericalresponse = strtok(response,s); //parse result so we only get the part after MD=
 	numericalresponse = strtok(NULL, s); // calling function again accesses everything after the delimiter
 	if (numericalresponse != NULL){ //if there is anything to report.
-		if((numericalresponse[1] == '0')){ //if this is not discoverable mode...
+		if((numericalresponse[1] == '0')&&(is_low(BT_CONNECTED))){ //if this is not discoverable mode, and no connection has been made...
+				#ifdef BT_DEBUG
+				USBSendString("connect\n");
+				#endif
+	
 			Bluetooth_Send_PROGMEM_CMD(CONNECT_TO_PAIRED_DEVICE,true); //then attempt a new connection.
 		}
 	}
+	
+	Bluetooth_Exit_Proxy_Mode();
 	return true;
 }
 
@@ -338,10 +350,6 @@ bool Bluetooth_Configure(){
 	uint8_t attempt_count = 0;
 	bool success;
 	
-//No longer necessary, since module is permanently fixed to 9600 baud.
-//	USBSendString("BT RESET...");
-   // set_high(BT_BAUD); //sets the baud rate to 9600 upon reset
-
     Bluetooth_Init(); //reset the module
 	
 	//Try to enter command mode, repeat if necessary:
@@ -507,9 +515,10 @@ bool Get_Response(){
 		response[3]=  uart_getc() & 0xFF;
 		response[4] = '\0';
 		
+		#ifdef BT_DEBUG
 		USBSendString(response);
 		USBSend(KEY_ENTER,LOWER);
-	
+		#endif
 		
 
 		if ((response[0] == 'C')||(response[0] == 'A')|| (response[0] == 'R')){  //if response is "CMD" or "AOK" or "REBOOT", bt module has received command successfully
