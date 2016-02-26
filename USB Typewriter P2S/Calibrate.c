@@ -193,6 +193,7 @@ void Calibrate(){
 	KeyPressed = WaitForKeypress();
 	if((KeyPressed)&&(KeyPressed <= 8)){ //if keypressed is 1, 2, 3, or 4, it represents a reed switch being held down.
 		Shift_Reed = KeyPressed;
+		USBSendPROGString(Str_Reed);
 		USBSendNumber(Shift_Reed);
 	}
 	else{
@@ -348,6 +349,7 @@ void QuickCalibrate(){
 	KeyPressed = WaitForKeypress();
 	if((KeyPressed)&&(KeyPressed <= 8)){ //if keypressed is 1, 2, 3, or 4, it represents a reed switch being held down.
 		Shift_Reed = KeyPressed;
+		USBSendPROGString(Str_Reed);
 		USBSendNumber(Shift_Reed);
 	}
 	else{
