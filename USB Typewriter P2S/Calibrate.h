@@ -15,7 +15,9 @@ int WaitForKeypress();
 void TeachASCIIKey(char teachkey, int keypressed, char Modifier);
 bool DetectHallSensor();
 void Adjust_Sensitivity();
+char Get_User_Response();
 void CalibrateReeds();
 void QuickCalibrate();
+void Calibrate_Manually();
 void SaveCalibration();
 #endif /* CALIBRATE_H_ */

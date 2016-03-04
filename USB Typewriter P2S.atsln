@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "USB Typewriter P2S", "USB Typewriter P2S\USB Typewriter P2S.cproj", "{8A2ACF90-5157-49C0-9D6F-7B082E47B4BE}"
 EndProject
 Global
