@@ -378,10 +378,10 @@ void QuickCalibrate(){
 			USBSend(code,LOWER);\
 		}\
 		else {\
-			if(code == 'a'){code = 'z'+1;}\
 			if(code == 'A'){code = 'Z'+1;}\
 			if(code == '0'){code = '9'+1;}\
 			while(CODE_IS_SKIPPED){code ++;}\
+			if(code == 146){code = 155;}\
 			USBSendASCII(code);\
 		}\
 }
@@ -396,10 +396,9 @@ void QuickCalibrate(){
 		USBSend(code,LOWER);\
 	}\
 	else {\
-		if(code == 'z'){code = 'a'-1;}\
 		if(code == 'Z'){code = 'A'-1;}\
 		if(code == '9'){code = '0'-1;}\
-		if(code == 145){code = 154;}\
+		if(code == 154){code = 145;}\
 		while(CODE_IS_SKIPPED){code --;}\
 		USBSendASCII(code);\
 	}\
@@ -460,6 +459,9 @@ void Calibrate_Manually(){
 					TeachASCIIKey(code,keypressed,modifier);
 					if(modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT){USBSendPROGString(Str_Shift_Plus);}
 					USBSendNumber(keypressed);
+					if((code >= 'a') && (code <='z')){
+						TeachASCIIKey(code-'a'+'A',keypressed,modifier|HID_KEYBOARD_MODIFIER_LEFTSHIFT);//program upper case letters too
+					}
 				}
 			INCREMENT_CODE();			
 			Delay_MS(CALIBRATION_DELAY);

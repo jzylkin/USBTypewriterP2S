@@ -186,7 +186,7 @@ void USBSendASCII(uint8_t number){
 	else if (number >= 100){
 		USBSend(HID_KEYBOARD_SC_KEYPAD_1_AND_END, LOWER);
 	}
-	else{
+	else if (number>31){ //alt codes less than 31 are not proper ascii -- no leading zeros
 //		USBSend(HID_KEYBOARD_SC_KEYPAD_0_AND_INSERT, LOWER);
 	}
 	Delay_MS(50);
