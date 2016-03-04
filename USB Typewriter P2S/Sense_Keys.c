@@ -222,14 +222,17 @@ unsigned long long ReadSensor(){
 		return Readout;
 }
 
-uint8_t GetHIDKeyCode(uint8_t key, uint8_t modifier){ 
+uint8_t GetHIDKeyCode(uint8_t key, uint8_t* modifier){ 
 	uint8_t code;
 
-	if ((modifier & HID_KEYBOARD_MODIFIER_LEFTALT) && FnKeyCodeLookUpTable[key]){ //if the FN key is held down, look up key in FN array.
+	if ((*modifier & HID_KEYBOARD_MODIFIER_LEFTALT) && FnKeyCodeLookUpTable[key]){ //if the FN key is held down, look up key in FN array.
 		code = FnKeyCodeLookUpTable[key];
+		*modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
+
 	}
-	else if ((modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ShiftKeyCodeLookUpTable[key]){
+	else if ((*modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ShiftKeyCodeLookUpTable[key]){
 		code = ShiftKeyCodeLookUpTable[key];
+		*modifier &= ~HID_KEYBOARD_MODIFIER_LEFTSHIFT;// if the key is in the shift table, it is a special key.  The shift modifier should not be sent..
 	}
 	else {
 		code = KeyCodeLookUpTable[key]; //otherwise, look up the key in the regular array.
@@ -246,7 +249,7 @@ uint8_t GetASCIIKeyCode(uint8_t key, uint8_t modifier){
 	
 	if ((modifier & HID_KEYBOARD_MODIFIER_LEFTSHIFT) && ASCIIShiftLookUpTable[key]){
 		code = ASCIIShiftLookUpTable[key];
-	}
+		}
 	else {
 		code = ASCIILookUpTable[key];
 	}
@@ -280,7 +283,7 @@ void LoadEepromParameters(){
 	 Shift_Reed = eeprom_read_byte((uint8_t *)SHIFT_REED_ADDR);
 	 Reeds_Are_Independent = eeprom_read_byte((uint8_t *)REEDS_INDEPENDENT_ADDR);
 	 UseDummyLoad = eeprom_read_byte((uint8_t*)DUMMY_LOAD_ADDR);
-	 BluetoothConfigured = eeprom_read_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR);
+//	 BluetoothConfigured = eeprom_read_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR);
 }
 
 void ClearKeyCodeTables(){
@@ -321,7 +324,7 @@ void RestoreFactoryDefaults(){
 			eeprom_update_byte((uint8_t*)DEFAULT_MODE_ADDR,USB_COMBO_MODE);
 			eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR,0); //do not use dummy load unless told to.
 			eeprom_write_word((uint16_t *)FILENUM_ADDR,0);//reset sd card file number to zero.
-			eeprom_write_byte((uint8_t*)USE_HALL_SENSOR_ADDR,HALL_NOT_PRESENT);
+//			eeprom_write_byte((uint8_t*)USE_HALL_SENSOR_ADDR,HALL_NOT_PRESENT); //dont change hall sensor when resetting defaults.
 			
 			LoadEepromParameters(); //load new defaults into RAM
 }

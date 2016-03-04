@@ -25,6 +25,7 @@ do not use it for commercial purposes, and you attribute its origins to Jack Zyl
 #include "Calibrate.h"
 #include "KeyCodes.h"
 
+
 //Globl variables:
 volatile int8_t Typewriter_Mode;
 
@@ -40,15 +41,16 @@ uint8_t ASCIIShiftLookUpTable[KEYCODE_ARRAY_LENGTH];
 uint8_t Shift_Reed;
 uint8_t UseHallSensor; 
 uint8_t HallSensorPolarity;
+bool Hold_Alt_Down;
 
 uint8_t DoubleTapTime;
 uint8_t KeyReleaseTime;
 uint8_t KeyHoldTime;
 uint8_t ReedHoldTime;
 
-uint8_t BluetoothConfigured;
+//uint8_t BluetoothConfigured;
 
-uint8_t KeyBufferMod;
+volatile uint8_t KeyBufferMod;
 
 bool Reed1Polarity; //reed switches are active low by default
 bool Reed2Polarity; //reed switches are active low by default
@@ -61,7 +63,7 @@ uint8_t Ignore_Flag; //flag to tell processor to ignore the next character typed
 
 uint8_t UseDummyLoad; //dummy load is a 100 ohm resistor (or so) that makes the device draw more current from supply -- useful for power supplies with load minimum requirements.
 
-volatile uint16_t TimeoutCounter;
+volatile uint16_t myTimeoutCounter;
 
 char StringBuffer[60];//global buffer to store strings that are being forwarded from program memory to regular data memory
 
@@ -154,12 +156,10 @@ int main(void)
 			while(1){
 				key = GetKey();
 				modifier = GetModifier(); 
-				code = GetHIDKeyCode(key, modifier);
-				
-				if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
+				code = GetHIDKeyCode(key, &modifier);
 					
 				if(code){//if the code is valid, send it
-						if ((code == KEY_U)&&Ignore_Flag) code = 0; //if user is holding down U on startup, don't add this U to file.
+						if ((code == KEY_U) && Ignore_Flag) code = 0; //if user is holding down U on startup, don't add this U to file.
 						Ignore_Flag = 0;
 						USBSend(code,modifier);
 				}
@@ -202,26 +202,53 @@ int main(void)
 				QuickCalibrate();
 				Typewriter_Mode = USB_LIGHT_MODE;//after calibrating, go to usb light mode.
 			break;
+			case MANUAL_CAL_MODE:
+				Calibrate_Manually();
+				Typewriter_Mode = USB_LIGHT_MODE;
+			break;
 			case BLUETOOTH_MODE:
-				USB_Disable();//comment this out for debugging purposes
-				if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
-				Bluetooth_Reset();
-				while(is_low(BT_CONNECTED)){set_low(RED_LED);set_high(GREEN_LED);}//wait for connection to happen, glow red until then.
-					set_high(RED_LED);//turn off red led if bt is connected.
-					set_low(GREEN_LED);
+				#ifndef BT_DEBUG
+					USB_Disable();//don't disable usb if it is debug mode.
+				#endif
+					
+					if(Get_Bluetooth_State() != INITIALIZED){Bluetooth_Init();};//initialize bluetooth if it hasn't been already. this sets up proxy mode, too.
+					if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
+				
+				while(is_low(BT_CONNECTED)){
+					set_low(RED_LED);
+					set_high(GREEN_LED);
+					#if MODULE_NAME==EHONG
+					
+						Bluetooth_Connect();
+						for (int i=0; i<=1000; i++){
+							Delay_MS(10); //10 seconds between connection attempts
+							if (is_high(BT_CONNECTED)){break;} //break FOR loop
+						}
+				
+					#endif
+				}//wait for connection to happen, glow red until then.
+				
+				set_high(RED_LED);//turn off red led if bt is connected.
+				set_low(GREEN_LED);
+				
+				#if MODULE_NAME==EHONG
+				Bluetooth_Send(0,0); //clear off keyboard report.
+				#endif
+				
 				while(is_high(BT_CONNECTED)){
 					key = GetKey();
 					modifier = GetModifier();
 									
-					code = GetHIDKeyCode(key, modifier);
+					code = GetHIDKeyCode(key, &modifier);
 					
-					if(FnKeyCodeLookUpTable[key]){modifier &= ~HID_KEYBOARD_MODIFIER_LEFTALT;}// if the key is in the function table, it is a special key.  The alt modifier should not be sent..
-									
-						if(code){
+					if(code){
 						Bluetooth_Send(code,modifier);
 					}
+						
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
+					
 				}
+			
 			break;
 			case PANIC_MODE:
 				USB_Disable();
@@ -248,7 +275,7 @@ int main(void)
 
 ISR (TIMER1_COMPA_vect){ //called each time timer1 counts up to the OCR1A register (every 10 ms, I think)
 	TMR1_Count ++;
-	TimeoutCounter ++;
+	myTimeoutCounter ++;
 
 		if ((Typewriter_Mode != USB_COMBO_MODE ) && (Typewriter_Mode != USB_LIGHT_MODE)){ //if we are not in the usual usb mode, usb tasks are taken care of by interrupts.  Otherwise, they are addressed in main flow.
 			MS_Device_USBTask(&Disk_MS_Interface);
@@ -409,10 +436,13 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 //	memcpy((void*)KeyboardReport->KeyCode, (void*)KeyBuffer->KeyCode, 6); //copy the keybuffer into the keyboard report being sent to host.
 	KeyboardReport->KeyCode[0] = KeyBuffer->KeyCode[0];
 
-	if (KeyboardReport->KeyCode[0]){ //if there is a key waiting to be sent, then use the modifier that goes with that key.
+	if (Hold_Alt_Down) { //this flag instructs us to hold alt down continuously, so that numpad ascii can be sent.
+		KeyboardReport->Modifier = HID_KEYBOARD_MODIFIER_LEFTALT;
+	}
+	else if (KeyboardReport->KeyCode[0]){ //if there is a key waiting to be sent, then use the modifier that goes with that key.
 		KeyboardReport->Modifier = KeyBufferMod;
 	}
-	else {
+	else{
 		KeyboardReport->Modifier = 0; //otherwise, clear the modifiers so the host doesn't think we are holding down shift or alt or whatever for no reason.
 	}
 	
@@ -438,18 +468,23 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const void* ReportData,
                                           const uint16_t ReportSize)
 {
-
 	uint8_t* LEDReport = (uint8_t*)ReportData;
+	static bool NumLockActivated;
+	static bool CapsLockDeactivated;
 
-	if (*LEDReport & HID_KEYBOARD_LED_NUMLOCK) //if numlock is somehow active,
-	  KeyBuffer->KeyCode[0] = HID_KEYBOARD_LED_NUMLOCK; //press numlock key to deactivate it.
+		if (!(*LEDReport & HID_KEYBOARD_LED_NUMLOCK) && !(NumLockActivated)){ //if numlock is somehow inactive, and numlock not already deactivated by code,
+		  KeyBuffer->KeyCode[0] = HID_KEYBOARD_SC_NUM_LOCK; //press numlock key to activate it.  -- NumLockDeactivated flag makes sure this only happens once per session.
+		  NumLockActivated = true;//only activate numlock once per session -- that way user can override
+		}
 
-	else if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) //if capslock is somehow active,
-	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_LED_CAPSLOCK; //press capslock key to deactivate it.
+		else if ((*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) && !(CapsLockDeactivated)){ //if capslock is somehow active,
+		 KeyBuffer ->KeyCode[0] = HID_KEYBOARD_SC_CAPS_LOCK; //press capslock key to deactivate it.
+		 CapsLockDeactivated = true; //only deactivate caps lock once per session -- that way user can override
+		}
 
-	else if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK) //if scrolllock is somehow active,
-	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_LED_SCROLLLOCK; //press scrolllock key to deactivate it.
-
+	//	else if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK) //if scrolllock is somehow active, nobody cares about scrolllock
+	//	  KeyBuffer ->KeyCode[0] = HID_KEYBOARD_SC_SCROLL_LOCK; //press scrolllock key to deactivate it.
+	
 }
 
 
@@ -459,7 +494,7 @@ void Init_Mode(){
 	uint8_t Default_Mode;
 	
 	Default_Mode = eeprom_read_byte((uint8_t*)DEFAULT_MODE_ADDR);
-	
+
 	key = GetKeySimple(); //read the key that is being held during startup (if any)
 	code = GetASCIIKeyCode(key,UPPER);
 	
@@ -471,26 +506,32 @@ void Init_Mode(){
 	}
 	else if(is_low(S2)&&is_low(S3)){ //configure bluetooth and test bluetooth -- reset bluetooth module  -- force initialization next time bluetooth is used.
 			if(Bluetooth_Configure()){
-					//this test mode resets the bluetooth channel.
-					BluetoothConfigured = 0;// even though it has been configured, save it as "not configured" to force configuration next time (on customer's end.)
-					eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); 	
+					#ifndef BT_DEBUG
+						USB_Disable(); //leave usb active if this is debug mode.
+					#endif
+					
+					#if MODULE_NAME==EHONG //ehong module requires you to manually clear the pairing list to enter inquiry mode
+					BluetoothInquire();//clear paired device list and try to pair.
+					#endif
+					
 					Typewriter_Mode = BLUETOOTH_MODE;
-					//Default_Mode = BLUETOOTH_MODE;  Do not set bluetooth mode as the default, since this mode only tests the bluetooth
+					//Default_Mode = BLUETOOTH_MODE;  //Do not set bluetooth mode as the default, since this mode only TESTS the bluetooth
 			}
 			else{ //if something goes wrong during configuration...
-				BluetoothConfigured = 0;
-				eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has not been configured already.
-				Typewriter_Mode = PANIC_MODE; //don't change default mode
+					Typewriter_Mode = PANIC_MODE; //don't change default mode
 			}
 	}
 	else if(is_low(S1)&&is_low(S2)){
-			Typewriter_Mode = SD_MODE;
+			Typewriter_Mode = MANUAL_CAL_MODE;
+			Default_Mode = USB_COMBO_MODE;
 	}
 	else if(is_low(S1)&&is_low(S3)){//quick calibration mode
 			Typewriter_Mode = QUICK_CAL_MODE;
+			Default_Mode = USB_COMBO_MODE;
 	}
 	else if (is_low(S1)){ //hold down S1 during initialization to calibrate
 			Typewriter_Mode = CAL_MODE;
+			Default_Mode = USB_COMBO_MODE;
 	}
 	else if(is_low(S2)){
 		Typewriter_Mode = SENSITIVITY_MODE;
@@ -515,21 +556,18 @@ void Init_Mode(){
 		}
 	}
 	else if(code == 'B'){ //if the letter B is being held by the user
-		USB_Disable();
-		if(BluetoothConfigured){
-			BluetoothInquire();//get a new device to pair with when you hold b key down.
-			Typewriter_Mode = BLUETOOTH_MODE; // for now, this is commented out
-			Default_Mode = BLUETOOTH_MODE;
-		}
-		if(Bluetooth_Configure()){ // attempt to configure.
-			BluetoothConfigured = 1;
-			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has been configured already.	
+		#ifndef BT_DEBUG
+			USB_Disable(); //if this is not debug mode, disable the usb port.
+		#endif
+		if(Bluetooth_Configure()){ // attempt to configure. this erases rn42 paired device list, but not ehong's
+			#if MODULE_NAME==EHONG 
+				BluetoothInquire(); //if configuration is successful, delete the paired device list so device can become discoverable.
+			#endif
+			
 			Typewriter_Mode = BLUETOOTH_MODE;
 			Default_Mode = BLUETOOTH_MODE;
 		}
 		else{ //if something goes wrong during configuration...
-			BluetoothConfigured = 0;
-			eeprom_update_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR, BluetoothConfigured); //remember that bluetooth has NOT been configured successfully.
 			Typewriter_Mode = PANIC_MODE; //indicate error
 		}
 	}

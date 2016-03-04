@@ -36,7 +36,16 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.2.13";
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.4.5.RN"; //EH identifies this as the version for E-HONG bluetooth modules. RN is RN42
+//		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
+	
+		#define		EHONG 1
+		#define		RN42 2
+		#define		MODULE_NAME   RN42
+		
+		#if MODULE_NAME>2
+		#error "INVALID BT MODULE SELECTION"
+		#endif
 
 	/* Includes: */
 		#include <avr/io.h>
@@ -112,7 +121,7 @@
 		#define DEFAULT_MODE_ADDR 0x20D
 		#define REEDS_INDEPENDENT_ADDR 0x20E
 		#define DUMMY_LOAD_ADDR 0x20F
-		#define BLUETOOTH_CONFIGURED_ADDR 0x210
+//		#define BLUETOOTH_CONFIGURED_ADDR 0x210
 		#define EEP_BANK2_END 0x211
 		
 		#define EEP_CHECKSUM_ADDR 0x3FF
@@ -156,11 +165,12 @@
 		#define HARDWARE_TEST 11
 		#define INITIALIZING 12
 		#define USB_LIGHT_MODE 13
+		#define MANUAL_CAL_MODE 14
 		
 		#define SD_BUFFER_LENGTH 512
 		
 		#define USB_SEND_TIMEOUT 100 //wait 50ms if usb send buffer is full before discarding a character.
-		#define USB_SEND_DELAY 15// wait 30ms after sending each key to usb.
+		#define USB_SEND_DELAY 20// wait 30ms after sending each key to usb.
 		#define CALIBRATION_DELAY 500// wait 500ms between programming keys.
 		
 		
@@ -171,8 +181,11 @@
 		#define SD_TIMEOUT_S  (uint16_t)1800 //how many seconds to wait without any input before closing the file (half an hour?)
 		#define SD_TIMEOUT (uint16_t)SD_TIMEOUT_S*100
 		
-		#define SD_SAVE_TIME_S (uint16_t)60 //how many seconds before saving work if no keys are pressed.
+		#define SD_SAVE_TIME_S (uint16_t)30 //how many seconds before saving work if no keys are pressed.
 		#define SD_SAVE_TIME (uint16_t)SD_SAVE_TIME_S*100
+		
+		#define BT_SLEEP_TIMEOUT_S  (uint16_t)6000 //how many seconds to wait without any input before sleeping bluetooth (10 min)
+		#define BT_SLEEP_TIMEOUT (uint16_t)BT_SLEEP_TIMEOUT_S*100
 		
 		#define STRING_SEND_DELAY 50
 		

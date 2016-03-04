@@ -52,6 +52,7 @@ LICENSE:
 #error "This library requires AVR-GCC 3.4 or later, update to newer AVR-GCC compiler !"
 #endif
 
+#include <stdbool.h>
 
 /*
 ** constants and macros
@@ -72,11 +73,11 @@ LICENSE:
 
 /** Size of the circular receive buffer, must be power of 2 */
 #ifndef UART_RX_BUFFER_SIZE
-#define UART_RX_BUFFER_SIZE 16
+#define UART_RX_BUFFER_SIZE 64
 #endif
 /** Size of the circular transmit buffer, must be power of 2 */
 #ifndef UART_TX_BUFFER_SIZE
-#define UART_TX_BUFFER_SIZE 16
+#define UART_TX_BUFFER_SIZE 64
 #endif
 
 /* test if the size of the circular buffers fits into SRAM */
@@ -186,6 +187,7 @@ extern void uart1_puts(const char *s );
 /** @brief  Put string from program memory to ringbuffer for transmitting via USART1 (only available on selected ATmega) @see uart_puts_p */
 extern void uart1_puts_p(const char *s );
 
+bool uart_check_rx(); //jack's function to check if uart has anything waiting.
 void uart_clear_rx_buffer();
 /** @brief  Macro to automatically put a string constant into program memory */
 #define uart1_puts_P(__s)       uart1_puts_p(PSTR(__s))

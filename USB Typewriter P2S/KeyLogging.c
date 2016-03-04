@@ -23,7 +23,7 @@ void LogKeystrokes(){
 	FRESULT filestatus;
 	FILINFO fileinfo;
 	uint16_t filenum;
-	uint8_t code = 0;
+	char code = 0;
 	uint8_t modifier;
 	uint8_t key;
 	
@@ -61,9 +61,10 @@ void LogKeystrokes(){
 		modifier = GetModifier();
 		code = GetASCIIKeyCode(key,modifier);
 	}
-	
-	AddToSDBuffer(code); //save this first key pressed to the buffer.  there will be more, and those will be handled in the main loop
-
+	if((code!='s')||(Ignore_Flag==0)){
+		AddToSDBuffer(code); //save this first key pressed to the buffer.  there will be more, and those will be handled in the main loop
+		Ignore_Flag = 0;
+	}
 	if (OpenLogFile()!=FR_OK){ //open the new log file.
 		Typewriter_Mode = PANIC_MODE; // go into panic mode
 		return;
@@ -71,19 +72,19 @@ void LogKeystrokes(){
 	
 	eeprom_write_word((uint16_t *)FILENUM_ADDR,filenum); // save the new filenumber for next time
 	
-	TimeoutCounter = 0; //reset timeout
+	myTimeoutCounter = 0; //reset timeout
 
-	while(TimeoutCounter < (SD_TIMEOUT)){ //keep listening for keys and adding them to buffer. Clear buffer occassionally.
+	while(myTimeoutCounter < (SD_TIMEOUT)){ //keep listening for keys and adding them to buffer. Clear buffer occassionally.
 			key = GetKey();
 			modifier = GetModifier();
 			
 			code = GetASCIIKeyCode(key, modifier);
 			
 			if(code){
-				if ((code == 's') && Ignore_Flag) code = 0; //if user is holding down S on startup, don't add this to file.
-				Ignore_Flag = 0;
+				//if ((code == 's') && Ignore_Flag) code = 0; //if user is holding down S on startup, don't add this to file.
+				//Ignore_Flag = 0;
 				AddToSDBuffer(code); //this adds the character to the sd write buffer.
-				TimeoutCounter = 0; //reset timeout every time a key is pressed.
+				myTimeoutCounter = 0; //reset timeout every time a key is pressed.
 			}
 			if((code == '\r')||(code == '.')||(code == ',')||(code == '!')||(code == '?')||(code == ':')||(code == '\"')){
 				GlowGreenLED(MEDIUM, GLOWING);//glow a green led to indicate write in progress.
@@ -91,7 +92,7 @@ void LogKeystrokes(){
 			}
 			Delay_MS(SENSE_DELAY);
 			
-			if ((TimeoutCounter > SD_SAVE_TIME) && (SD_Buffer[0] != '\0')){
+			if ((myTimeoutCounter > SD_SAVE_TIME) && (SD_Buffer[0] != '\0')){
 				set_low(GREEN_LED);
 				Delay_MS(3000);
 				WriteToLogFile();

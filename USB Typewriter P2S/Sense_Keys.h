@@ -22,7 +22,7 @@ void ClearKeyCodeTables();
 
 uint8_t GetASCIIKeyCode(uint8_t key, uint8_t modifier);
 
-uint8_t GetHIDKeyCode(uint8_t key, uint8_t modifier);
+uint8_t GetHIDKeyCode(uint8_t key, uint8_t* modifier); //modifier is passed by reference so it can be edited if necessary.
 
 bool getHallState();
 

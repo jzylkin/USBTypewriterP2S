@@ -2,15 +2,27 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+Bluetooth.c
+
 Calibrate.c
 
 Config_Interrupts.c
 
 Config_IO.c
 
-Init_Mode.c
-
 Descriptors.c
+
+KeyLogging.c
+
+Lib\FatFS\diskio.c
+
+Lib\FatFS\ff.c
+
+Lib\SCSI.c
+
+Lib\SDCardManager.c
+
+uart.c
 
 Keyboard.c
 
