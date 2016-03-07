@@ -17,7 +17,7 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 
 //messages to user are stored in program memory space, to conserve data memory (there is much more program memory than data memory)
 	const char Str_USB_Typewriter[]		PROGMEM = "USB TYPEWRITER (TM)\r";
-	const char Str_Firmware_Ver[]		PROGMEM = FIRMWARE_VERSION;
+	const char Str_Firmware_Ver[]		PROGMEM = FIRMWARE_VERSION_AND_MODULE;
 	const char Str_Typewriter_Mode[]	PROGMEM = "DEFAULT SETTING: ";
 	const char Str_BT_Mode[]			PROGMEM = "BLUETOOTH KEYBOARD MODE\r";
 	const char Str_Light_Mode[]			PROGMEM = "LIGHT MODE (SD CARD READER DISABLED)\r";

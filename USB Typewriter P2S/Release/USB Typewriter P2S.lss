@@ -297,7 +297,7 @@ Disassembly of section .text:
 
 00000574 <Str_Firmware_Ver>:
      574:	46 49 52 4d 57 41 52 45 20 56 45 52 20 35 2e 34     FIRMWARE VER 5.4
-     584:	2e 35 2e 45 48 00                                   .5.EH.
+     584:	2e 36 2e 45 48 00                                   .6.EH.
 
 0000058a <Str_USB_Typewriter>:
      58a:	55 53 42 20 54 59 50 45 57 52 49 54 45 52 20 28     USB TYPEWRITER (
