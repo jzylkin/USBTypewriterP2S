@@ -40,7 +40,7 @@
 		#define		RN42 2
 
 		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.4.6" //EH identifies this as the version for E-HONG bluetooth modules. RN is RN42
-		#define		MODULE_NAME			EHONG
+		#define		MODULE_NAME			RN42
 		
 //		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
 	
