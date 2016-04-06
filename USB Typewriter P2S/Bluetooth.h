@@ -9,6 +9,7 @@
 #ifndef BLUETOOTH_H_
 #define BLUETOOTH_H_
 
+bool Bluetooth_Test();
 bool Bluetooth_Enter_CMD_Mode();
 void Bluetooth_Reset();
 void Bluetooth_Enter_Proxy_Mode();

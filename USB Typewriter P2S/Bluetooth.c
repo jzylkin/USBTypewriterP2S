@@ -27,7 +27,9 @@ const char SET_PROXY_MODE[] PROGMEM = "AT+BP=00,00";
 const char SET_HID_PARAMS[] PROGMEM = "AT+PF=00,01,00,00,00";
 const char SET_MODULE_FEATURES[] PROGMEM = "AT+FT=FF,01,FF,10,01,010";//try it autoconnect way
 const char DISABLE_MIM[] PROGMEM = "AT+MM=00"; 
+const char ENABLE_MIM[] PROGMEM = "AT+MM=01";
 const char DISABLE_PIN[] PROGMEM = "AT+IO=03";
+const char ENABLE_PIN[] PROGMEM = "AT+IO=01";
 const char CLEAR_PAIRED_LIST[] PROGMEM = "AT+CP";
 const char ENABLE_SLEEP[] PROGMEM = "AT+SP=01";
 const char DISABLE_SLEEP[] PROGMEM = "AT+SP=00";
@@ -96,6 +98,16 @@ void Bluetooth_Init(){
 	BT_State = INITIALIZED;
 }
 
+bool Bluetooth_Test(){
+		bool success = false;
+		Bluetooth_Init();
+		Bluetooth_Enter_Proxy_Mode();
+		success = Bluetooth_Send_PROGMEM_CMD(ENABLE_UI,true); //enable responses from bluetooth module -- if response is "OK" then bluetooth module is present and responsive.
+		Bluetooth_Exit_Proxy_Mode();//enter bypass mode
+		
+		return success;
+}
+
 bool Bluetooth_Configure(){
 	bool success;
 	success = true;
@@ -115,8 +127,14 @@ bool Bluetooth_Configure(){
 	Bluetooth_Send_PROGMEM_CMD(SET_HID_PARAMS,true);//set hid parameters
 	Delay_MS(500);
 	Bluetooth_Send_PROGMEM_CMD(SET_MODULE_FEATURES,true); //configure module features (see manual):
-	Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true); //do not use man-in-middle protection
-	Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true);//set IO setting to "no input or output" hopefully this means no need for pin-code.
+	if(DisablePinCode){
+		Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true); //disable man-in-middle protection.  Some android device requires it.
+		Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true);//set IO setting to display yes/no
+	}
+	else{
+		Bluetooth_Send_PROGMEM_CMD(ENABLE_PIN,true);//set IO setting to display yes/no
+		Bluetooth_Send_PROGMEM_CMD(ENABLE_MIM,true); //enable man-in-middle protection.  Some android device requires it.
+	}
 	Bluetooth_Send_PROGMEM_CMD(DISABLE_SLEEP,true);//no sleep mode.
 	
 	
@@ -345,6 +363,22 @@ void Bluetooth_Init(){
 	
 }
 
+bool Bluetooth_Test(){
+		uint8_t attempt_count = 0;
+		bool cmdmode = false;
+		
+	    Bluetooth_Init(); //reset the module
+		do {
+			attempt_count++;
+			cmdmode = Bluetooth_Enter_CMD_Mode();
+		}while((attempt_count < 5)&&(!cmdmode));
+		
+		Bluetooth_Send_CMD("R,1"); //reset module to exit command mode.
+		
+		return cmdmode; //return true if cmdmode was entered successfully.
+
+}
+
 bool Bluetooth_Configure(){
 	bool cmdmode;
 	uint8_t attempt_count = 0;
@@ -521,13 +555,16 @@ bool Get_Response(){
 		#endif
 		
 
-		if ((response[0] == 'C')||(response[0] == 'A')|| (response[0] == 'R')){  //if response is "CMD" or "AOK" or "REBOOT", bt module has received command successfully
+		if ((response[0] == 'C') && (response[1] == 'M')){//if response is "CMD", bt has entered command mode successfully.
+			return true;
+		}
+		else if((response[0] == 'A')|| (response[0] == 'R')){  //if response is or "AOK" or "REBOOT", bt module has received command successfully
 			return true;
 		}
 		else if(response[0] == 'N'){ //"NOT SET"  means bt is discoverable.
 			return true;
 		}
-		else if(response[0] == 'E'){ //"END" means successfully ended cmd mode;
+		else if((response[0] == 'E')&&(response[1] == 'N')){ //"END" means successfully ended cmd mode;
 			return true;
 		}
 		else{

@@ -10,9 +10,16 @@
 #include "Calibrate.h"
 #include "globals.h"
 
-const uint8_t HIDNumbers[] = {KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8,KEY_9,KEY_0}; //usb codes for 0-9
-const uint8_t ASCIINumbers[] = {'1','2','3','4','5','6','7','8','9','0'}; // the ascii codes for 0-9
-const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};// ascii codes for weird characters above 0-9 on  typewriters.
+const uint8_t HIDNumbers[] PROGMEM = {KEY_1,KEY_2,KEY_3,KEY_4,KEY_5,KEY_6,KEY_7,KEY_8,KEY_9,KEY_0}; //usb codes for 0-9
+const uint8_t ASCIINumbers[] PROGMEM = {'1','2','3','4','5','6','7','8','9','0'}; // the ascii codes for 0-9
+const uint8_t ASCIINumSymbols[] PROGMEM = {'!','\"','#','$','%','_','&','\'','(',')'};// ascii codes for weird characters above 0-9 on  typewriters.
+const uint8_t hid_arrows[] PROGMEM = {HID_KEYBOARD_SC_LEFT_ARROW,HID_KEYBOARD_SC_RIGHT_ARROW,HID_KEYBOARD_SC_UP_ARROW,HID_KEYBOARD_SC_DOWN_ARROW};
+const char str_left[] PROGMEM = "LEFT";
+const char str_right[] PROGMEM = "RIGHT";
+const char str_up[] PROGMEM = "UP";
+const char str_down[] PROGMEM = "DOWN";
+
+const char * const arrow_table[] = {str_left, str_right, str_up, str_down};
 	
 
 //messages to user are stored in program memory space, to conserve data memory (there is much more program memory than data memory)
@@ -28,15 +35,19 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Calibrating[]		PROGMEM = "CALIBRATING...\r";
 	const char Str_Type_The_Following[] PROGMEM = "TYPE THE FOLLOWING KEYS (PRESS SPACE TO SKIP)...\r";
 	const char Str_Shift_Error[]		PROGMEM = "ERROR...SHIFT MUST BE A REED SWITCH.\r";
-	const char Str_SD_Only[]			PROGMEM = " (DURING SD CARD MODE):";
-	const char Str_USB_Only[]			PROGMEM = " (DURING USB/BLUETOOTH MODE):";
+	const char Str_SD_Only[]			PROGMEM = " (DURING SD CARD MODE):\t";
+	const char Str_USB_Only[]			PROGMEM = " (DURING USB/BT MODE):   \t";
 	const char Str_Dummy_Load[]			PROGMEM = "DUMMY LOAD ACTIVATED\r";
 	const char Str_No_Dummy_Load[]		PROGMEM = "DUMMY LOAD DEACTIVATED\r";
+	const char Str_Pin_Code_Enabled[]	PROGMEM = "BLUETOOTH PIN ENABLED\r";
+	const char Str_Pin_Code_Disabled[]	PROGMEM = "BLUETOOTH PIN DISABLED\r";
 	const char Str_Quick_Calibrate[]	PROGMEM = "QUICK CALIBRATION MODE...\r";
 	const char Str_Spacebar[]			PROGMEM = "SPACEBAR";
-	const char Str_Enter[]				PROGMEM = "ENTER";
-	const char Str_Second_Enter[]		PROGMEM = "SECONDARY ENTER";
-	const char Str_Post[]				PROGMEM = "SEND";
+	const char Str_Enter[]				PROGMEM = "ENTER\t";
+	const char Str_Tab[]				PROGMEM = "TAB\t";
+	const char Str_Esc[]				PROGMEM = "ESC\t";
+	const char Str_Second_Enter[]		PROGMEM = "SECOND ENTER";
+	const char Str_Post[]				PROGMEM = "SEND\t";
 	const char Str_Backspace[]			PROGMEM = "BACKSPACE";
 	const char Str_Calibrate_Hall[]		PROGMEM = "HOLD DOWN ANY KEY TO CALIBRATE HALL EFFECT SENSOR...\r";
 	const char Str_No_Hall[]			PROGMEM = "NO HALL EFFECT SENSOR DETECTED. (NOT A PROBLEM)\r";
@@ -58,6 +69,7 @@ const uint8_t ASCIINumSymbols[] = {'!','\"','#','$','%','_','&','\'','(',')'};//
 	const char Str_Shift_Plus[] PROGMEM = "SHIFT+";
 	const char Str_Reed[] PROGMEM ="REED";
 	const char Str_Header[] PROGMEM = "\rCHAR:\tCONTACT#:\r";
+	const char Str_BT_Not_Found[] PROGMEM = "NO BLUETOOTH MODULE DETECTED...\r";
 
 void Calibrate(){
 	uint8_t ASCIIKey;
@@ -104,20 +116,22 @@ void Calibrate(){
 		Reed2Polarity= is_low(REED_2);
 		Reed3Polarity = is_low(REED_3);
 		Reed4Polarity = is_low(REED_4);
+		
+		if(!Bluetooth_Test()){ //if there is no bluetooth module, tell the user.
+			USBSendPROGString(Str_BT_Not_Found);
+			Delay_MS(2000);
+		}
+		
+		if(is_low(S3)){
+				TogglePinCodeSetting();	
+		}
+		if (is_low(S2)){//hold down to activate the dummy load
+				ToggleDummyLoad();
+		}
 
 		DetectHallSensor();
 	
-	if (is_low(S2)){//hold down to activate the dummy load
-		if (UseDummyLoad) {
-			UseDummyLoad = 0; 
-			USBSendPROGString(Str_No_Dummy_Load);
-		}
-		else {
-		UseDummyLoad = 1; 
-		USBSendPROGString(Str_Dummy_Load);
-		}
-		eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR, UseDummyLoad);
-	}
+
 	
 	USBSendPROGString(Str_Type_The_Following);
 	USBSendPROGString(Str_Header);
@@ -148,18 +162,18 @@ void Calibrate(){
 
 //--------TEACH NUMBER KEYS---------
 	for (int i = 0; i <= 9; i ++){
-			USBSend(HIDNumbers[i], LOWER);
+			USBSend(pgm_read_byte(&HIDNumbers[i]), LOWER); //numbers are saved in program space.
 			USBSend(KEY_TAB,LOWER);// used to be a colon
 			KeyPressed = WaitForKeypress();
 			Modifier = GetModifier();
 			
 			Modifier &= ~(HID_KEYBOARD_MODIFIER_LEFTSHIFT); //numbers are always lower-case (override user's shift key)
 			
-			TeachHIDKey(HIDNumbers[i], KeyPressed, Modifier); //teach the hid keycode array about this key -- must be lowercase.
+			TeachHIDKey(pgm_read_byte(&HIDNumbers[i]), KeyPressed, Modifier); //teach the hid keycode array about this key -- must be lowercase.
 			
 			if ( !(Modifier & FN_MODIFIER)) { //if the fn key is not being pressed (sd card doesn't use fn key)
-				TeachASCIIKey(ASCIINumbers[i], KeyPressed, LOWER); // and the ascii array about this key
-				TeachASCIIKey(ASCIINumSymbols[i],KeyPressed, UPPER); // and the symbols above the numbers on most typewriters, for asii (sd card) use only.
+				TeachASCIIKey(pgm_read_byte(&ASCIINumbers[i]), KeyPressed, LOWER); // and the ascii array about this key
+				TeachASCIIKey(pgm_read_byte(&ASCIINumSymbols[i]),KeyPressed, UPPER); // and the symbols above the numbers on most typewriters, for asii (sd card) use only.
 				FnKeyCodeLookUpTable[KeyPressed] = (KEY_F1+i);			}
 			
 			USBSend(KEY_ENTER,LOWER);
@@ -231,24 +245,36 @@ void Calibrate(){
 	}
 	
 //=======TEACH ARROW KEYS========
-uint8_t hid_arrows[] = {HID_KEYBOARD_SC_LEFT_ARROW,HID_KEYBOARD_SC_RIGHT_ARROW,HID_KEYBOARD_SC_UP_ARROW,HID_KEYBOARD_SC_DOWN_ARROW};
-uint8_t unicode_arrows[] = {27,26,24,25}; //corresponding unicode for the arrow keys above
+
 	
-for(int i=0;i<4;i++){
-	USBSendASCII(unicode_arrows[i]);
+for(uint8_t i=0;i<4;i++){
+	USBSendPROGString(arrow_table[i]);
 	USBSend(KEY_TAB,LOWER);// used to be a colon
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
-	TeachHIDKey(hid_arrows[i],KeyPressed,Modifier);
+	TeachHIDKey(pgm_read_byte(&hid_arrows[i]),KeyPressed,Modifier);
 	USBSend(KEY_ENTER,LOWER);
 }
 
 
 //-------TEACH VARIOUS UPPER CASE SYMBOLS ---------
+	//!
+	USBSend(KEY_1|FORCE_UPPER,UPPER);
+	USBSend(KEY_TAB,LOWER);
+	KeyPressed = WaitForKeypress();
+	Modifier = GetModifier();
+
+	if(!(Modifier&FN_MODIFIER&UPPER)){ //don't bother dealing with complicated combinations of FN and Shift to produce an !
+		TeachHIDKey(KEY_1|FORCE_UPPER,KeyPressed,Modifier);
+		TeachASCIIKey('!',KeyPressed,Modifier);
+	}
+	
+	USBSend(KEY_ENTER,LOWER);
+
+
 	//@ for sd
 	USBSend(KEY_2,UPPER);
 	USBSendPROGString(Str_SD_Only);
-	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	
@@ -273,7 +299,6 @@ for(int i=0;i<4;i++){
 	//?
 	USBSend(KEY_SLASH,UPPER);
 	USBSendPROGString(Str_SD_Only);
-	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
 	TeachASCIIKey('?',KeyPressed,Modifier);
@@ -297,18 +322,7 @@ for(int i=0;i<4;i++){
 	TeachHIDKey(KEY_SLASH|FORCE_UPPER,KeyPressed,Modifier);
 	USBSend(KEY_ENTER,LOWER);
 	
-	//!
-	USBSend(KEY_1|FORCE_UPPER,UPPER);
-	USBSend(KEY_TAB,LOWER);
-	KeyPressed = WaitForKeypress();
-	Modifier = GetModifier();
 
-	if(!(Modifier&FN_MODIFIER&UPPER)){ //don't bother dealing with complicated combinations of FN and Shift to produce an !
-		TeachHIDKey(KEY_1|FORCE_UPPER,KeyPressed,Modifier);
-		TeachASCIIKey('!',KeyPressed,Modifier);
-	}
-	 
-	USBSend(KEY_ENTER,LOWER);
 	
 	
 //------TEACH REED SWITCHES--------//
@@ -320,14 +334,42 @@ for(int i=0;i<4;i++){
 	
 }
 
+void TogglePinCodeSetting(){ //toggle the use of pin codes for bluetooth.
+		if(DisablePinCode == 0){
+			USBSendPROGString(Str_Pin_Code_Disabled);
+			DisablePinCode = 1;
+		}
+		else{
+			USBSendPROGString(Str_Pin_Code_Enabled);
+			DisablePinCode = 0;
+		}
+		eeprom_update_byte((uint8_t*)DISABLE_PIN_CODE_ADDR, DisablePinCode);
+}
+
+void ToggleDummyLoad(){
+		if (UseDummyLoad) {
+				UseDummyLoad = 0;
+				USBSendPROGString(Str_No_Dummy_Load);
+		}
+		else {
+				UseDummyLoad = 1;
+				USBSendPROGString(Str_Dummy_Load);
+		}
+		eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR, UseDummyLoad);
+}
+
 void QuickCalibrate(){
 	uint8_t KeyPressed; //
-	
-	
+
 	while(USB_DeviceState != DEVICE_STATE_Configured){;}//wait for configuration to complete
 	Delay_MS(1000);//wait 1 second.
 	
 	USBSendPROGString(Str_Quick_Calibrate);
+			
+	if(!Bluetooth_Test()){ //if there is no bluetooth module, tell the user.
+		USBSendPROGString(Str_BT_Not_Found);
+		Delay_MS(2000);
+	}
 	
 	/*Measure the reed switch polarities*/
 	Reed1Polarity = is_low(REED_1); //if reed_1 is low at start of calibration, then the polarity of reed 1 is active high
@@ -512,7 +554,7 @@ void CalibrateReeds(){
 	USBSend(KEY_ENTER,LOWER);
 	
 //------TEACH ESC KEY ----------
-	USBSendString("ESC");
+	USBSendPROGString(Str_Esc);
 	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();
@@ -521,7 +563,7 @@ void CalibrateReeds(){
 	USBSend(KEY_ENTER,LOWER);
 	
 	//------TEACH TAB KEY ---------
-	USBSendString("TAB");
+	USBSendPROGString(Str_Tab);
 	USBSend(KEY_TAB,LOWER);
 	KeyPressed = WaitForKeypress();
 	Modifier = GetModifier();

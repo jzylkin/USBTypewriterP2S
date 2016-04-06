@@ -48,6 +48,8 @@ uint8_t KeyReleaseTime;
 uint8_t KeyHoldTime;
 uint8_t ReedHoldTime;
 
+uint8_t DisablePinCode;
+
 //uint8_t BluetoothConfigured;
 
 volatile uint8_t KeyBufferMod;

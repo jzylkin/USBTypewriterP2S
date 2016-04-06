@@ -10,6 +10,8 @@
 #define CALIBRATE_H_
 
 void Calibrate();
+void TogglePinCodeSetting();
+void ToggleDummyLoad();
 void TeachHIDKey(char teachkey, int keypressed, char Modifier);
 int WaitForKeypress();
 void TeachASCIIKey(char teachkey, int keypressed, char Modifier);
