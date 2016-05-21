@@ -25,22 +25,27 @@ bool BluetoothInquire();
 void Bluetooth_Init();
 void Bluetooth_Send(uint8_t key, uint8_t modifier);
 uint8_t Get_Bluetooth_State();
+
 #define INACTIVE 0
 #define INITIALIZED 1
 
 #if MODULE_NAME==EHONG
+void Bluetooth_Send_Pin(int pin);
+void Bluetooth_Enter_Pin();
 bool Bluetooth_Send_CMD(char* command, bool verbose);
 bool Bluetooth_Send_PROGMEM_CMD(const char* progcommand, bool verbose);
 bool Get_Response(bool verbose);
 //bluetooth states for the bt_state variable
 #define BLUETOOTH_RESPONSE_DELAY 100 //delay for a little bit to make sure bluetooth has time to respond after each command --100ms recommended by makeymakey.
 #define BLUETOOTH_RESET_DELAY 500 //500ms recommended by datasheet
+void Bluetooth_Toggle_iOS_Keyboard();
 
 #elif MODULE_NAME==RN42
 bool Get_Response();
 bool Bluetooth_Send_CMD(char* command);
 bool Bluetooth_Enter_CMD_Mode();
 void Bluetooth_Exit_CMD_Mode();
+
 #define BLUETOOTH_RESPONSE_DELAY 100 //delay for a little bit to make sure bluetooth has time to respond after each command --100ms recommended by makeymakey.
 #define BLUETOOTH_RESET_DELAY 700 //500ms recommended by datasheet
 #endif //modulename

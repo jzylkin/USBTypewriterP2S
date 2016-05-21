@@ -335,15 +335,15 @@ for(uint8_t i=0;i<4;i++){
 }
 
 void TogglePinCodeSetting(){ //toggle the use of pin codes for bluetooth.
-		if(DisablePinCode == 0){
+		if(EnablePinCode == 1){
 			USBSendPROGString(Str_Pin_Code_Disabled);
-			DisablePinCode = 1;
+			EnablePinCode = 0;
 		}
 		else{
 			USBSendPROGString(Str_Pin_Code_Enabled);
-			DisablePinCode = 0;
+			EnablePinCode = 1;
 		}
-		eeprom_update_byte((uint8_t*)DISABLE_PIN_CODE_ADDR, DisablePinCode);
+		eeprom_update_byte((uint8_t*)ENABLE_PIN_CODE_ADDR, EnablePinCode);
 }
 
 void ToggleDummyLoad(){

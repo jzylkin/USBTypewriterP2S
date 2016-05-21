@@ -25,7 +25,6 @@ const char SET_FRIENDLY_NAME[] PROGMEM = "AT+NM=USB Typewriter BT";
 const char ENABLE_UI[] PROGMEM = "AT+UI=01";
 const char SET_PROXY_MODE[] PROGMEM = "AT+BP=00,00";
 const char SET_HID_PARAMS[] PROGMEM = "AT+PF=00,01,00,00,00";
-const char SET_MODULE_FEATURES[] PROGMEM = "AT+FT=FF,01,FF,10,01,010";//try it autoconnect way
 const char DISABLE_MIM[] PROGMEM = "AT+MM=00"; 
 const char ENABLE_MIM[] PROGMEM = "AT+MM=01";
 const char DISABLE_PIN[] PROGMEM = "AT+IO=03";
@@ -37,6 +36,7 @@ const char CHECK_DISCOVERABLE[] PROGMEM = "AT+MD";
 const char CONNECT_TO_PAIRED_DEVICE[] PROGMEM = "AT+CT";
 const char SEND_EMPTY_HID_REPORT[] PROGMEM = "AT+KR=A1,01,00,00,00,00,00,00,00,00";
 const char SET_BYPASS_MODE[] PROGMEM = "AT+BP=04,07,00";
+const char SET_GAP_IDENTIFICATION[] PROGMEM = "AT+GA=03C1";
 
 
 
@@ -69,6 +69,14 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 		Delay_MS(5);
 		uart_putc(0xA1);uart_putc(0x01);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);
 }
+
+//Toggle iOS virtual keyboard on and off.
+void Bluetooth_Toggle_iOS_Keyboard(){
+	uart_putc(0xA1);uart_putc(0x02);uart_putc(0x08);uart_putc(0); //this is the command to toggle a virtual keyboard.
+	Delay_MS(5);
+	uart_putc(0xA1);uart_putc(0x02);uart_putc(0);uart_putc(0);//now release the "toggle" key.
+}
+
 
 /**
  * Initialize Bluetooth 
@@ -126,15 +134,19 @@ bool Bluetooth_Configure(){
 	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE,true); //bypass channel is proxy
 	Bluetooth_Send_PROGMEM_CMD(SET_HID_PARAMS,true);//set hid parameters
 	Delay_MS(500);
+//	Bluetooth_Send_PROGMEM_CMD(SET_GAP_IDENTIFICATION,true); only for ble
 	Bluetooth_Send_PROGMEM_CMD(SET_MODULE_FEATURES,true); //configure module features (see manual):
-	if(DisablePinCode){
-		Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true); //disable man-in-middle protection.  Some android device requires it.
-		Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true);//set IO setting to display yes/no
-	}
-	else{
-		Bluetooth_Send_PROGMEM_CMD(ENABLE_PIN,true);//set IO setting to display yes/no
-		Bluetooth_Send_PROGMEM_CMD(ENABLE_MIM,true); //enable man-in-middle protection.  Some android device requires it.
-	}
+//	if(EnablePinCode){
+
+		Bluetooth_Send_CMD("AT+IO=02",true); // 00 is display only. 01 is display y/n. 02 is kb. 03 is no display
+		Bluetooth_Send_CMD("AT+MM=00",true); //00 is no mim.  01 is mim.
+		Bluetooth_Send_CMD("AT+CD=000540",true);
+		Bluetooth_Send_CMD("AT+MT=01",true); //force bt master mode
+//	}
+//	else{
+//		Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true);//set IO setting to display yes/no
+//		Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true); //enable man-in-middle protection.  Some android device requires it.
+//	}
 	Bluetooth_Send_PROGMEM_CMD(DISABLE_SLEEP,true);//no sleep mode.
 	
 	
@@ -148,6 +160,9 @@ bool Bluetooth_Configure(){
 	This command is only needed when the first time use this Bluetooth module.*/
 	
 	Bluetooth_Send_PROGMEM_CMD(CLEAR_PAIRED_LIST,true); //clear paired device list, which forces the device to go into discovery mode.
+
+	set_low(RED_LED);
+	Bluetooth_Enter_Pin(); //as a final step of configuration, enter pin to host.
 	
 	Bluetooth_Exit_Proxy_Mode();//enter bypass mode
 	
@@ -302,6 +317,31 @@ bool Bluetooth_Connect(){
 	Bluetooth_Exit_Proxy_Mode();
 	return true;
 }
+
+void Bluetooth_Send_Pin(int pin){
+	sprintf(cmd_buffer,"AT+PK=%06x",pin);
+	Bluetooth_Send_CMD(cmd_buffer,true);
+}
+
+void Bluetooth_Enter_Pin(){
+	uint32_t pin = 0;
+	uint8_t key = 0 ;
+	uint8_t code = 0;
+	uint32_t pinplace = 100000;
+	while(pinplace){
+		key = GetKey();
+		code = GetASCIIKeyCode(key, LOWER);
+		if (code == 'l'){code = '1';} //lower case L is a 1.
+		if(code)
+		{
+			code = code - '0'; //code number is converted from ascii to decimal by subtracting ascii 0.
+			pin = pin + (pinplace*code);
+			pinplace = pinplace / 10;
+		}
+	}
+	Bluetooth_Send_Pin(pin);
+}
+
 
 #elif MODULE_NAME==RN42
 /**
@@ -578,6 +618,8 @@ bool Get_Response(){
 uint8_t Get_Bluetooth_State(){
 	return BT_State;
 }
+
+
 
 
 

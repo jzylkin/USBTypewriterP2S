@@ -38,8 +38,7 @@
 
 		//document the firmware version and bluetooth module version on the following two lines: choices for module_name are "RN42" or "EHONG"
 		
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.4.8" //EH identifies this as the version for E-HONG bluetooth modules. RN is RN42
-		#define		MODULE_NAME			EHONG
+		#define		MODULE_NAME			EHONG //the module name can be either EHONG or RN42
 
 		
 //		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
@@ -128,7 +127,7 @@
 		#define DEFAULT_MODE_ADDR 0x20D
 		#define REEDS_INDEPENDENT_ADDR 0x20E
 		#define DUMMY_LOAD_ADDR 0x20F
-		#define DISABLE_PIN_CODE_ADDR 0x210
+		#define ENABLE_PIN_CODE_ADDR 0x210
 		#define EEP_BANK2_END 0x211
 		
 		#define EEP_CHECKSUM_ADDR 0x3FF

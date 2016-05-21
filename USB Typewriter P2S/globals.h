@@ -29,7 +29,7 @@ extern uint8_t HallSensorPolarity;
 extern bool Hold_Alt_Down;
 //extern uint8_t BluetoothConfigured;
 
-extern uint8_t DisablePinCode;
+extern uint8_t EnablePinCode;
 
 extern bool Reed1Polarity;
 extern bool Reed2Polarity;

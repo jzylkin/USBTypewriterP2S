@@ -48,7 +48,7 @@ uint8_t KeyReleaseTime;
 uint8_t KeyHoldTime;
 uint8_t ReedHoldTime;
 
-uint8_t DisablePinCode;
+uint8_t EnablePinCode;
 
 //uint8_t BluetoothConfigured;
 
@@ -215,40 +215,40 @@ int main(void)
 					
 					if(Get_Bluetooth_State() != INITIALIZED){Bluetooth_Init();};//initialize bluetooth if it hasn't been already. this sets up proxy mode, too.
 					if(UseDummyLoad){set_low(DUMMY_LOAD);configure_as_output(DUMMY_LOAD);}
-				
-				while(is_low(BT_CONNECTED)){
+
+				while(is_low(BT_CONNECTED)){	
 					set_low(RED_LED);
 					set_high(GREEN_LED);
 					#if MODULE_NAME==EHONG
-					
-						Bluetooth_Connect();
-						for (int i=0; i<=1000; i++){
-							Delay_MS(10); //10 seconds between connection attempts
-							if (is_high(BT_CONNECTED)){break;} //break FOR loop
-						}
-				
+					Bluetooth_Connect();
+					for (int i=0; i<=1000; i++){//10 seconds between connection attempts
+						Delay_MS(10); //poll connection status every 10ms.
+						if (is_high(BT_CONNECTED)){break;} //break FOR loop
+					}
 					#endif
-				}//wait for connection to happen, glow red until then.
-				
-				set_high(RED_LED);//turn off red led if bt is connected.
-				set_low(GREEN_LED);
-				
+				}
+					
 				#if MODULE_NAME==EHONG
-				Bluetooth_Send(0,0); //clear off keyboard report.
 				#endif
-				
+
+				//wait for connection to happen, glow red until then.
 				while(is_high(BT_CONNECTED)){
+					set_high(RED_LED);
+					set_low(GREEN_LED);
+
 					key = GetKey();
 					modifier = GetModifier();
 									
 					code = GetHIDKeyCode(key, &modifier);
 					
-					if(code){
+					if(code == KEY_ESC){
+						Bluetooth_Toggle_iOS_Keyboard();
+					}
+					else if(code){
 						Bluetooth_Send(code,modifier);
 					}
 						
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
-					
 				}
 			
 			break;

@@ -283,7 +283,7 @@ void LoadEepromParameters(){
 	 Shift_Reed = eeprom_read_byte((uint8_t *)SHIFT_REED_ADDR);
 	 Reeds_Are_Independent = eeprom_read_byte((uint8_t *)REEDS_INDEPENDENT_ADDR);
 	 UseDummyLoad = eeprom_read_byte((uint8_t*)DUMMY_LOAD_ADDR);
-	 DisablePinCode = eeprom_read_byte((uint8_t*)DISABLE_PIN_CODE_ADDR);
+	 EnablePinCode = eeprom_read_byte((uint8_t*)ENABLE_PIN_CODE_ADDR);
 //	 BluetoothConfigured = eeprom_read_byte((uint8_t*)BLUETOOTH_CONFIGURED_ADDR);
 }
 
@@ -326,7 +326,7 @@ void RestoreFactoryDefaults(){
 			eeprom_update_byte((uint8_t*)DUMMY_LOAD_ADDR,0); //do not use dummy load unless told to.
 			eeprom_write_word((uint16_t *)FILENUM_ADDR,0);//reset sd card file number to zero.
 //			eeprom_write_byte((uint8_t*)USE_HALL_SENSOR_ADDR,HALL_NOT_PRESENT); //dont change hall sensor when resetting defaults.
-			eeprom_update_byte((uint8_t*)DISABLE_PIN_CODE_ADDR,0);// do not disable pin code by default
+			eeprom_update_byte((uint8_t*)ENABLE_PIN_CODE_ADDR,0);// do not enable pin code by default
 			
 			LoadEepromParameters(); //load new defaults into RAM
 }
