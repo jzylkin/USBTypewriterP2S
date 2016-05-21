@@ -229,6 +229,8 @@ int main(void)
 				}
 					
 				#if MODULE_NAME==EHONG
+//				Bluetooth_Send(0,0); //clear off keyboard report.
+//				Bluetooth_Toggle_iOS_Keyboard();//toggle the onscreen keyboard.
 				#endif
 
 				//wait for connection to happen, glow red until then.

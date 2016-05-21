@@ -25,6 +25,7 @@ const char SET_FRIENDLY_NAME[] PROGMEM = "AT+NM=USB Typewriter BT";
 const char ENABLE_UI[] PROGMEM = "AT+UI=01";
 const char SET_PROXY_MODE[] PROGMEM = "AT+BP=00,00";
 const char SET_HID_PARAMS[] PROGMEM = "AT+PF=00,01,00,00,00";
+const char SET_MODULE_FEATURES[] PROGMEM = "AT+FT=FF,01,FF,10,01,0100"; //controls autoconnect, auto-discoverable, and discovery timeout.
 const char DISABLE_MIM[] PROGMEM = "AT+MM=00"; 
 const char ENABLE_MIM[] PROGMEM = "AT+MM=01";
 const char DISABLE_PIN[] PROGMEM = "AT+IO=03";
