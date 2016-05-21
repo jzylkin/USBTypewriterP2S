@@ -139,8 +139,6 @@ Discarded input sections
  .text.BT_Sleep
                 0x00000000       0x1a Bluetooth.o
  .text.BT_Wake  0x00000000       0x18 Bluetooth.o
- .progmem.data.SET_GAP_IDENTIFICATION
-                0x00000000        0xb Bluetooth.o
  .progmem.data.SEND_EMPTY_HID_REPORT
                 0x00000000       0x24 Bluetooth.o
  .progmem.data.ENABLE_SLEEP
