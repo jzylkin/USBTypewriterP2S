@@ -48,9 +48,7 @@ uint8_t KeyReleaseTime;
 uint8_t KeyHoldTime;
 uint8_t ReedHoldTime;
 
-uint8_t EnablePinCode;
-
-//uint8_t BluetoothConfigured;
+uint8_t EnablePinCode = 1;
 
 volatile uint8_t KeyBufferMod;
 
@@ -227,26 +225,27 @@ int main(void)
 					}
 					#endif
 				}
-					
+				set_high(RED_LED);
+				set_low(GREEN_LED);
+
 				#if MODULE_NAME==EHONG
-//				Bluetooth_Send(0,0); //clear off keyboard report.
-//				Bluetooth_Toggle_iOS_Keyboard();//toggle the onscreen keyboard.
+				Bluetooth_Send(0,0); //clear off keyboard report.
+				Bluetooth_Toggle_iOS_Keyboard();
 				#endif
 
 				//wait for connection to happen, glow red until then.
 				while(is_high(BT_CONNECTED)){
-					set_high(RED_LED);
-					set_low(GREEN_LED);
+
 
 					key = GetKey();
 					modifier = GetModifier();
 									
 					code = GetHIDKeyCode(key, &modifier);
 					
-					if(code == KEY_ESC){
-						Bluetooth_Toggle_iOS_Keyboard();
-					}
-					else if(code){
+	//				if(code == KEY_ESC){
+	//					Bluetooth_Toggle_iOS_Keyboard();
+	//				}
+					if(code){
 						Bluetooth_Send(code,modifier);
 					}
 						
@@ -329,6 +328,7 @@ bool WaitForEnumeration(){
 /** Configures the board hardware and chip peripherals for functionality. */
 void SetupHardware()
 {
+	UHWCON |=  (1 << UVREGE);
 
 	/* Disable watchdog if enabled by bootloader/fuses */
 	MCUSR &= ~(1 << WDRF);
@@ -353,13 +353,13 @@ void SetupHardware()
 	Reed2Polarity= eeprom_read_byte((uint8_t *)REED_2_POLARITY_ADDR);
 	Reed3Polarity = eeprom_read_byte((uint8_t *)REED_3_POLARITY_ADDR);
 	Reed4Polarity = eeprom_read_byte((uint8_t *)REED_4_POLARITY_ADDR);
+   
 	
 }
 
 /** Event handler for the library USB Connection event. */
 void EVENT_USB_Device_Connect(void)
 {
-
 
 }
 

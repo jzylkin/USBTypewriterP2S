@@ -122,9 +122,6 @@ void Calibrate(){
 			Delay_MS(2000);
 		}
 		
-		if(is_low(S3)){
-				TogglePinCodeSetting();	
-		}
 		if (is_low(S2)){//hold down to activate the dummy load
 				ToggleDummyLoad();
 		}
@@ -332,18 +329,6 @@ for(uint8_t i=0;i<4;i++){
 	
 	USBSendPROGString(Str_Settings_Saved);
 	
-}
-
-void TogglePinCodeSetting(){ //toggle the use of pin codes for bluetooth.
-		if(EnablePinCode == 1){
-			USBSendPROGString(Str_Pin_Code_Disabled);
-			EnablePinCode = 0;
-		}
-		else{
-			USBSendPROGString(Str_Pin_Code_Enabled);
-			EnablePinCode = 1;
-		}
-		eeprom_update_byte((uint8_t*)ENABLE_PIN_CODE_ADDR, EnablePinCode);
 }
 
 void ToggleDummyLoad(){

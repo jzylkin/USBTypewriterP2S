@@ -30,7 +30,7 @@ uint8_t Get_Bluetooth_State();
 #define INITIALIZED 1
 
 #if MODULE_NAME==EHONG
-void Bluetooth_Send_Pin(int pin);
+void Bluetooth_Send_Pin(uint32_t pin);
 void Bluetooth_Enter_Pin();
 bool Bluetooth_Send_CMD(char* command, bool verbose);
 bool Bluetooth_Send_PROGMEM_CMD(const char* progcommand, bool verbose);

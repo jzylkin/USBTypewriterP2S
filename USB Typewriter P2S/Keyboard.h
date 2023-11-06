@@ -38,7 +38,7 @@
 
 		//document the firmware version and bluetooth module version on the following two lines: choices for module_name are "RN42" or "EHONG"
 		
-		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.5.0" //bugfix of iphone
+		#define		FIRMWARE_VERSION	"FIRMWARE VER 5.7.0" 
 		#define		MODULE_NAME			EHONG //the module name can be either EHONG or RN42
 
 		

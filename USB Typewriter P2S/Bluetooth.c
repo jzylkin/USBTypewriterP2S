@@ -13,7 +13,7 @@
 uint8_t BT_State; //BT state is "inactive" by default
 
 #if MODULE_NAME==EHONG
-#define response_buffer_len 32
+#define response_buffer_len 60
 char response[response_buffer_len]; //array to store bluetooth module's responses to commands
 
 
@@ -24,12 +24,15 @@ char cmd_buffer[] = "AT+KR=A1,01,00,00,00,00,00,00,00,00";
 const char SET_FRIENDLY_NAME[] PROGMEM = "AT+NM=USB Typewriter BT";
 const char ENABLE_UI[] PROGMEM = "AT+UI=01";
 const char SET_PROXY_MODE[] PROGMEM = "AT+BP=00,00";
-const char SET_HID_PARAMS[] PROGMEM = "AT+PF=00,01,00,00,00";
+const char SET_HID_PARAMS[] PROGMEM = "AT+PF=00,01,00";
+const char SET_BAUD_RATE[] PROGMEM = "AT+BR=0B";
 const char SET_MODULE_FEATURES[] PROGMEM = "AT+FT=FF,01,FF,10,01,0100"; //controls autoconnect, auto-discoverable, and discovery timeout.
 const char DISABLE_MIM[] PROGMEM = "AT+MM=00"; 
-const char ENABLE_MIM[] PROGMEM = "AT+MM=01";
+const char ENABLE_MIM[] PROGMEM = "AT+MM=02";
 const char DISABLE_PIN[] PROGMEM = "AT+IO=03";
 const char ENABLE_PIN[] PROGMEM = "AT+IO=01";
+const char SET_BT_COD[] PROGMEM = "AT+CD=000540";
+const char DISABLE_MASTERSHIP[] PROGMEM = "AT+MT=00";
 const char CLEAR_PAIRED_LIST[] PROGMEM = "AT+CP";
 const char ENABLE_SLEEP[] PROGMEM = "AT+SP=01";
 const char DISABLE_SLEEP[] PROGMEM = "AT+SP=00";
@@ -37,6 +40,9 @@ const char CHECK_DISCOVERABLE[] PROGMEM = "AT+MD";
 const char CONNECT_TO_PAIRED_DEVICE[] PROGMEM = "AT+CT";
 const char SEND_EMPTY_HID_REPORT[] PROGMEM = "AT+KR=A1,01,00,00,00,00,00,00,00,00";
 const char SET_BYPASS_MODE[] PROGMEM = "AT+BP=04,07,00";
+
+const char CHANGE_BAUD_RATE_MESSAGE[] PROGMEM = "CHANGING BAUD";
+const char SENDING_MESSAGE[] PROGMEM = "SENDING";
 //const char SET_GAP_IDENTIFICATION[] PROGMEM = "AT+GA=03C1";
 
 
@@ -67,8 +73,10 @@ void Bluetooth_Send(uint8_t key, uint8_t modifier){
 		}
 	
 		uart_putc(0xA1);uart_putc(0x01);uart_putc(modifier);uart_putc(0);uart_putc(key);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);
-		Delay_MS(5);
+		Delay_MS(1);
 		uart_putc(0xA1);uart_putc(0x01);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);uart_putc(0);
+		
+		Get_Response(false);
 }
 
 //Toggle iOS virtual keyboard on and off.
@@ -76,6 +84,8 @@ void Bluetooth_Toggle_iOS_Keyboard(){
 	uart_putc(0xA1);uart_putc(0x02);uart_putc(0x08);uart_putc(0); //this is the command to toggle a virtual keyboard.
 	Delay_MS(5);
 	uart_putc(0xA1);uart_putc(0x02);uart_putc(0);uart_putc(0);//now release the "toggle" key.
+	Get_Response(true);
+
 }
 
 
@@ -86,6 +96,7 @@ void Bluetooth_Toggle_iOS_Keyboard(){
  * \return void
  */
 void Bluetooth_Init(){
+	uart_clear_rx_buffer();
 	uart_init(UART_BAUD_SELECT(9600,F_CPU));//reinitialize uart to 9600 baud
 	
 	Bluetooth_Reset(); //reset the module
@@ -94,15 +105,32 @@ void Bluetooth_Init(){
 	bool btbaudis9600 = Get_Response(true); //getresponse will only be intelligible if baud is 9600 still, because Atmega's baud rate is still 9600
 
 	if(btbaudis9600){ //if bt module still has baud 9600, change it to 57600
+		#ifdef BT_DEBUG
+			USBSendPROGString(CHANGE_BAUD_RATE_MESSAGE);
+		#endif
 		Bluetooth_Enter_Proxy_Mode();
-		Bluetooth_Send_CMD("AT+BR=0B",false);//change baud rate to 57600 if 
+		for (int i=0; i<10; i++)
+		{
+			if (Bluetooth_Send_PROGMEM_CMD(SET_BAUD_RATE, true)){break;}
+			Delay_MS(100);
+		} 
+
 		Delay_MS(100); //delay necessary for command to send before re-initializing uart.
 		uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+
 		Bluetooth_Exit_Proxy_Mode();
 		Delay_MS(100);
 	}
-	
+
 	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+
+	uart_clear_rx_buffer();
+	Bluetooth_Reset(); //reset the module
+	Delay_MS(1500);
+	Get_Response(true);
 
 	BT_State = INITIALIZED;
 }
@@ -124,47 +152,59 @@ bool Bluetooth_Configure(){
 	#ifdef BT_DEBUG
 		while(USB_DeviceState != DEVICE_STATE_Configured){;} //usb must be connected for debug to work
 		Delay_MS(500);
-		USBSendString("BT DEBUG MODE");
+//		USBSendString("BT DEBUG MODE");
 	#endif
 	
 	Bluetooth_Init();
 	
 	Bluetooth_Enter_Proxy_Mode();
-	success &= Bluetooth_Send_PROGMEM_CMD(ENABLE_UI,true); //enable responses from bluetooth module -- if response is "OK" then bluetooth module is present and responsive.		
-	Bluetooth_Send_PROGMEM_CMD(SET_FRIENDLY_NAME,true); //set friendly name
-	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE,true); //bypass channel is proxy
-	Bluetooth_Send_PROGMEM_CMD(SET_HID_PARAMS,true);//set hid parameters
-	Delay_MS(500);
-//	Bluetooth_Send_PROGMEM_CMD(SET_GAP_IDENTIFICATION,true); only for ble
-	Bluetooth_Send_PROGMEM_CMD(SET_MODULE_FEATURES,true); //configure module features (see manual):
-//	if(EnablePinCode){
 
-		Bluetooth_Send_CMD("AT+IO=02",true); // 00 is display only. 01 is display y/n. 02 is kb. 03 is no display
-		Bluetooth_Send_CMD("AT+MM=00",true); //00 is no mim.  01 is mim.
-		Bluetooth_Send_CMD("AT+CD=000540",true);
-		Bluetooth_Send_CMD("AT+MT=01",true); //force bt master mode
-//	}
-//	else{
-//		Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true);//set IO setting to display yes/no
-//		Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true); //enable man-in-middle protection.  Some android device requires it.
-//	}
-	Bluetooth_Send_PROGMEM_CMD(DISABLE_SLEEP,true);//no sleep mode.
+    //enable responses from bluetooth module -- if response is "OK" then bluetooth module is present and responsive.
+	int attempts = 10;
+	while(attempts > 0 && !Bluetooth_Send_PROGMEM_CMD(ENABLE_UI,true)) {
+	  attempts--;
+	  Delay_MS(100);
+	}
+	success = (attempts != 0);
 	
-	
- //
-	/*enable the auto connection after power on as permanent mode;
-	enable the auto connect after paired; -- was disabled by default.
-	enable auto reconnect after link lost as permanent mode;
-	set the interval of auto reconnect to 5s.
-	configure the discover mode as 01: auto discoverable when empty.
-	configure the timeout of discoverable as 600 seconds (10 min).
-	This command is only needed when the first time use this Bluetooth module.*/
-	
-	Bluetooth_Send_PROGMEM_CMD(CLEAR_PAIRED_LIST,true); //clear paired device list, which forces the device to go into discovery mode.
+	if (success)
+	{
+		Bluetooth_Send_PROGMEM_CMD(SET_HID_PARAMS,true);//set hid parameters
+		Delay_MS(1000); // Delay to allow for reboot.
 
-	set_low(RED_LED);
-	Bluetooth_Enter_Pin(); //as a final step of configuration, enter pin to host.
+		Bluetooth_Send_PROGMEM_CMD(SET_FRIENDLY_NAME,true); //set friendly name
+	//	Bluetooth_Send_PROGMEM_CMD(SET_GAP_IDENTIFICATION,true); only for ble
+		Bluetooth_Send_PROGMEM_CMD(SET_MODULE_FEATURES,true); //configure module features (see manual):
+		
+		if(EnablePinCode){
+			// These two settings together enable "auto-confirmation" of MIM challenge by the module.
+			Bluetooth_Send_PROGMEM_CMD(ENABLE_PIN, true);
+			Bluetooth_Send_PROGMEM_CMD(ENABLE_MIM, true);
+		}
+		else{
+			Bluetooth_Send_PROGMEM_CMD(DISABLE_MIM,true); 
+			Bluetooth_Send_PROGMEM_CMD(DISABLE_PIN,true);
+
+		}
+		Bluetooth_Send_PROGMEM_CMD(SET_BT_COD,true);
+		Bluetooth_Send_PROGMEM_CMD(DISABLE_MASTERSHIP,true); //select bt master/slave mode
+
+		Bluetooth_Send_PROGMEM_CMD(DISABLE_SLEEP,true);//no sleep mode.
+
+	 //
+		/*enable the auto connection after power on as permanent mode;
+		enable the auto connect after paired; -- was disabled by default.
+		enable auto reconnect after link lost as permanent mode;
+		set the interval of auto reconnect to 5s.
+		configure the discover mode as 01: auto discoverable when empty.
+		configure the timeout of discoverable as 600 seconds (10 min).
+		This command is only needed when the first time use this Bluetooth module.*/
 	
+		Bluetooth_Send_PROGMEM_CMD(CLEAR_PAIRED_LIST,true); //clear paired device list, which forces the device to go into discovery mode.
+
+	//	set_low(RED_LED);
+	//	Bluetooth_Enter_Pin(); //as a final step of configuration, enter pin to host.
+	}
 	Bluetooth_Exit_Proxy_Mode();//enter bypass mode
 	
 	return success; //if any of the commands failed, success will be false.
@@ -184,7 +224,9 @@ bool Bluetooth_Send_CMD(char* command, bool verbose){
 	
 	uart_clear_rx_buffer();
 	#ifdef BT_DEBUG
-	if(verbose){USBSendString("sending command\n");}
+	if(verbose){USBSendString("snd ");}
+    if(verbose){USBSendString(command);}
+	if(verbose){USBSendString("\n");}
 	#endif
 	
 	while (command[i] != '\0'){//loop until end of string
@@ -202,14 +244,12 @@ bool Bluetooth_Send_CMD(char* command, bool verbose){
 bool Bluetooth_Send_PROGMEM_CMD(const char* progcommand, bool verbose){
 		strcpy_P(StringBuffer, (char*) progcommand);
 		return Bluetooth_Send_CMD(StringBuffer,verbose);
-
-\
 }
 
 	
 void Bluetooth_Reset(){
 	set_low(BT_RESET);//reset the bluetooth module
-	Delay_MS(50); //hold in reset for 50ms
+	Delay_MS(75); //hold in reset for 50ms
 	set_high(BT_RESET); //reactivate bluetooth module
 	Delay_MS(BLUETOOTH_RESET_DELAY);//takes 500ms from power on for module to be able to receive commands.
 	
@@ -220,12 +260,12 @@ void Bluetooth_Reset(){
 
 void Bluetooth_Enter_Proxy_Mode(){
 	Delay_MS(1000);
-	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE,false);
-	Delay_MS(1000);
+	Bluetooth_Send_PROGMEM_CMD(SET_PROXY_MODE,true);
+	Delay_MS(2000);
 }
 
 void Bluetooth_Exit_Proxy_Mode(){
-	Bluetooth_Send_PROGMEM_CMD(SET_BYPASS_MODE,false);
+	Bluetooth_Send_PROGMEM_CMD(SET_BYPASS_MODE,true);
 }
 
 bool Get_Response(bool verbose){
@@ -237,7 +277,7 @@ bool Get_Response(bool verbose){
 		response[2] = '\0';
 		response[4] = '\0';
 	
-		for(uint8_t i=0; i<response_buffer_len; i++){
+		for(uint8_t i=0; i<response_buffer_len ; i++){
 			tmpchar = uart_getc();
 			if ((tmpchar & 0xFF00) != 0){ //check upper byte of getc for error code -- most commonly this would be "buffer empty"
 				response[i]='\0'; //mark the string as having ended.
@@ -256,7 +296,7 @@ bool Get_Response(bool verbose){
 			USBSendString(response);
 		#endif
 		
-		if ((response[0] == 'O')||(response[2] == '=')||(response[0] == 'C')){  //if response is "OK" or "XX=...", or "Copyright" bt module has received command successfully
+		if ((response[0] == 'O')||(response[2] == '=')||(response[0] == 'C')||(response[0] == 'B')){  //if response is "OK" or "XX=...", or "Copyright" or "BLUETOOTH" bt module has received command successfully
 			return true;
 		}
 		else{
@@ -317,11 +357,6 @@ bool Bluetooth_Connect(){
 	
 	Bluetooth_Exit_Proxy_Mode();
 	return true;
-}
-
-void Bluetooth_Send_Pin(int pin){
-	sprintf(cmd_buffer,"AT+PK=%06x",pin);
-	Bluetooth_Send_CMD(cmd_buffer,true);
 }
 
 void Bluetooth_Enter_Pin(){

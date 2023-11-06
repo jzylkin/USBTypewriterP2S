@@ -27,7 +27,6 @@ extern uint8_t Shift_Reed;
 extern uint8_t UseHallSensor; 
 extern uint8_t HallSensorPolarity;
 extern bool Hold_Alt_Down;
-//extern uint8_t BluetoothConfigured;
 
 extern uint8_t EnablePinCode;
 

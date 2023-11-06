@@ -4,6 +4,12 @@
               
   dean [at] fourwalledcubicle [dot] com
       www.fourwalledcubicle.com
+
+Modified by Jack Zylkin for the USB Typewriter project.
+ Copyright (C) Jack Zylkin 2015.
+www.usbtypewriter.com
+jack [at] usbtypewriter.com
+
 */
 
 /*
