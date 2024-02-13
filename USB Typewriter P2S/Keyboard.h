@@ -42,7 +42,7 @@
 		#define		MODULE_NAME			EHONG //the module name can be either EHONG or RN42
 
 		
-//		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
+		#define		BT_DEBUG  //define BT_DEBUG to relay bluetooth module UART conversations over usb.
 	
 		#if				MODULE_NAME==RN42
 		#define			MODULE_STR ".RN"

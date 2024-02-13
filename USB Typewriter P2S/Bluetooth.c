@@ -97,13 +97,15 @@ void Bluetooth_Toggle_iOS_Keyboard(){
  */
 void Bluetooth_Init(){
 	uart_clear_rx_buffer();
-	uart_init(UART_BAUD_SELECT(9600,F_CPU));//reinitialize uart to 9600 baud
+	
+	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(115200,F_CPU));//reinitialize uart to 9600 baud
 	
 	Bluetooth_Reset(); //reset the module
 	Delay_MS(1000);
 	
 	bool btbaudis9600 = Get_Response(true); //getresponse will only be intelligible if baud is 9600 still, because Atmega's baud rate is still 9600
 
+/*
 	if(btbaudis9600){ //if bt module still has baud 9600, change it to 57600
 		#ifdef BT_DEBUG
 			USBSendPROGString(CHANGE_BAUD_RATE_MESSAGE);
@@ -121,11 +123,11 @@ void Bluetooth_Init(){
 		Bluetooth_Exit_Proxy_Mode();
 		Delay_MS(100);
 	}
-
-	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
-	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
-	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
-	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+*/
+//	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+//	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+//	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
+//	uart_init(UART_BAUD_SELECT(57600,F_CPU));//reinitialize uart to match the BT module's baud rate.
 
 	uart_clear_rx_buffer();
 	Bluetooth_Reset(); //reset the module
@@ -226,7 +228,7 @@ bool Bluetooth_Send_CMD(char* command, bool verbose){
 	#ifdef BT_DEBUG
 	if(verbose){USBSendString("snd ");}
     if(verbose){USBSendString(command);}
-	if(verbose){USBSendString("\n");}
+	if(verbose){USBSendString("\r\n");}
 	#endif
 	
 	while (command[i] != '\0'){//loop until end of string
@@ -271,7 +273,7 @@ void Bluetooth_Exit_Proxy_Mode(){
 bool Get_Response(bool verbose){
 	uint16_t tmpchar;
 	if(verbose){
-		Delay_MS(BLUETOOTH_RESPONSE_DELAY); //wait for the response to be sent.
+		Delay_MS(2000); //wait for the response to be sent.
 		response[0] = '\0'; //clear response string
 		response[1] = '\0';
 		response[2] = '\0';
@@ -300,7 +302,12 @@ bool Get_Response(bool verbose){
 			return true;
 		}
 		else{
-			return false;
+
+					#ifdef BT_DEBUG
+					USBSendString(" N\n");
+					#endif
+					
+								return false;
 		}
 	}
 	else{
