@@ -194,7 +194,7 @@
 		#define BT_SLEEP_TIMEOUT_S  (uint16_t)6000 //how many seconds to wait without any input before sleeping bluetooth (10 min)
 		#define BT_SLEEP_TIMEOUT (uint16_t)BT_SLEEP_TIMEOUT_S*100
 		
-		#define STRING_SEND_DELAY 50
+		#define STRING_SEND_DELAY 20 // TODO: Should be slower like 50Bluetooth_Enter_Proxy_Mode
 		
 		/** Indicates if the disk is write protected or not. */
 		#define DISK_READ_ONLY           false

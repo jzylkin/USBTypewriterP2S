@@ -225,6 +225,8 @@ int main(void)
 					}
 					#endif
 				}
+				
+				Delay_MS(10000); // TODO: REMOVE THIS DELAY
 				set_high(RED_LED);
 				set_low(GREEN_LED);
 
@@ -233,21 +235,24 @@ int main(void)
 				Bluetooth_Toggle_iOS_Keyboard();
 				#endif
 
+			
 				//wait for connection to happen, glow red until then.
-				while(is_high(BT_CONNECTED)){
-
-
+				// TODO: Reenable
+				//while(is_high(BT_CONNECTED)){
+				while(1){
+					/* RE-ENABLE THIS FOR NORMAL USE
 					key = GetKey();
 					modifier = GetModifier();
+					*/
 									
-					code = GetHIDKeyCode(key, &modifier);
+					//code = GetHIDKeyCode(key, &modifier);
 					
 	//				if(code == KEY_ESC){
 	//					Bluetooth_Toggle_iOS_Keyboard();
 	//				}
-					if(code){
-						Bluetooth_Send(code,modifier);
-					}
+						Bluetooth_Send(05,0);
+						USBSendString("well");
+						Delay_MS(2000);
 						
 					Delay_MS(SENSE_DELAY);//perform this loop every X ms.
 				}
@@ -515,7 +520,7 @@ void Init_Mode(){
 					#endif
 					
 					#if MODULE_NAME==EHONG //ehong module requires you to manually clear the pairing list to enter inquiry mode
-					BluetoothInquire();//clear paired device list and try to pair.
+					//BluetoothInquire();//clear paired device list and try to pair.
 					#endif
 					
 					Typewriter_Mode = BLUETOOTH_MODE;

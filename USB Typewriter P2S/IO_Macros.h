@@ -116,8 +116,8 @@
 #define BT_CTS					PE6
 #define BT_CTS_PORT				PORTE
 
-#define BT_RTS					PF0
-#define BT_RTS_PORT				PORTF
+#define BT_AT_MODE				PF0
+#define BT_AT_MODE_PORT	        PORTF
 
 #define LED1					PC6
 #define LED1_PORT				PORTC

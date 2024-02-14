@@ -81,6 +81,9 @@ void Config_IO(){
 	set_high(BT_CTS);
 	configure_as_output(BT_CTS);
 	
+	set_high(BT_AT_MODE);
+	configure_as_output(BT_AT_MODE);
+	
 	set_high(LED1);
 	configure_as_output(LED1);
 	
